@@ -2,7 +2,7 @@ import { makeStyles } from "@material-ui/core";
 import anime from "animejs";
 import clsx from "clsx";
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = (alt) => makeStyles((theme) => ({
     root: {
         border: "none",
         backgroundPositionY: "2vh",
@@ -14,14 +14,14 @@ const useStyles = makeStyles((theme) => ({
         outline: "none",
         height: "10vh",
         width: "50%",
-        background: "url('/images/Button.png')",
+        background: alt ? "url('/images/Button-alt.png')" : "url('/images/Button.png')",
         backgroundRepeat: "no-repeat",
         backgroundSize: "contain"
     }
 }));
 
 const CIButton = (props) => {
-    const cls = useStyles();
+    const cls = useStyles(props.alt)();
 
     const buttonId = "button" + anime.random(1, 100);
 

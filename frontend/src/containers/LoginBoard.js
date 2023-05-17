@@ -1,7 +1,8 @@
 import { useContext, useEffect, useState } from "react";
-import { Grid, makeStyles } from "@material-ui/core";
+import { makeStyles } from "@material-ui/core";
 import { useHistory } from "react-router-dom";
 import { AppContext } from "../App";
+import { showReadingPane } from "../libs/animations";
 import CIButton from "../shared/CIButton";
 import CIInput from "../shared/CIInput";
 import CILabel from "../shared/CILabel";
@@ -13,9 +14,8 @@ const useStyles = makeStyles({
         position: "absolute",
         top: "3%",
         left: "110%",
-        width: "30vw",
         height: "94vh",
-        padding: "20px",
+        width: "30vw",
         background: "url('/images/Board.png')",
         backgroundRepeat: "no-repeat",
         backgroundSize: "100% 100%"
@@ -37,54 +37,90 @@ const useStyles = makeStyles({
         transform: "scale(0)"
     },
     header: {
-        height: "11vh",
-        marginTop: "9vh",
-        marginLeft: "3.8vw",
-        padding: "0px 14px",
+        cursor: "pointer",
+        marginTop: "18.4%",
+        marginLeft: "18.4%",
+        height: "10vh",
+        width: "75vw",
         background: "url('/images/Header.png')",
+        backgroundRepeat: "no-repeat",
+        backgroundSize: "contain"
+    },
+    title: {
+        "&#sign-up": {
+            marginLeft: "38.5%"
+        },
+        position: "absolute",
+        marginTop: "4%",
+        marginLeft: "11.5%",
+        cursor: "pointer",
+        fontSize: "3.3vh",
+        textAlign: "center"
+    },
+    tab: {
+        position: "absolute",
+        top: "11.1%",
+        left: "14.3%",
+        height: "10vh",
+        width: "10vw",
+        background: "url('/images/Switch.png')",
         backgroundRepeat: "no-repeat",
         backgroundSize: "contain"
     },
     body: {
         position: "relative",
         height: "61vh",
-        marginLeft: "1.4vw",
+        marginLeft: "8%",
+        marginRight: "4%",
         overflow: "hidden",
         textAlign: "center"
     },
     signInSection: {
         "& button": {
-            marginTop: "1vh"
+            marginTop: "1vh",
+            marginLeft: "1%"
         },
         "& input": {
             marginTop: "0.7vh"
         },
         "& label": {
             "&:nth-child(5)": {
-                marginTop: "5.6vh"
+                marginTop: "5.6vh",
+                marginLeft: "1%"
             },
             marginTop: "2.7vh"
         },
         position: "absolute",
         zIndex: 2,
-        marginLeft: "11.5%"
+        marginTop: "2vh",
+        marginLeft: "12.5%"
     },
     signUpSection: {
+        position: "absolute",
+        "& button": {
+            width: "9.65vw",
+            marginTop: "1vh",
+        },
         "& input": {
             marginBottom: "1vh"
         },
-        "& button": {
-            marginTop: "1vh"
+        "& label": {
+            "&:nth-child(6)": {
+                marginRight: "0.3vw"
+            },
+            marginLeft: "3%"
         },
         zIndex: 2,
+        marginTop: "5%",
         marginLeft: "105%"
     },
     resetSection: {
+        position: "absolute",
         "& label": {
             "&:first-child": {
                 fontSize: "4.5vh",
                 fontWeight: "bold",
-                letterSpacing: 1
+                letterSpacing: "0.1vw"
             },
             "&:nth-child(2)": {
                 marginTop: "8vh",
@@ -96,58 +132,42 @@ const useStyles = makeStyles({
             width: "45%"
         },
         "& div": {
-            width: "100vw"
+            display: "flex",
+            justifyContent: "space-between",
+            width: "95.5%"
         },
         "& input": {
-            marginBottom: "3vh"
+            marginBottom: "3vh",
+            marginLeft: "2.5vw"
         },
-        alignContent: "baseline",
         opacity: 0,
         rotate: "-90deg",
-        marginTop: "-195%",
-        marginLeft: "-48%",
-        width: "105%"
+        height: "43.3vh",
+        width: "105%",
+        marginTop: "9%",
+        marginLeft: "-100%"
+    },
+    grid: {
+        display: "flex"
     },
     age: {
-        marginTop: "4px",
-        marginLeft: "22px",
+        marginTop: "0.6vh",
+        marginLeft: "1vw",
         width: "2.7vw"
     },
     email: {
         width: "9.1vw"
     },
     footerText: {
-        "& label": {
-            fontSize: "2vh",
-            marginLeft: "2px"
-        },
         fontSize: "2vh",
-        marginTop: "1.7vh"
+        marginTop: "1.7vh",
+        marginBottom: "-1.33vh"
     },
-    button: {
-        "& label": {
-            cursor: "pointer",
-            fontSize: "3.3vh"
-        },
-        background: "none",
-        border: "none",
-        cursor: "pointer",
-        marginTop: "-1vh",
-        textAlign: "center",
-        zIndex: 2
-    },
-    tab: {
-        position: "absolute",
-        top: "11.3vh",
-        left: "14.7vw",
-        height: "10vh",
-        width: "10vw",
-        background: "url('/images/Switch.png')",
-        backgroundRepeat: "no-repeat",
-        backgroundSize: "contain"
+    link: {
+        display: "inline",
+        fontSize: "2vh"
     }
 });
-
 
 const LoginBoard = () => {
     const cls = useStyles();
@@ -162,8 +182,8 @@ const LoginBoard = () => {
         history.push(active ? "/login" : "/signup");
 
         anime({
-            targets: "#active-tab",
-            left: active ? "6.2vw" : "14.7vw",
+            targets: `.${cls.tab}`,
+            left: active ? "6.2vw" : "14.3vw",
             easing: "linear",
             duration: 250
         });
@@ -180,14 +200,14 @@ const LoginBoard = () => {
             duration: 250
         });
         anime({
-            targets: "#sign-in-section",
-            marginLeft: active ? "11.5%" : "-105%",
+            targets: `.${cls.signInSection}`,
+            marginLeft: active ? "12.5%" : "-105%",
             easing: "linear",
             duration: 250
         });
         anime({
-            targets: "#sign-up-section",
-            marginLeft: active ? "105%" : "11.5%",
+            targets: `.${cls.signUpSection}`,
+            marginLeft: active ? "105%" : "12.5%",
             easing: "linear",
             duration: 250
         });
@@ -240,9 +260,9 @@ const LoginBoard = () => {
             duration: 0
         });
         anime({
-            targets: "#reset-section",
+            targets: `.${cls.resetSection}`,
             opacity: 1,
-            marginLeft: "64%",
+            marginLeft: "1%",
             easing: "easeOutQuint",
             duration: 2000
         });
@@ -291,109 +311,126 @@ const LoginBoard = () => {
             duration: 0
         });
         anime({
-            targets: "#reset-section",
+            targets: `.${cls.resetSection}`,
             opacity: 0,
-            marginLeft: "-48%",
+            marginLeft: "-100%",
             easing: "easeOutQuint",
             duration: 2000
         });
     }
 
-    const handleSignIn = () => {
-        setUser({ active: true, access: false });
-
-        anime({
-            targets: "#guide",
-            left: "-30%",
-            easing: "easeInQuint",
-            duration: 2000
-        });
-        anime({
-            targets: "#board",
-            left: "110%",
-            easing: "easeInQuint",
-            duration: 2000
-        });
-
-        if (!user.access) {
-            history.push("/home");
-            anime({
-                targets: "#logo",
-                opacity: 0.6,
-                top: "-80%",
-                left: "50%",
-                scale: 1,
-                translateX: "-50%",
-                translateY: "180%",
+    const handleSign = () => {
+        anime
+            .timeline()
+            .add({
+                targets: "#guide",
+                left: "-30%",
                 easing: "easeInQuint",
                 duration: 2000
-            });
-        }
-        else {
-            anime({
-                targets: "#logo",
-                left: "-50%",
+            })
+            .add({
+                targets: "#board",
+                left: "110%",
                 easing: "easeInQuint",
                 duration: 2000
+            }, "-=2000")
+            .finished.then(() => {
+                setUser({ active: true, access: false });
+                history.push("/access");
+
+                if (user.access) {
+                    anime({
+                        targets: "#logo",
+                        opacity: 0.6,
+                        top: "-80%",
+                        left: "50%",
+                        scale: 1,
+                        translateX: "-50%",
+                        translateY: "180%",
+                        easing: "easeInQuint",
+                        duration: 2000
+                    });
+                }
+                else {
+                    anime({
+                        targets: "#logo",
+                        left: "-50%",
+                        easing: "easeInQuint",
+                        duration: 2000
+                    });
+                }
             });
-        }
     }
 
-    return <Grid>
+    const handleClick = (path) => () => {
+        anime
+            .timeline()
+            .add({
+                targets: "#guide",
+                left: "-30%",
+                easing: "easeInQuint",
+                duration: 2000
+            })
+            .add({
+                targets: "#board",
+                left: "110%",
+                easing: "easeInQuint",
+                duration: 2000
+            }, "-=2000")
+            .finished.then(() => {
+                history.push(path);
+                showReadingPane();
+            });
+    }
+
+    return <div>
         <img className={cls.guide} id="guide" src="/avatars/Avatar_1.png" />
         <img className={cls.guide2} id="guide2" src="/avatars/Avatar_2.png" />
-        <Grid className={cls.board} container id="board">
-            <Grid className={cls.header} container item xs={9} alignItems="center" spacing={4} onClick={handleSwitch}>
-                <Grid className={cls.tab} id="active-tab" />
-                <Grid className={cls.button} item xs={6}>
-                    <CILabel id="sign-in">
-                        Sign In
-                    </CILabel>
-                </Grid>
-                <Grid className={cls.button} item xs={6}>
-                    <CILabel id="sign-up">
-                        Sign Up
-                    </CILabel>
-                </Grid>
-            </Grid>
-            <Grid className={cls.body} container>
-                <Grid className={cls.signInSection} id="sign-in-section">
+        <div className={cls.board} id="board">
+            <div className={cls.header} onClick={handleSwitch}>
+                <div className={cls.tab} />
+                <CILabel className={cls.title} id="sign-in">
+                    Sign In
+                </CILabel>
+                <CILabel className={cls.title} id="sign-up">
+                    Sign Up
+                </CILabel>
+            </div>
+            <div className={cls.body}>
+                <div className={cls.signInSection}>
                     <CILabel>Username</CILabel>
                     <CIInput />
                     <CILabel>Password</CILabel>
                     <CIInput type="password" />
                     <CILink onClick={handleLink}>Forgot Password?</CILink>
-                    <CIButton onClick={handleSignIn}>Sign In</CIButton>
-                </Grid>
-                <Grid className={cls.signUpSection} id="sign-up-section">
+                    <CIButton onClick={handleSign}>Sign In</CIButton>
+                </div>
+                <div className={cls.signUpSection}>
                     <CIInput placeholder="Username" />
                     <CIInput placeholder="Password" type="password" />
-                    <Grid container>
-                        <Grid item xs={7}>
-                            <CIInput className={cls.email} placeholder="Email" sm />
-                        </Grid>
-                        <Grid item xs={3}>
-                            <CIInput className={cls.age} placeholder="Age" xs />
-                        </Grid>
-                    </Grid>
-                    <CIButton onClick={handleSignIn}>Sign Up</CIButton>
+                    <div className={cls.grid}>
+                        <CIInput className={cls.email} placeholder="Email" sm />
+                        <CIInput className={cls.age} placeholder="Age" xs />
+                    </div>
+                    <CIButton onClick={handleSign}>Sign Up</CIButton>
                     <CILabel className={cls.footerText}>
                         By Signing Up, you are agreeing to our
-                        <CILink>Terms & Conditions</CILink>
                     </CILabel>
-                </Grid>
-                <Grid className={cls.resetSection} container id="reset-section" justifyContent="center">
+                    <CILink className={cls.link} onClick={handleClick("/terms-conditions")}>Terms & Conditions</CILink> |
+                    <CILink className={cls.link} onClick={handleClick("/privacy")}>Privacy Policy</CILink>
+                </div>
+                <div className={cls.resetSection}>
                     <CILabel>Forgot Password?</CILabel>
                     <CILabel>Email</CILabel>
                     <CIInput />
-                    <Grid container spacing={1} justifyContent="space-between">
+                    <div>
                         <CIButton>Send</CIButton>
                         <CIButton onClick={handleCancel}>Cancel</CIButton>
-                    </Grid>
-                </Grid>
-            </Grid>
-        </Grid>
-    </Grid>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div >
 }
 
 export default LoginBoard;

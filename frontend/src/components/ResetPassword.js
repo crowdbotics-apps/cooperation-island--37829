@@ -1,5 +1,6 @@
-import { Grid, makeStyles } from "@material-ui/core";
+import { makeStyles } from "@material-ui/core";
 import { useHistory } from "react-router-dom";
+import { showLoginBoard } from "../libs/animations";
 import CILabel from "../shared/CILabel";
 import CIInput from "../shared/CIInput";
 import CIButton from "../shared/CIButton";
@@ -15,11 +16,10 @@ const useStyles = makeStyles({
     },
     board: {
         position: "absolute",
-        top: "-4%",
+        top: "-1%",
         left: "110%",
-        width: "30vw",
         height: "100vh",
-        padding: "20px",
+        width: "30vw",
         rotate: "90deg",
         background: "url('/images/Board.png')",
         backgroundRepeat: "no-repeat",
@@ -30,21 +30,24 @@ const useStyles = makeStyles({
             width: "36%"
         },
         "& input": {
-            marginTop: "-1vh"
+            marginTop: "1vh",
+            marginBottom: "1vh",
+            marginLeft: "5.25vw"
         },
         "& label": {
             "&:first-child": {
                 fontSize: "4.5vh",
                 fontWeight: "bold",
-                letterSpacing: 1,
+                letterSpacing: "0.1vw",
                 marginBottom: "4vh"
             },
             width: "100%"
         },
         rotate: "-90deg",
         height: "61vh",
+        width: "100%",
         marginTop: "30%",
-        marginLeft: "4%",
+        marginLeft: "9%",
         textAlign: "center"
     }
 });
@@ -70,35 +73,24 @@ const ResetPassword = () => {
                 duration: 2000
             }, "-=2000")
             .finished.then(() => {
-                history.push("/home");
-                anime({
-                    targets: "#guide",
-                    left: "7%",
-                    easing: "easeOutQuint",
-                    duration: 2000
-                });
-                anime({
-                    targets: "#board",
-                    left: "63%",
-                    easing: "easeOutQuint",
-                    duration: 2000
-                });
+                history.push("/login");
+                showLoginBoard();
             });
     }
 
-    return <Grid>
+    return <div>
         <img className={cls.guide} id="guide" src="/avatars/Avatar_3.png" />
-        <Grid className={cls.board} id="board2">
-            <Grid className={cls.body} container justifyContent="center">
+        <div className={cls.board} id="board2">
+            <div className={cls.body}>
                 <CILabel>Reset Password</CILabel>
                 <CILabel>Email</CILabel>
                 <CIInput disabled />
                 <CILabel>Password</CILabel>
                 <CIInput type="password" />
                 <CIButton onClick={handleSave}>Save</CIButton>
-            </Grid>
-        </Grid>
-    </Grid>
+            </div>
+        </div>
+    </div>
 }
 
 export default ResetPassword;

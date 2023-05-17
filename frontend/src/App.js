@@ -5,6 +5,7 @@ import HomePage from "./containers/HomePage";
 import LoginBoard from "./containers/LoginBoard";
 import LandingPage from "./components/LandingPage";
 import ResetPassword from "./components/ResetPassword";
+import ReadingPane from "./components/ReadingPane";
 import "react-toastify/dist/ReactToastify.min.css";
 
 const AppContext = createContext();
@@ -28,12 +29,14 @@ const App = () => {
       if (user.access)
         return;
       else
-        return <Route path="/home" component={LandingPage} />
+        return <Route path="/access" component={LandingPage} />
     }
     else {
       return <Switch>
         <Route path="/login" component={LoginBoard} />
         <Route path="/signup" component={LoginBoard} />
+        <Route path="/terms-conditions" component={ReadingPane} />
+        <Route path="/privacy" component={ReadingPane} />
         <Redirect to="/" />
       </Switch>;
     }

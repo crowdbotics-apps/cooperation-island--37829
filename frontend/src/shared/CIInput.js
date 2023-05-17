@@ -13,7 +13,7 @@ const useStyles = (size) => makeStyles((theme) => ({
         fontSize: "3.3vh",
         fontWeight: "400",
         outline: "none",
-        padding: "1px 20px",
+        padding: "0 1.6vw",
         height: "11.7vh",
         background: `url("/images/Input-${size}.png")`,
         backgroundRepeat: "no-repeat",
