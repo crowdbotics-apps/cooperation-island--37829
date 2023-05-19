@@ -2,28 +2,32 @@ import CILabel from "../shared/CILabel";
 
 const { makeStyles, Backdrop, LinearProgress } = require("@material-ui/core");
 
-const useStyles = makeStyles({
+const useStyles = makeStyles((theme) => ({
     backdrop: {
         zIndex: 0,
     },
     grid: {
-        position: "absolute",
         height: "100vh",
         width: "100vw",
-        marginTop: "-60vh"
+        marginTop: "-100vh"
     },
     hidden: {
         display: "none"
     },
     label: {
-        fontSize: "5vh",
-        textShadow: "2px 2px 2px black"
+        fontSize: "10vh",
+        height: "12vh",
+        textShadow: "2px 2px 2px black",
+        marginTop: "-8vh"
     },
     progress: {
-        position: "absolute",
-        width: "100vw",
+        height: "0.7vh",
+        marginTop: "98.5vh"
+    },
+    bar: {
+        backgroundColor: theme.palette.primary.light
     }
-});
+}));
 
 const LoadAssets = ({ onLoad, progress }) => {
     const cls = useStyles();
@@ -34,7 +38,7 @@ const LoadAssets = ({ onLoad, progress }) => {
                 Please Wait...
             </CILabel>
         </Backdrop>
-        <LinearProgress className={cls.progress} variant="buffer" value={progress} valueBuffer={Math.round(progress + (Math.random() * 10))} />
+        <LinearProgress classes={{ root: cls.progress, bar2Buffer: cls.bar }} variant="buffer" value={progress} valueBuffer={Math.round(progress + (Math.random() * 10))} />
 
         <img className={cls.hidden} id="assets" onLoad={onLoad} src={require("../assets/avatars/Avatar_1.png")} />
         <img className={cls.hidden} id="assets" onLoad={onLoad} src={require("../assets/avatars/Avatar_2.png")} />
