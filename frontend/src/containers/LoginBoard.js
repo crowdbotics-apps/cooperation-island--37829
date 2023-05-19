@@ -3,6 +3,9 @@ import { makeStyles } from "@material-ui/core";
 import { useHistory } from "react-router-dom";
 import { AppContext } from "../App";
 import { showReadingPane } from "../libs/animations";
+import BoardImg from "../assets/images/Board.png";
+import HeaderImg from "../assets/images/Header.png";
+import SwitchImg from "../assets/images/Switch.png";
 import CIButton from "../shared/CIButton";
 import CIInput from "../shared/CIInput";
 import CILabel from "../shared/CILabel";
@@ -16,7 +19,7 @@ const useStyles = makeStyles({
         left: "110%",
         height: "94vh",
         width: "30vw",
-        background: "url('/images/Board.png')",
+        background: `url(${BoardImg})`,
         backgroundRepeat: "no-repeat",
         backgroundSize: "100% 100%"
     },
@@ -42,7 +45,7 @@ const useStyles = makeStyles({
         marginLeft: "18.4%",
         height: "10vh",
         width: "75vw",
-        background: "url('/images/Header.png')",
+        background: `url(${HeaderImg})`,
         backgroundRepeat: "no-repeat",
         backgroundSize: "contain"
     },
@@ -63,7 +66,7 @@ const useStyles = makeStyles({
         left: "14.3%",
         height: "10vh",
         width: "10vw",
-        background: "url('/images/Switch.png')",
+        background: `url(${SwitchImg})`,
         backgroundRepeat: "no-repeat",
         backgroundSize: "contain"
     },
@@ -385,8 +388,8 @@ const LoginBoard = () => {
     }
 
     return <div>
-        <img className={cls.guide} id="guide" src="/avatars/Avatar_1.png" />
-        <img className={cls.guide2} id="guide2" src="/avatars/Avatar_2.png" />
+        <img className={cls.guide} id="guide" src={require("../assets/avatars/Avatar_1.png")} />
+        <img className={cls.guide2} id="guide2" src={require("../assets/avatars/Avatar_2.png")} />
         <div className={cls.board} id="board">
             <div className={cls.header} onClick={handleSwitch}>
                 <div className={cls.tab} />
