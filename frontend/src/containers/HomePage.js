@@ -39,7 +39,7 @@ const HomePage = () => {
 
     const allItems = document.querySelectorAll("#assets").length;
 
-    const isLoaded = loadedItems === allItems;
+    const isLoaded = loadedItems === allItems && allItems !== 0;
 
     useEffect(() => {
         if (isLoaded) {
