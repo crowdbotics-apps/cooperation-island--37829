@@ -1,4 +1,6 @@
 import { makeStyles } from "@material-ui/core";
+import ButtonImg from "../assets/images/Button.png";
+import ButtonAltImg from "../assets/images/Button-alt.png";
 import anime from "animejs";
 import clsx from "clsx";
 
@@ -14,7 +16,7 @@ const useStyles = (alt) => makeStyles((theme) => ({
         outline: "none",
         height: "10vh",
         width: "50%",
-        background: alt ? "url('/images/Button-alt.png')" : "url('/images/Button.png')",
+        background: `url(${alt ? ButtonAltImg : ButtonImg})`,
         backgroundRepeat: "no-repeat",
         backgroundSize: "contain"
     }

@@ -105,9 +105,6 @@ const useStyles = makeStyles({
             marginBottom: "1vh"
         },
         "& label": {
-            "&:nth-child(6)": {
-                marginRight: "0.3vw"
-            },
             marginLeft: "3%"
         },
         zIndex: 2,
@@ -166,6 +163,10 @@ const useStyles = makeStyles({
     link: {
         display: "inline",
         fontSize: "2vh"
+    },
+    pipe: {
+        display: "inline",
+        fontSize: "2.5vh"
     }
 });
 
@@ -416,7 +417,8 @@ const LoginBoard = () => {
                     <CILabel className={cls.footerText}>
                         By Signing Up, you are agreeing to our
                     </CILabel>
-                    <CILink className={cls.link} onClick={handleClick("/terms-conditions")}>Terms & Conditions</CILink> |
+                    <CILink className={cls.link} onClick={handleClick("/terms-conditions")}>Terms & Conditions</CILink>
+                    <CILabel className={cls.pipe}>|</CILabel>
                     <CILink className={cls.link} onClick={handleClick("/privacy")}>Privacy Policy</CILink>
                 </div>
                 <div className={cls.resetSection}>

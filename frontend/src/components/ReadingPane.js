@@ -1,6 +1,7 @@
 import { makeStyles } from "@material-ui/core";
 import { useHistory } from "react-router-dom";
 import { showLoginBoard } from "../libs/animations";
+import BoardImg from "../assets/images/Board-lg.png";
 import CILabel from "../shared/CILabel";
 import CIButton from "../shared/CIButton";
 import anime from "animejs";
@@ -20,7 +21,7 @@ const useStyles = makeStyles((theme) => ({
         height: "94vh",
         width: "54vw",
         textAlign: "center",
-        background: "url('/images/Board-lg.png')",
+        background: `url(${BoardImg})`,
         backgroundRepeat: "no-repeat",
         backgroundSize: "100% 100%"
     },
@@ -82,7 +83,7 @@ const ReadingPane = () => {
     }
 
     return <div>
-        <img className={cls.guide} id="guide" src={`/avatars/Avatar_${pageType ? 4 : 5}.png`} />
+        <img className={cls.guide} id="guide" src={require(`../assets/avatars/Avatar_${pageType ? 4 : 5}.png`)} />
         <div className={cls.board} id="board3">
             <CILabel className={cls.title}>
                 {pageType ? "Terms & Conditions" : "Privacy Policy"}

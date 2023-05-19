@@ -87,8 +87,8 @@ const HomePage = () => {
     }, []);
 
     return <div className={cls.root}>
-        <img className={cls.BG} id="background" src="/images/Application_BG.jpg" />
-        <img className={cls.logo} id="logo" src="/images/Logo_Text.png" />
+        <img className={cls.BG} id="background" src={require("../assets/images/Application_BG.jpg")} />
+        <img className={cls.logo} id="logo" src={require("../assets/images/Logo_Text.png")} />
     </div>
 }
 

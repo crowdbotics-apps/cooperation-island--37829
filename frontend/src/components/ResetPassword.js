@@ -1,6 +1,7 @@
 import { makeStyles } from "@material-ui/core";
 import { useHistory } from "react-router-dom";
 import { showLoginBoard } from "../libs/animations";
+import BoardImg from "../assets/images/Board.png";
 import CILabel from "../shared/CILabel";
 import CIInput from "../shared/CIInput";
 import CIButton from "../shared/CIButton";
@@ -21,7 +22,7 @@ const useStyles = makeStyles({
         height: "100vh",
         width: "30vw",
         rotate: "90deg",
-        background: "url('/images/Board.png')",
+        background: `url(${BoardImg})`,
         backgroundRepeat: "no-repeat",
         backgroundSize: "100% 100%"
     },
@@ -79,7 +80,7 @@ const ResetPassword = () => {
     }
 
     return <div>
-        <img className={cls.guide} id="guide" src="/avatars/Avatar_3.png" />
+        <img className={cls.guide} id="guide" src={require("../assets/avatars/Avatar_3.png")} />
         <div className={cls.board} id="board2">
             <div className={cls.body}>
                 <CILabel>Reset Password</CILabel>
