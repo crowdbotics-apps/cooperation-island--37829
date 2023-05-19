@@ -37,12 +37,16 @@ const HomePage = () => {
 
     const [loadedItems, setLoaded] = useState(0);
 
+    const [fetchStatus, setStatus] = useState(true);
+
     const allItems = document.querySelectorAll("#assets").length;
 
     const isLoaded = loadedItems === allItems && allItems !== 0;
 
     useEffect(() => {
-        if (isLoaded) {
+        if (isLoaded && fetchStatus) {
+            setStatus(false);
+
             anime
             .timeline({
                 delay: 200
@@ -96,7 +100,7 @@ const HomePage = () => {
                     }
                 });
         }
-    }, [loadedItems]);
+    }, [loadedItems, fetchStatus]);
 
     const handleLoaded = () => {
         setLoaded(x => x + 1);
@@ -107,7 +111,7 @@ const HomePage = () => {
             <img className={cls.BG} id="background" src={require("../assets/images/Application_BG.jpg")} />
             <img className={cls.logo} id="logo" src={require("../assets/images/Logo_Text.png")} />
         </div>
-        {!isLoaded && <LoadAssets onLoad={handleLoaded} progress={Math.round((loadedItems / allItems) * 100)} />}
+        {(!isLoaded && fetchStatus) && <LoadAssets onLoad={handleLoaded} progress={Math.round((loadedItems / allItems) * 100)} />}
     </Fragment>
 }
 
