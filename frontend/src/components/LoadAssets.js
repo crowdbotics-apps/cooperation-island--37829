@@ -1,6 +1,5 @@
-import CILabel from "../shared/CILabel";
-
-const { makeStyles, Backdrop, LinearProgress } = require("@material-ui/core");
+import { makeStyles, Backdrop, LinearProgress } from "@material-ui/core";
+import LogoText from "./LogoText";
 
 const useStyles = makeStyles((theme) => ({
     backdrop: {
@@ -13,12 +12,6 @@ const useStyles = makeStyles((theme) => ({
     },
     hidden: {
         display: "none"
-    },
-    label: {
-        fontSize: "10vh",
-        height: "12vh",
-        textShadow: "2px 2px 2px black",
-        marginTop: "-8vh"
     },
     progress: {
         height: "0.7vh",
@@ -34,9 +27,7 @@ const LoadAssets = ({ onLoad, progress }) => {
 
     return <div className={cls.grid}>
         <Backdrop className={cls.backdrop} open>
-            <CILabel className={cls.label}>
-                Please Wait...
-            </CILabel>
+            <LogoText />
         </Backdrop>
         <LinearProgress classes={{ root: cls.progress, bar2Buffer: cls.bar }} variant="buffer" value={progress} valueBuffer={Math.round(progress + (Math.random() * 10))} />
 
