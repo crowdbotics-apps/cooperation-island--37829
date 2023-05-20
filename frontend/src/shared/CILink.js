@@ -1,4 +1,5 @@
 import { makeStyles } from "@material-ui/core";
+import { Howl } from "howler";
 import anime from "animejs";
 import clsx from "clsx";
 
@@ -21,6 +22,10 @@ const CILink = (props) => {
     const labelId = "label" + anime.random(1, 100);
 
     const handleClick = () => {
+        new Howl({
+            src: require("../assets/sounds/Click.mp3"),
+            autoplay: true
+        });
         anime({
             targets: "#" + labelId,
             letterSpacing: [1, 0],

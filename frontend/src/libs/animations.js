@@ -113,7 +113,7 @@ export const showLogo = () => {
     });
     anime({
         targets: "g",
-        stroke: ["#CEB891", "#7C382D"],
+        stroke: ["#7C382D", "#CEB891"],
         easing: "linear",
         duration: 2000,
         direction: "alternate",

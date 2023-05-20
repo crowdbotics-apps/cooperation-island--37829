@@ -1,4 +1,5 @@
 import { makeStyles } from "@material-ui/core";
+import { Howl } from "howler";
 import ButtonImg from "../assets/images/Button.png";
 import ButtonAltImg from "../assets/images/Button-alt.png";
 import anime from "animejs";
@@ -28,6 +29,10 @@ const CIButton = (props) => {
     const buttonId = "button" + anime.random(1, 100);
 
     const handleClick = () => {
+        new Howl({
+            src: require("../assets/sounds/Click.mp3"),
+            autoplay: true
+        });
         anime({
             targets: "#" + buttonId,
             scale: [0.9, 1],
