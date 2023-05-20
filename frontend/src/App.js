@@ -4,6 +4,7 @@ import { ToastContainer } from "react-toastify";
 import HomePage from "./containers/HomePage";
 import LoginBoard from "./containers/LoginBoard";
 import LandingPage from "./components/LandingPage";
+import Dashboard from "./containers/Dashboard";
 import ResetPassword from "./components/ResetPassword";
 import ReadingPane from "./components/ReadingPane";
 import "react-toastify/dist/ReactToastify.min.css";
@@ -27,7 +28,7 @@ const App = () => {
   const getRoutes = () => {
     if (user.active) {
       if (user.access)
-        return;
+        return <Route path="/home" component={Dashboard} />
       else
         return <Route path="/access" component={LandingPage} />
     }
@@ -35,6 +36,7 @@ const App = () => {
       return <Switch>
         <Route path="/login" component={LoginBoard} />
         <Route path="/signup" component={LoginBoard} />
+        <Route path="/reset-password" component={ResetPassword} />
         <Route path="/terms-conditions" component={ReadingPane} />
         <Route path="/privacy" component={ReadingPane} />
         <Redirect to="/" />
@@ -45,7 +47,6 @@ const App = () => {
   return <AppContext.Provider value={{ user, setUser: handleUser }}>
     <Route path="/" component={HomePage} />
     <Switch>
-      <Route path="/reset-password" component={ResetPassword} />
       {getRoutes()}
       <Redirect to="/" />
     </Switch>

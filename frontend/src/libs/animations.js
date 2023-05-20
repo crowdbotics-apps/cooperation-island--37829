@@ -76,10 +76,47 @@ export const showReadingPane = () => {
 }
 
 export const showLandingPage = () => {
+    anime
+        .timeline()
+        .add({
+            targets: "#board4",
+            top: ["76%", "10%"],
+            easing: "easeOutQuint",
+            duration: 2000
+        })
+        .add({
+            targets: "#guide",
+            top: "-0.5%",
+            scale: [0, 1],
+            easing: "easeOutQuint",
+            duration: 2000
+        })
+        .add({
+            targets: "#animal",
+            top: "0.3%",
+            scale: [0, 1],
+            easing: "easeOutQuint",
+            duration: 2000
+        });
+}
+
+export const showHomePage = () => { }
+
+export const showLogo = () => {
     anime({
-        targets: "#logo",
-        opacity: 0.6,
-        easing: "easeInQuint",
-        duration: 2000
+        targets: "svg",
+        strokeDashoffset: [0, 500],
+        easing: "linear",
+        duration: 2000,
+        direction: "alternate",
+        loop: true
+    });
+    anime({
+        targets: "g",
+        stroke: ["#CEB891", "#7C382D"],
+        easing: "linear",
+        duration: 2000,
+        direction: "alternate",
+        loop: true
     });
 }

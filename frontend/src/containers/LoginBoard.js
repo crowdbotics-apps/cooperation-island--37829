@@ -2,7 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import { makeStyles } from "@material-ui/core";
 import { useHistory } from "react-router-dom";
 import { AppContext } from "../App";
-import { showReadingPane } from "../libs/animations";
+import { showHomePage, showLandingPage, showReadingPane } from "../libs/animations";
 import BoardImg from "../assets/images/Board.png";
 import HeaderImg from "../assets/images/Header.png";
 import SwitchImg from "../assets/images/Switch.png";
@@ -180,7 +180,7 @@ const LoginBoard = () => {
 
     const [active, setActive] = useState(window.location.pathname === "/login");
 
-    const { user, setUser } = useContext(AppContext);
+    const { setUser } = useContext(AppContext);
 
     useEffect(() => {
         history.push(active ? "/login" : "/signup");
@@ -324,44 +324,41 @@ const LoginBoard = () => {
     }
 
     const handleSign = () => {
-        anime
-            .timeline()
-            .add({
-                targets: "#guide",
-                left: "-30%",
+        if (window) {
+            anime({
+                targets: "#logo",
+                opacity: 0.6,
+                top: "-80%",
+                left: "50%",
+                scale: 1,
+                translateX: "-50%",
+                translateY: "180%",
                 easing: "easeInQuint",
                 duration: 2000
-            })
-            .add({
-                targets: "#board",
-                left: "110%",
-                easing: "easeInQuint",
-                duration: 2000
-            }, "-=2000")
+            });
+        }
+        anime({
+            targets: "#guide",
+            left: "-30%",
+            easing: "easeInQuint",
+            duration: 2000
+        });
+        anime({
+            targets: "#board",
+            left: "110%",
+            easing: "easeInQuint",
+            duration: 2000
+        })
             .finished.then(() => {
-                setUser({ active: true, access: false });
-                history.push("/access");
+                setUser({ active: true, access: true });
 
-                if (user.access) {
-                    anime({
-                        targets: "#logo",
-                        opacity: 0.6,
-                        top: "-80%",
-                        left: "50%",
-                        scale: 1,
-                        translateX: "-50%",
-                        translateY: "180%",
-                        easing: "easeInQuint",
-                        duration: 2000
-                    });
+                if (window) {
+                    history.push("/home");
+                    showHomePage();
                 }
                 else {
-                    anime({
-                        targets: "#logo",
-                        left: "-50%",
-                        easing: "easeInQuint",
-                        duration: 2000
-                    });
+                    history.push("/access");
+                    showLandingPage();
                 }
             });
     }

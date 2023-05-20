@@ -1,7 +1,7 @@
 import { Fragment, useContext, useEffect, useState } from "react";
 import { makeStyles } from "@material-ui/core";
 import { useHistory } from "react-router-dom";
-import { showLandingPage, showLoginBoard, showReadingPane, showResetPassword } from "../libs/animations";
+import { showHomePage, showLandingPage, showLoginBoard, showReadingPane, showResetPassword } from "../libs/animations";
 import { AppContext } from "../App";
 import anime from "animejs";
 import LoadAssets from "../components/LoadAssets";
@@ -48,9 +48,9 @@ const HomePage = () => {
             setStatus(false);
 
             anime
-            .timeline({
-                delay: 200
-            })
+                .timeline({
+                    delay: 200
+                })
                 .add({
                     targets: "#background",
                     opacity: 1,
@@ -72,29 +72,59 @@ const HomePage = () => {
                     });
                     if (!user.active) {
                         if (window.location.pathname === "/")
-                        history.push("/login");
+                            history.push("/login");
 
                         showLoginBoard();
                         showResetPassword();
                         showReadingPane();
                     }
                     else {
-                        if (window.location.pathname === "/reset-password")
-                        showResetPassword();
-                        else if (window.location.pathname === "/access")
-                        showLandingPage();
+                        if (window.location.pathname === "/access") {
+                            anime({
+                                targets: "#logo",
+                                top: "-12%",
+                                left: "-12%",
+                                scale: 0.45,
+                                translateX: ["-50%", "0%"],
+                                translateY: ["-50%", "0%"],
+                                easing: "easeOutQuint",
+                                duration: 2000
+                            });
+                            showLandingPage();
+                        }
+                        else if (window.location.pathname === "/home") {
+                            anime({
+                                targets: "#logo",
+                                opacity: 0.6,
+                                easing: "easeInQuint",
+                                duration: 2000
+                            });
+                            showHomePage();
+                        }
                         else if (window.location.pathname === "/") {
-                            if (!user.access) {
-                                history.push("/access");
-                                showLandingPage();
-                            }
-                            else {
+                            if (user.access) {
+                                history.push("/home");
                                 anime({
                                     targets: "#logo",
-                                    top: "150%",
-                                    easing: "easeInElastic",
+                                    opacity: 0.6,
+                                    easing: "easeInQuint",
                                     duration: 2000
                                 });
+                                showHomePage();
+                            }
+                            else {
+                                history.push("/access");
+                                anime({
+                                    targets: "#logo",
+                                    top: "-12%",
+                                    left: "-12%",
+                                    scale: 0.45,
+                                    translateX: ["-50%", "0%"],
+                                    translateY: ["-50%", "0%"],
+                                    easing: "easeOutQuint",
+                                    duration: 2000
+                                });
+                                showLandingPage();
                             }
                         }
                     }
