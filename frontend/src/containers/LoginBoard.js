@@ -11,6 +11,7 @@ import CIInput from "../shared/CIInput";
 import CILabel from "../shared/CILabel";
 import CILink from "../shared/CILink";
 import anime from "animejs";
+import clsx from "clsx";
 
 const useStyles = makeStyles({
     board: {
@@ -40,7 +41,6 @@ const useStyles = makeStyles({
         transform: "scale(0)"
     },
     header: {
-        cursor: "pointer",
         marginTop: "18.4%",
         marginLeft: "18.4%",
         height: "10vh",
@@ -56,7 +56,6 @@ const useStyles = makeStyles({
         position: "absolute",
         marginTop: "4%",
         marginLeft: "11.5%",
-        cursor: "pointer",
         fontSize: "3.3vh",
         textAlign: "center"
     },
@@ -66,7 +65,6 @@ const useStyles = makeStyles({
         left: "14.3%",
         height: "10vh",
         width: "10vw",
-        cursor: "pointer",
         background: `url(${SwitchImg})`,
         backgroundRepeat: "no-repeat",
         backgroundSize: "contain"
@@ -389,9 +387,9 @@ const LoginBoard = () => {
         <img className={cls.guide} id="guide" src={require("../assets/avatars/Avatar_1.png")} />
         <img className={cls.guide2} id="guide2" src={require("../assets/avatars/Avatar_2.png")} />
         <div className={cls.board} id="board">
-            <div className={cls.header} onClick={handleSwitch}>
-                <div className={cls.tab} />
-                <CILabel className={cls.title} id="sign-in">
+            <div className={clsx(cls.header, "pointer")} onClick={handleSwitch}>
+                <div className={clsx(cls.tab, "pointer")} />
+                <CILabel className={clsx(cls.title, "pointer")} id="sign-in">
                     Sign In
                 </CILabel>
                 <CILabel className={cls.title} id="sign-up">

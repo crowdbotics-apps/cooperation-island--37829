@@ -33,7 +33,7 @@ const CIInput = (props) => {
     }
     const cls = useStyles(size)();
 
-    return <input {...{ ...props, ...others }} className={clsx(cls.root, props.className)} />
+    return <input {...{ ...props, ...others }} className={clsx(cls.root, props.className, "typer")} />
 }
 
 export default CIInput;

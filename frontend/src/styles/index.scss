@@ -11,3 +11,11 @@ body {
   font-family: "Summer Show";
   src: url("../assets/fonts/Summer-Show.ttf") format("truetype");
 }
+
+.pointer {
+  cursor: url("../assets/images/Pointer.png"), auto;
+}
+
+.typer {
+  cursor: url("../assets/images/Typer.png"), auto;
+}

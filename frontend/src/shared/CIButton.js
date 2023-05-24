@@ -10,7 +10,6 @@ const useStyles = (alt) => makeStyles((theme) => ({
         border: "none",
         backgroundPositionY: "2vh",
         color: theme.palette.primary.light,
-        cursor: "pointer",
         fontFamily: "Summer Show",
         fontSize: "3.3vh",
         fontWeight: "400",
@@ -41,7 +40,7 @@ const CIButton = (props) => {
         props.onClick && props.onClick();
     }
 
-    return <button {...props} className={clsx(cls.root, props.className)} id={buttonId} onClick={handleClick} />
+    return <button {...props} className={clsx(cls.root, props.className, "pointer")} id={buttonId} onClick={handleClick} />
 }
 
 export default CIButton;

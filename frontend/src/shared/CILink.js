@@ -6,7 +6,6 @@ import clsx from "clsx";
 const useStyles = makeStyles((theme) => ({
     root: {
         color: theme.palette.primary.main,
-        cursor: "pointer",
         display: "block",
         fontFamily: "Summer Show",
         fontSize: "3.3vh",
@@ -34,7 +33,7 @@ const CILink = (props) => {
         props.onClick && props.onClick();
     }
 
-    return <label {...props} className={clsx(cls.root, props.className)} id={labelId} onClick={handleClick} />
+    return <label {...props} className={clsx(cls.root, props.className, "pointer")} id={labelId} onClick={handleClick} />
 }
 
 export default CILink;

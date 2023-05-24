@@ -33,6 +33,17 @@ const LoadAssets = ({ onLoad, progress }) => {
 
         <img className={cls.hidden} id="assets" onLoad={onLoad} src={require("../assets/animals/Animal_1.png")} />
 
+        <img className={cls.hidden} id="assets" onLoad={onLoad} src={require("../assets/avatars/xs/Avatar_1.png")} />
+        <img className={cls.hidden} id="assets" onLoad={onLoad} src={require("../assets/avatars/xs/Avatar_2.png")} />
+        <img className={cls.hidden} id="assets" onLoad={onLoad} src={require("../assets/avatars/xs/Avatar_3.png")} />
+        <img className={cls.hidden} id="assets" onLoad={onLoad} src={require("../assets/avatars/xs/Avatar_4.png")} />
+        <img className={cls.hidden} id="assets" onLoad={onLoad} src={require("../assets/avatars/xs/Avatar_5.png")} />
+        <img className={cls.hidden} id="assets" onLoad={onLoad} src={require("../assets/avatars/xs/Avatar_6.png")} />
+        <img className={cls.hidden} id="assets" onLoad={onLoad} src={require("../assets/avatars/xs/Avatar_7.png")} />
+        <img className={cls.hidden} id="assets" onLoad={onLoad} src={require("../assets/avatars/xs/Avatar_8.png")} />
+        <img className={cls.hidden} id="assets" onLoad={onLoad} src={require("../assets/avatars/xs/Avatar_9.png")} />
+        <img className={cls.hidden} id="assets" onLoad={onLoad} src={require("../assets/avatars/xs/Avatar_10.png")} />
+
         <img className={cls.hidden} id="assets" onLoad={onLoad} src={require("../assets/avatars/Avatar_1.png")} />
         <img className={cls.hidden} id="assets" onLoad={onLoad} src={require("../assets/avatars/Avatar_2.png")} />
         <img className={cls.hidden} id="assets" onLoad={onLoad} src={require("../assets/avatars/Avatar_3.png")} />
@@ -57,7 +68,9 @@ const LoadAssets = ({ onLoad, progress }) => {
         <img className={cls.hidden} id="assets" onLoad={onLoad} src={require("../assets/images/Input-sm.png")} />
         <img className={cls.hidden} id="assets" onLoad={onLoad} src={require("../assets/images/Input-xs.png")} />
         <img className={cls.hidden} id="assets" onLoad={onLoad} src={require("../assets/images/Logo_Text.png")} />
+        <img className={cls.hidden} id="assets" onLoad={onLoad} src={require("../assets/images/Pointer.png")} />
         <img className={cls.hidden} id="assets" onLoad={onLoad} src={require("../assets/images/Switch.png")} />
+        <img className={cls.hidden} id="assets" onLoad={onLoad} src={require("../assets/images/Typer.png")} />
 
         <audio className={cls.hidden} id="assets" onCanPlay={onLoad} src={require("../assets/sounds/Click.mp3")} />
     </div>

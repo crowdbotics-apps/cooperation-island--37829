@@ -13,7 +13,8 @@ const useStyles = makeStyles({
         top: "33.5%",
         left: "-30%",
         height: "88vh",
-        width: "30vw"
+        width: "30vw",
+        transform: "scaleX(-1)"
     },
     board: {
         position: "absolute",
