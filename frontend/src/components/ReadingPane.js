@@ -12,7 +12,7 @@ const useStyles = makeStyles((theme) => ({
         top: "33.5%",
         left: "-30%",
         height: "88vh",
-        width: "21vw"
+        width: "30vw"
     },
     board: {
         position: "absolute",

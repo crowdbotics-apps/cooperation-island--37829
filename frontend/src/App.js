@@ -1,21 +1,21 @@
 import { createContext, useState } from "react";
 import { Redirect, Route, Switch } from "react-router-dom";
-import { ToastContainer } from "react-toastify";
 import HomePage from "./containers/HomePage";
 import LoginBoard from "./containers/LoginBoard";
-import LandingPage from "./components/LandingPage";
+import LandingPage from "./containers/LandingPage";
+import UserDetails from "./containers/UserDetails";
+import Avatar from "./containers/Avatar";
 import Dashboard from "./containers/Dashboard";
 import ResetPassword from "./components/ResetPassword";
 import ReadingPane from "./components/ReadingPane";
-import "react-toastify/dist/ReactToastify.min.css";
 
 const AppContext = createContext();
 
 const App = () => {
   const [user, setUser] = useState({
     id: "",
-    access: false,
-    active: false,
+    access: true,
+    active: true,
   });
 
   const handleUser = (data) => {
@@ -28,7 +28,12 @@ const App = () => {
   const getRoutes = () => {
     if (user.active) {
       if (user.access)
-        return <Route path="/home" component={Dashboard} />
+        return <Switch>
+          <Route path="/home" component={Dashboard} />
+          <Route path="/avatar" component={Avatar} />
+          <Route path="/details" component={UserDetails} />
+          <Redirect to="/" />
+        </Switch>
       else
         return <Route path="/access" component={LandingPage} />
     }
@@ -50,15 +55,6 @@ const App = () => {
       {getRoutes()}
       <Redirect to="/" />
     </Switch>
-    <ToastContainer
-      position="bottom-right"
-      autoClose={2000}
-      closeButton={false}
-      pauseOnHover={false}
-      pauseOnFocusLoss={false}
-      draggable={false}
-      theme="dark"
-    />
   </AppContext.Provider>
 }
 

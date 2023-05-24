@@ -1,4 +1,5 @@
 import anime from "animejs";
+import $ from "jquery";
 
 export const showLoginBoard = () => {
     anime({
@@ -13,7 +14,7 @@ export const showLoginBoard = () => {
     });
     anime({
         targets: "#guide",
-        left: "7%",
+        left: "6%",
         easing: "easeOutQuint",
         duration: 2000
     });
@@ -38,7 +39,7 @@ export const showResetPassword = () => {
     });
     anime({
         targets: "#guide",
-        left: "7%",
+        left: "3%",
         easing: "easeOutQuint",
         duration: 2000
     });
@@ -63,7 +64,7 @@ export const showReadingPane = () => {
     });
     anime({
         targets: "#guide",
-        left: "7%",
+        left: "2.5%",
         easing: "easeOutQuint",
         duration: 2000
     });
@@ -100,11 +101,43 @@ export const showLandingPage = () => {
         });
 }
 
+export const showAvatarPage = () => {
+    anime
+        .timeline()
+        .add({
+            targets: "#background",
+            opacity: 0,
+            easing: "linear",
+            duration: 2000,
+            complete: () => {
+                $("#background").attr("src", require("../assets/images/Avatar_BG.png"));
+            }
+        })
+        .add({
+            targets: "#background",
+            opacity: 1,
+            easing: "linear",
+            duration: 2000
+        })
+        .add({
+            targets: "#frame",
+            scale: [0, 1],
+            delay: (_, i) => i % 5 * 300,
+            duration: 2000
+        }, "-=2000")
+        .add({
+            targets: "#avatar-page",
+            height: "100vh",
+            easing: "linear",
+            duration: 2000
+        }, "-=4000");
+}
+
 export const showHomePage = () => { }
 
 export const showLogo = () => {
     anime({
-        targets: "svg",
+        targets: "#logo-text",
         strokeDashoffset: [0, 500],
         easing: "linear",
         duration: 2000,
@@ -112,7 +145,7 @@ export const showLogo = () => {
         loop: true
     });
     anime({
-        targets: "g",
+        targets: "#logo-text g",
         stroke: ["#7C382D", "#CEB891"],
         easing: "linear",
         duration: 2000,

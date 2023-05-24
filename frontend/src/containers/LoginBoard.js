@@ -28,15 +28,15 @@ const useStyles = makeStyles({
         top: "33.5%",
         left: "-30%",
         height: "70vh",
-        width: "22vw",
+        width: "24vw",
         transform: "scaleX(-1)"
     },
     guide2: {
         position: "absolute",
         top: "44%",
-        left: "52%",
+        left: "50%",
         height: "70vh",
-        width: "22vw",
+        width: "24vw",
         transform: "scale(0)"
     },
     header: {
@@ -66,6 +66,7 @@ const useStyles = makeStyles({
         left: "14.3%",
         height: "10vh",
         width: "10vw",
+        cursor: "pointer",
         background: `url(${SwitchImg})`,
         backgroundRepeat: "no-repeat",
         backgroundSize: "contain"
@@ -80,7 +81,7 @@ const useStyles = makeStyles({
     },
     signInSection: {
         "& button": {
-            marginTop: "1vh",
+            marginTop: "2vh",
             marginLeft: "1%"
         },
         "& input": {
@@ -233,7 +234,7 @@ const LoginBoard = () => {
         anime({
             targets: "#guide2",
             scale: [0, 1],
-            top: "0%",
+            top: "2%",
             easing: "easeOutQuint",
             duration: 2000
         });
@@ -277,7 +278,7 @@ const LoginBoard = () => {
             targets: "#guide",
             scaleX: -1,
             scaleY: 1,
-            left: "7%",
+            left: "6%",
             easing: "easeOutQuint",
             duration: 2000
         });

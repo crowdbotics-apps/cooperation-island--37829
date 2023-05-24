@@ -1,10 +1,11 @@
 import { Fragment, useContext, useEffect, useState } from "react";
 import { makeStyles } from "@material-ui/core";
 import { useHistory } from "react-router-dom";
-import { showHomePage, showLandingPage, showLoginBoard, showReadingPane, showResetPassword } from "../libs/animations";
+import { showAvatarPage, showHomePage, showLandingPage, showLoginBoard, showReadingPane, showResetPassword } from "../libs/animations";
+import LoadAssets from "../components/LoadAssets";
 import { AppContext } from "../App";
 import anime from "animejs";
-import LoadAssets from "../components/LoadAssets";
+import $ from "jquery";
 
 const useStyles = makeStyles((theme) => ({
     BG: {
@@ -39,7 +40,7 @@ const HomePage = () => {
 
     const [fetchStatus, setStatus] = useState(true);
 
-    const allItems = document.querySelectorAll("#assets").length;
+    const allItems = $("#assets").length;
 
     const isLoaded = loadedItems === allItems && allItems !== 0;
 
@@ -92,6 +93,15 @@ const HomePage = () => {
                             });
                             showLandingPage();
                         }
+                        else if (window.location.pathname === "/avatar") {
+                            anime({
+                                targets: "#logo",
+                                top: "150%",
+                                easing: "easeInElastic",
+                                duration: 2000
+                            });
+                            showAvatarPage();
+                        }
                         else if (window.location.pathname === "/home") {
                             anime({
                                 targets: "#logo",
@@ -103,14 +113,26 @@ const HomePage = () => {
                         }
                         else if (window.location.pathname === "/") {
                             if (user.access) {
-                                history.push("/home");
-                                anime({
-                                    targets: "#logo",
-                                    opacity: 0.6,
-                                    easing: "easeInQuint",
-                                    duration: 2000
-                                });
-                                showHomePage();
+                                if (user.avatar) {
+                                    history.push("/home");
+                                    anime({
+                                        targets: "#logo",
+                                        opacity: 0.6,
+                                        easing: "easeInQuint",
+                                        duration: 2000
+                                    });
+                                    showHomePage();
+                                }
+                                else {
+                                    history.push("/avatar");
+                                    anime({
+                                        targets: "#logo",
+                                        top: "150%",
+                                        easing: "easeInElastic",
+                                        duration: 2000
+                                    });
+                                    showAvatarPage();
+                                }
                             }
                             else {
                                 history.push("/access");

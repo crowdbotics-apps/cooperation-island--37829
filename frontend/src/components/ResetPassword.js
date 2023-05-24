@@ -13,7 +13,7 @@ const useStyles = makeStyles({
         top: "33.5%",
         left: "-30%",
         height: "88vh",
-        width: "20vw"
+        width: "30vw"
     },
     board: {
         position: "absolute",
@@ -84,7 +84,7 @@ const ResetPassword = () => {
         <div className={cls.board} id="board2">
             <div className={cls.body}>
                 <CILabel>Reset Password</CILabel>
-                <CILabel>Email</CILabel>
+                <CILabel>Username</CILabel>
                 <CIInput disabled />
                 <CILabel>Password</CILabel>
                 <CIInput type="password" />

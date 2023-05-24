@@ -39,8 +39,13 @@ const LoadAssets = ({ onLoad, progress }) => {
         <img className={cls.hidden} id="assets" onLoad={onLoad} src={require("../assets/avatars/Avatar_4.png")} />
         <img className={cls.hidden} id="assets" onLoad={onLoad} src={require("../assets/avatars/Avatar_5.png")} />
         <img className={cls.hidden} id="assets" onLoad={onLoad} src={require("../assets/avatars/Avatar_6.png")} />
+        <img className={cls.hidden} id="assets" onLoad={onLoad} src={require("../assets/avatars/Avatar_7.png")} />
+        <img className={cls.hidden} id="assets" onLoad={onLoad} src={require("../assets/avatars/Avatar_8.png")} />
+        <img className={cls.hidden} id="assets" onLoad={onLoad} src={require("../assets/avatars/Avatar_9.png")} />
+        <img className={cls.hidden} id="assets" onLoad={onLoad} src={require("../assets/avatars/Avatar_10.png")} />
 
         <img className={cls.hidden} id="assets" onLoad={onLoad} src={require("../assets/images/Application_BG.jpg")} />
+        <img className={cls.hidden} id="assets" onLoad={onLoad} src={require("../assets/images/Avatar_BG.png")} />
         <img className={cls.hidden} id="assets" onLoad={onLoad} src={require("../assets/images/Board-lg.png")} />
         <img className={cls.hidden} id="assets" onLoad={onLoad} src={require("../assets/images/Board.png")} />
         <img className={cls.hidden} id="assets" onLoad={onLoad} src={require("../assets/images/Button-alt.png")} />

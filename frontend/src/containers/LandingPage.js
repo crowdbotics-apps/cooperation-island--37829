@@ -17,9 +17,9 @@ const useStyles = makeStyles({
     guide: {
         position: "absolute",
         top: "38%",
-        left: "73%",
+        left: "71%",
         height: "58vh",
-        width: "15vw",
+        width: "20vw",
         transform: "scale(0)"
     },
     board: {
