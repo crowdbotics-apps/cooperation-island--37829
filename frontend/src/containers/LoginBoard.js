@@ -2,7 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import { makeStyles } from "@material-ui/core";
 import { useHistory } from "react-router-dom";
 import { AppContext } from "../App";
-import { showHomePage, showLandingPage, showReadingPane } from "../libs/animations";
+import { showAvatarPage, showLandingPage, showReadingPane } from "../libs/animations";
 import BoardImg from "../assets/images/Board.png";
 import HeaderImg from "../assets/images/Header.png";
 import SwitchImg from "../assets/images/Switch.png";
@@ -10,6 +10,7 @@ import CIButton from "../shared/CIButton";
 import CIInput from "../shared/CIInput";
 import CILabel from "../shared/CILabel";
 import CILink from "../shared/CILink";
+import { Howl } from "howler";
 import anime from "animejs";
 import clsx from "clsx";
 
@@ -179,7 +180,7 @@ const LoginBoard = () => {
 
     const [active, setActive] = useState(window.location.pathname === "/login");
 
-    const { setUser } = useContext(AppContext);
+    const { setHowler, setUser } = useContext(AppContext);
 
     useEffect(() => {
         history.push(active ? "/login" : "/signup");
@@ -326,12 +327,7 @@ const LoginBoard = () => {
         if (window) {
             anime({
                 targets: "#logo",
-                opacity: 0.6,
-                top: "-80%",
-                left: "50%",
-                scale: 1,
-                translateX: "-50%",
-                translateY: "180%",
+                left: "-50%",
                 easing: "easeInQuint",
                 duration: 2000
             });
@@ -350,10 +346,17 @@ const LoginBoard = () => {
         })
             .finished.then(() => {
                 setUser({ active: true, access: true });
+                setHowler({
+                    welcome: new Howl({
+                        src: [require("../assets/sounds/Welcome.mp3")],
+                        autoplay: true,
+                        loop: true
+                    })
+                });
 
                 if (window) {
-                    history.push("/home");
-                    showHomePage();
+                    history.push("/avatar");
+                    showAvatarPage();
                 }
                 else {
                     history.push("/access");
@@ -392,7 +395,7 @@ const LoginBoard = () => {
                 <CILabel className={clsx(cls.title, "pointer")} id="sign-in">
                     Sign In
                 </CILabel>
-                <CILabel className={cls.title} id="sign-up">
+                <CILabel className={clsx(cls.title, "pointer")} id="sign-up">
                     Sign Up
                 </CILabel>
             </div>

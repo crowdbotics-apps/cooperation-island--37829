@@ -18,12 +18,21 @@ const App = () => {
     active: true,
   });
 
+  const [howler, setHowler] = useState({});
+
   const handleUser = (data) => {
     setUser({
       ...user,
       ...data
     });
   }
+
+  const handleHowler = (data) => {
+    setHowler({
+      ...howler,
+      ...data
+    });
+  }  
 
   const getRoutes = () => {
     if (user.active) {
@@ -49,7 +58,7 @@ const App = () => {
     }
   }
 
-  return <AppContext.Provider value={{ user, setUser: handleUser }}>
+  return <AppContext.Provider value={{ howler, user, setHowler: handleHowler, setUser: handleUser }}>
     <Route path="/" component={HomePage} />
     <Switch>
       {getRoutes()}

@@ -1,8 +1,10 @@
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useContext, useEffect, useState } from "react";
 import { makeStyles } from "@material-ui/core";
 import { usePrevious } from "../libs/utils";
 import AvatarFrame from "../components/AvatarFrame";
 import CIButton from "../shared/CIButton";
+import { AppContext } from "../App";
+import { Howl } from "howler";
 import anime from "animejs";
 import clsx from "clsx";
 
@@ -54,6 +56,7 @@ const useStyles = makeStyles((theme) => ({
         transform: "scale(0)",
         margin: "0 auto",
         width: "20vw",
+        marginTop: "-6vh",
         top: "79vh"
     },
     button: {
@@ -63,6 +66,12 @@ const useStyles = makeStyles((theme) => ({
         margin: "0 auto",
         width: "10% !important",
         top: "90vh"
+    },
+    logout: {
+        position: "absolute",
+        top: "4%",
+        left: "100%",
+        width: "4vw"
     }
 }));
 
@@ -72,6 +81,8 @@ const Avatar = () => {
     const [active, setActive] = useState(0);
 
     const [avatar, setAvatar] = useState(0);
+
+    const { howler } = useContext(AppContext);
 
     const prevActive = usePrevious(active);
 
@@ -119,7 +130,24 @@ const Avatar = () => {
     }, [active]);
 
     const handleClick = (id) => () => {
+        new Howl({
+            src: require("../assets/sounds/Click.mp3"),
+            autoplay: true
+        });
         setActive(id);
+    }
+
+    const handleSave = () => {
+        new Howl({
+            src: require("../assets/sounds/Avatar.mp3"),
+            autoplay: true,
+            onplay: () => {
+                howler.welcome.fade(1, 0.1, 1000);
+            },
+            onend: () => {
+                howler.welcome.fade(0.1, 1, 1000);
+            }
+        });
     }
 
     return <div className={cls.root} id="avatar-page">
@@ -137,12 +165,13 @@ const Avatar = () => {
             <AvatarFrame active={active === 9} avatar={9} className={cls.frame} onClick={handleClick(9)} variant={3} />
             <AvatarFrame active={active === 10} avatar={10} className={cls.frame} onClick={handleClick(10)} variant={1} />
         </div>
+        <img className={clsx(cls.logout, "pointer")} id="logout" src={require("../assets/images/Logout.png")} />
         {Boolean(active) && <Fragment>
             <img className={cls.avatar} src={avatar && require(`../assets/avatars/Avatar_${avatar}.png`)} />
             <svg className={cls.svg} viewBox="0 0 370 87">
                 <ellipse cx="185" cy="43.5" rx="185" ry="43.5" fill="#29756B" />
             </svg>
-            <CIButton className={cls.button}>Save</CIButton>
+            <CIButton className={cls.button} onClick={handleSave}>Save</CIButton>
         </Fragment>}
     </div>
 }
