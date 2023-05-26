@@ -6,7 +6,7 @@ from home.api.v1.viewsets import (
     SignupViewSet,
     LoginViewSet,
     ConsentAccessCodeViewSet,
-    UserViewSet
+    # UserViewSet
 )
 
 
