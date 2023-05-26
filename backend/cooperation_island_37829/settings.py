@@ -23,7 +23,7 @@ from google.cloud import secretmanager
 from google.auth.exceptions import DefaultCredentialsError
 from google.api_core.exceptions import PermissionDenied
 from modules.manifest import get_modules
-
+import datetime
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -41,7 +41,7 @@ try:
     settings_name = os.environ.get("SETTINGS_NAME", "django_settings")
     name = client.secret_version_path(project, settings_name, "latest")
     payload = client.access_secret_version(name=name).payload.data.decode("UTF-8")
-    env.read_env(io.StringIO(payload))
+    env.read_env(io.StringIO(payload))  
 except (DefaultCredentialsError, PermissionDenied):
     pass
 
@@ -77,26 +77,33 @@ LOCAL_APPS = [
 THIRD_PARTY_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
+
     'rest_auth',
     'rest_auth.registration',
+    
     'bootstrap4',
+
     'allauth',
     'allauth.account',
+
+
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
     'django_extensions',
     'drf_yasg',
     'storages',
-    'fcm_django',
+    # 'django_sendgrid',
+    # 'fcm_django',
 ]
 MODULES_APPS = get_modules()
 
-INSTALLED_APPS += LOCAL_APPS + THIRD_PARTY_APPS + MODULES_APPS
+INSTALLED_APPS += LOCAL_APPS + THIRD_PARTY_APPS  + MODULES_APPS
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
+    # 'corsheaders.middleware.CorsMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -108,7 +115,8 @@ ROOT_URLCONF = 'cooperation_island_37829.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'web_build')],
+        'DIRS': [os.path.join(BASE_DIR, 'web_build'),
+                 os.path.join(BASE_DIR, 'templates'),],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -122,6 +130,9 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'cooperation_island_37829.wsgi.application'
+
+
+CORS_ALLOW_ALL_ORIGINS = True
 
 
 # Database
@@ -189,13 +200,18 @@ MEDIA_URL = '/mediafiles/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'mediafiles')
 # allauth / users
 ACCOUNT_EMAIL_REQUIRED = True
-ACCOUNT_AUTHENTICATION_METHOD = 'email'
-ACCOUNT_USERNAME_REQUIRED = False
-ACCOUNT_EMAIL_VERIFICATION = "optional"
+ACCOUNT_AUTHENTICATION_METHOD = 'username'
+ACCOUNT_USERNAME_REQUIRED = True
+ACCOUNT_EMAIL_VERIFICATION = "mandatory"
 ACCOUNT_CONFIRM_EMAIL_ON_GET = True
-ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
-ACCOUNT_UNIQUE_EMAIL = True
+ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = False
+ACCOUNT_UNIQUE_EMAIL = False
+ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS=7
 LOGIN_REDIRECT_URL = "users:redirect"
+# ACCOUNT_EMAIL_CONFIRMATION_ANONYMOUS_REDIRECT_URL = None
+# ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = None
+# ACCOUNT_EMAIL_CONFIRMATION_HMAC = True
+# ACCOUNT_SESSION_REMEMBER = True
 
 ACCOUNT_ADAPTER = "users.adapters.AccountAdapter"
 SOCIALACCOUNT_ADAPTER = "users.adapters.SocialAccountAdapter"
@@ -203,7 +219,7 @@ ACCOUNT_ALLOW_REGISTRATION = env.bool("ACCOUNT_ALLOW_REGISTRATION", True)
 SOCIALACCOUNT_ALLOW_REGISTRATION = env.bool("SOCIALACCOUNT_ALLOW_REGISTRATION", True)
 
 REST_AUTH_SERIALIZERS = {
-    # Replace password reset serializer to fix 500 error
+
     "PASSWORD_RESET_SERIALIZER": "home.api.v1.serializers.PasswordSerializer",
 }
 REST_AUTH_REGISTER_SERIALIZERS = {
@@ -211,14 +227,42 @@ REST_AUTH_REGISTER_SERIALIZERS = {
     "REGISTER_SERIALIZER": "home.api.v1.serializers.SignupSerializer",
 }
 
+
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ],
+
+}
+
+
+
+
+
+
 # Custom user model
 AUTH_USER_MODEL = "users.User"
 
+
 EMAIL_HOST = env.str("EMAIL_HOST", "smtp.sendgrid.net")
 EMAIL_HOST_USER = env.str("SENDGRID_USERNAME", "")
-EMAIL_HOST_PASSWORD = env.str("SENDGRID_PASSWORD", "")
+EMAIL_HOST_PASSWORD = env.str("SENDGRID_API_KEY", "")
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
+
+
+# EMAIL_BACKEND = 'sendgrid_backends.SendgridBackend'
+# SENDGRID_API_KEY = env.str("SENDGRID_API_KEY", "")
+env.str("DEFAULT_FROM_EMAIL", "")
+DEFAULT_FROM_EMAIL = 'puneet20p@gmail.com'
+
+
+ACCOUNT_EMAIL_TEMPLATE_NAME = 'password_reset_email.txt'
+
+
+
+
 
 
 # AWS S3 config
@@ -249,11 +293,11 @@ SWAGGER_SETTINGS = {
     "DEFAULT_INFO": f"{ROOT_URLCONF}.api_info",
 }
 
-if DEBUG or not (EMAIL_HOST_USER and EMAIL_HOST_PASSWORD):
-    # output email to console instead of sending
-    if not DEBUG:
-        logging.warning("You should setup `SENDGRID_USERNAME` and `SENDGRID_PASSWORD` env vars to send emails.")
-    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+# if DEBUG or not (EMAIL_HOST_USER and EMAIL_HOST_PASSWORD):
+#     # output email to console instead of sending
+#     if not DEBUG:
+#         logging.warning("You should setup `SENDGRID_USERNAME` and `SENDGRID_PASSWORD` env vars to send emails.")
+#     EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
 
 # GCP config 
