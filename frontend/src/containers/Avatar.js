@@ -1,8 +1,10 @@
 import { Fragment, useContext, useEffect, useState } from "react";
 import { makeStyles } from "@material-ui/core";
+import { useHistory } from "react-router-dom";
 import { usePrevious } from "../libs/utils";
 import AvatarFrame from "../components/AvatarFrame";
 import CIButton from "../shared/CIButton";
+import CILogout from "../shared/CILogout";
 import { AppContext } from "../App";
 import { Howl } from "howler";
 import anime from "animejs";
@@ -78,13 +80,20 @@ const useStyles = makeStyles((theme) => ({
 const Avatar = () => {
     const cls = useStyles();
 
+    const history = useHistory();
+
     const [active, setActive] = useState(0);
 
     const [avatar, setAvatar] = useState(0);
 
-    const { howler } = useContext(AppContext);
+    const { howler, user } = useContext(AppContext);
 
     const prevActive = usePrevious(active);
+
+    useEffect(() => {
+        if (user.avatar || !user.details)
+            history.push("/");
+    }, []);
 
     useEffect(() => {
         if (prevActive) {
@@ -142,10 +151,10 @@ const Avatar = () => {
             src: require("../assets/sounds/Avatar.mp3"),
             autoplay: true,
             onplay: () => {
-                howler.welcome.fade(1, 0.1, 1000);
+                howler.welcome?.fade(1, 0.1, 1000);
             },
             onend: () => {
-                howler.welcome.fade(0.1, 1, 1000);
+                howler.welcome?.fade(0.1, 1, 1000);
             }
         });
     }
@@ -165,7 +174,7 @@ const Avatar = () => {
             <AvatarFrame active={active === 9} avatar={9} className={cls.frame} onClick={handleClick(9)} variant={3} />
             <AvatarFrame active={active === 10} avatar={10} className={cls.frame} onClick={handleClick(10)} variant={1} />
         </div>
-        <img className={clsx(cls.logout, "pointer")} id="logout" src={require("../assets/images/Logout.png")} />
+        <CILogout className={cls.logout} id="logout" />
         {Boolean(active) && <Fragment>
             <img className={cls.avatar} src={avatar && require(`../assets/avatars/Avatar_${avatar}.png`)} />
             <svg className={cls.svg} viewBox="0 0 370 87">

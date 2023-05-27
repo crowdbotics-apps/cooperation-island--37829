@@ -1,7 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 import { makeStyles } from "@material-ui/core";
 import { useHistory } from "react-router-dom";
-import { AppContext } from "../App";
 import { showAvatarPage, showLandingPage, showReadingPane } from "../libs/animations";
 import BoardImg from "../assets/images/Board.png";
 import HeaderImg from "../assets/images/Header.png";
@@ -10,6 +9,7 @@ import CIButton from "../shared/CIButton";
 import CIInput from "../shared/CIInput";
 import CILabel from "../shared/CILabel";
 import CILink from "../shared/CILink";
+import { AppContext } from "../App";
 import { Howl } from "howler";
 import anime from "animejs";
 import clsx from "clsx";
@@ -425,7 +425,7 @@ const LoginBoard = () => {
                 </div>
                 <div className={cls.resetSection}>
                     <CILabel>Forgot Password?</CILabel>
-                    <CILabel>Email</CILabel>
+                    <CILabel>Username</CILabel>
                     <CIInput />
                     <div>
                         <CIButton>Send</CIButton>

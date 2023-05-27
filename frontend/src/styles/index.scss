@@ -12,10 +12,24 @@ body {
   src: url("../assets/fonts/Summer-Show.ttf") format("truetype");
 }
 
-.pointer {
+button, .pointer {
   cursor: url("../assets/images/Pointer.png"), auto !important;
 }
 
 .typer {
   cursor: url("../assets/images/Typer.png"), auto;
+}
+
+.Toastify__toast {
+  background-color: #FBF6D8;
+  filter: drop-shadow(-3px 4px 6px black);
+}
+
+.Toastify__toast-body {
+  color: #7C382D;
+  font-family: "Summer Show";
+}
+
+.MuiPickersMonth-monthSelected, .MuiPickersYear-yearSelected {
+  color: #207067 !important;
 }

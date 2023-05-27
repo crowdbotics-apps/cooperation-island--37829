@@ -107,6 +107,29 @@ export const showLandingPage = () => {
         });
 }
 
+export const showDetailsPage = () => {
+    anime({
+        targets: "#guide",
+        left: "6%",
+        easing: "easeOutQuint",
+        duration: 2000
+    });
+    anime
+        .timeline()
+        .add({
+            targets: "#board",
+            left: "63%",
+            easing: "easeOutQuint",
+            duration: 2000
+        })
+        .add({
+            targets: "#logout",
+            left: "94%",
+            easing: "easeOutQuint",
+            duration: 2000
+        });
+}
+
 export const showAvatarPage = () => {
     anime
         .timeline()

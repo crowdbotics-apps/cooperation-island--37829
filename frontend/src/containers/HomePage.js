@@ -1,10 +1,9 @@
 import { Fragment, useContext, useEffect, useState } from "react";
 import { makeStyles } from "@material-ui/core";
 import { useHistory } from "react-router-dom";
-import { showAvatarPage, showHomePage, showLandingPage, showLoginBoard, showReadingPane, showResetPassword } from "../libs/animations";
+import { showAvatarPage, showDetailsPage, showHomePage, showLandingPage, showLoginBoard, showReadingPane, showResetPassword } from "../libs/animations";
 import LoadAssets from "../components/LoadAssets";
 import { AppContext } from "../App";
-import { Howl } from "howler";
 import anime from "animejs";
 import $ from "jquery";
 
@@ -35,7 +34,7 @@ const HomePage = () => {
 
     const history = useHistory();
 
-    const { user, setHowler } = useContext(AppContext);
+    const { user } = useContext(AppContext);
 
     const [loadedItems, setLoaded] = useState(0);
 
@@ -85,14 +84,6 @@ const HomePage = () => {
                             showLoginBoard(true);
                     }
                     else {
-                        setHowler({
-                            welcome: new Howl({
-                                src: [require("../assets/sounds/Welcome.mp3")],
-                                autoplay: true,
-                                loop: true
-                            })
-                        });
-
                         if (window.location.pathname === "/access") {
                             anime({
                                 targets: "#logo",
@@ -105,6 +96,19 @@ const HomePage = () => {
                                 duration: 2000
                             });
                             showLandingPage();
+                        }
+                        else if (window.location.pathname === "/details") {
+                            anime({
+                                targets: "#logo",
+                                top: "-12%",
+                                left: "-12%",
+                                scale: 0.45,
+                                translateX: ["-50%", "0%"],
+                                translateY: ["-50%", "0%"],
+                                easing: "easeOutQuint",
+                                duration: 2000
+                            });
+                            showDetailsPage();
                         }
                         else if (window.location.pathname === "/avatar") {
                             anime({
@@ -130,8 +134,34 @@ const HomePage = () => {
                         }
                         else if (window.location.pathname === "/") {
                             if (user.access) {
-                                if (user.avatar) {
-                                    history.push("/home");
+                                if (user.details) {
+                                    if (user.avatar) {
+                                        history.push("/home");
+                                        anime({
+                                            targets: "#logo",
+                                            top: "-12%",
+                                            left: "-12%",
+                                            scale: 0.45,
+                                            translateX: ["-50%", "0%"],
+                                            translateY: ["-50%", "0%"],
+                                            easing: "easeOutQuint",
+                                            duration: 2000
+                                        });
+                                        showHomePage();
+                                    }
+                                    else {
+                                        history.push("/avatar");
+                                        anime({
+                                            targets: "#logo",
+                                            top: "150%",
+                                            easing: "easeInElastic",
+                                            duration: 2000
+                                        });
+                                        showAvatarPage();
+                                    }
+                                }
+                                else {
+                                    history.push("/details");
                                     anime({
                                         targets: "#logo",
                                         top: "-12%",
@@ -142,17 +172,7 @@ const HomePage = () => {
                                         easing: "easeOutQuint",
                                         duration: 2000
                                     });
-                                    showHomePage();
-                                }
-                                else {
-                                    history.push("/avatar");
-                                    anime({
-                                        targets: "#logo",
-                                        top: "150%",
-                                        easing: "easeInElastic",
-                                        duration: 2000
-                                    });
-                                    showAvatarPage();
+                                    showDetailsPage();
                                 }
                             }
                             else {

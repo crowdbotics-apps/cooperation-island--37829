@@ -3,7 +3,7 @@ import BoardImg from "../assets/images/Board.png";
 import CIButton from "../shared/CIButton";
 import CIInput from "../shared/CIInput";
 import CILabel from "../shared/CILabel";
-import clsx from "clsx";
+import CILogout from "../shared/CILogout";
 
 const useStyles = makeStyles({
     animal: {
@@ -81,7 +81,7 @@ const LandingPage = () => {
                 <CIButton>Submit</CIButton>
             </div>
         </div>
-        <img className={clsx(cls.logout, "pointer")} id="logout" src={require("../assets/images/Logout.png")} />
+        <CILogout className={cls.logout} id="logout" />
     </div>
 }
 

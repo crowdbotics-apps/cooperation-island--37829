@@ -26,14 +26,19 @@ const useStyles = (InputImg) => makeStyles((theme) => ({
 }));
 
 const CIInput = (props) => {
-    const size = props.disabled ? InputImgdisabled : props.xs ? InputImgxs : props.sm ? InputImgsm : InputImgmd;
-    const others = {
-        xs: undefined,
-        sm: undefined
-    }
-    const cls = useStyles(size)();
+    const type = props.disabled ? InputImgdisabled : props.xs ? InputImgxs : props.sm ? InputImgsm : InputImgmd;
 
-    return <input {...{ ...props, ...others }} className={clsx(cls.root, props.className, "typer")} />
+    const cls = useStyles(type)();
+
+    const params = { ...props };
+
+    delete params.error;
+    delete params.helperText;
+    delete params.InputProps;
+    delete params.sm;
+    delete params.xs;
+
+    return <input {...params} className={clsx(cls.root, props.className, props.disabled || "typer")} />
 }
 
 export default CIInput;
