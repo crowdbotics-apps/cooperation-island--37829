@@ -15,7 +15,7 @@ const useStyles = makeStyles((theme) => ({
 const CILabel = (props) => {
     const cls = useStyles();
 
-    return <label {...props} className={clsx(cls.root, props.className)} />
+    return <label {...props} className={clsx(cls.root, props.className, "typer")} />
 }
 
 export default CILabel;

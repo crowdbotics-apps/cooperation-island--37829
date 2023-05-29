@@ -3,6 +3,7 @@ import BoardImg from "../assets/images/Board.png";
 import CIButton from "../shared/CIButton";
 import CIInput from "../shared/CIInput";
 import CILabel from "../shared/CILabel";
+import CILogout from "../shared/CILogout";
 
 const useStyles = makeStyles({
     animal: {
@@ -57,6 +58,12 @@ const useStyles = makeStyles({
         marginTop: "47%",
         marginLeft: "-12%",
         textAlign: "center"
+    },
+    logout: {
+        position: "absolute",
+        top: "4%",
+        left: "100%",
+        width: "4vw"
     }
 });
 
@@ -74,6 +81,7 @@ const LandingPage = () => {
                 <CIButton>Submit</CIButton>
             </div>
         </div>
+        <CILogout className={cls.logout} id="logout" />
     </div>
 }
 

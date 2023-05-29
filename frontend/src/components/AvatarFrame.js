@@ -56,7 +56,7 @@ const useStyles = makeStyles({
         position: "absolute",
         overflow: "hidden",
         height: "24.3vh",
-        width: "18vw",
+        width: "14vw",
         top: "0vh"
     },
     frame: {
@@ -137,7 +137,7 @@ const AvatarFrame = (props) => {
             <path d="M252.75 185.325C248.078 197.621 237.47 189.417 239.23 175.732C240.99 162.052 254.572 163.656 256.891 166.502" fill="#7C382D" id="path-dark" />
             <path d="M156.854 8.21364C141.871 7.0686 131.312 2.63307 153.775 4.18792C176.239 5.73674 203.09 8.07503 223.353 11.0762C243.615 14.0775 271.646 26.5403 274.006 67.8461C276.358 109.152 272.617 165.084 269.56 167.483C266.503 169.881 271.805 96.8217 266.525 69.2081C260.929 39.9072 245.263 21.3937 218.728 16.3374C192.186 11.2691 165.68 8.88258 156.854 8.21364Z" fill="#B76400" id="path-light" />
         </svg>
-        <svg className={clsx(cls.worm, cls[`variant${props.variant}`, "pointer"])} viewBox="0 0 74 38">
+        <svg className={clsx(cls.worm, cls[`variant${props.variant}`], "pointer")} viewBox="0 0 74 38">
             <path d="M18.7489 17.2301C24.2182 20.2115 32.8592 -0.339056 46.481 0.00425575C60.0907 0.353591 61.9962 14.0379 63.0333 20.5488C64.0705 27.0536 72.8984 24.1264 73.3024 30.8963C73.6944 37.6662 66.3498 40.762 57.5098 34.2331C48.5372 27.6198 53.729 17.0916 46.2217 15.0317C37.8942 12.7429 35.03 32.2334 17.3017 29.8363C2.61262 27.8427 11.5009 13.279 18.7489 17.2301Z" fill="#B1B233" />
             <path d="M28.1773 11.0625C25.1562 15.2244 27.3813 22.0846 32.7842 17.1818C38.1991 12.2731 42.3116 7.82207 48.0582 9.89398C53.7988 11.9719 58.3876 6.83429 54.0641 2.88921C49.7466 -1.04984 37.4273 -1.67021 28.1773 11.0625Z" fill="#B1B233" />
             <path d="M3.90315 13.2669C10.4035 5.79833 24.5439 9.21338 24.1399 22.2351C23.6816 37.1602 -9.29655 28.4087 3.90315 13.2669Z" fill="#B1B233" />
@@ -211,7 +211,7 @@ const AvatarFrame = (props) => {
             </defs>
         </svg>}
         <div className={clsx(cls.container, "pointer")}>
-            <img className={clsx(cls.avatar, cls[`avatar_${props.avatar}`, "pointer"])} src={require(`../assets/avatars/xs/Avatar_${props.avatar}.png`)} />
+            <img className={clsx(cls.avatar, cls[`avatar_${props.avatar}`], "pointer")} src={require(`../assets/avatars/xs/Avatar_${props.avatar}.png`)} />
         </div>
     </div>
 

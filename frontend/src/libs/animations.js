@@ -1,14 +1,14 @@
 import anime from "animejs";
 import $ from "jquery";
 
-export const showLoginBoard = () => {
+export const showLoginBoard = (alt) => {
     anime({
         targets: "#logo",
         top: "-12%",
         left: "-12%",
         scale: 0.45,
-        translateX: "0%",
-        translateY: "0%",
+        translateX: alt ? ["-50%", "0%"] : "0%",
+        translateY: alt ? ["-50%", "0%"] : "0%",
         easing: "easeOutQuint",
         duration: 2000
     });
@@ -51,14 +51,14 @@ export const showResetPassword = () => {
     });
 }
 
-export const showReadingPane = () => {
+export const showReadingPane = (alt) => {
     anime({
         targets: "#logo",
         top: "-12%",
         left: "-12%",
         scale: 0.45,
-        translateX: "0%",
-        translateY: "0%",
+        translateX: alt ? ["-50%", "0%"] : "0%",
+        translateY: alt ? ["-50%", "0%"] : "0%",
         easing: "easeOutQuint",
         duration: 2000
     });
@@ -86,6 +86,12 @@ export const showLandingPage = () => {
             duration: 2000
         })
         .add({
+            targets: "#logout",
+            left: "94%",
+            easing: "easeOutQuint",
+            duration: 2000
+        }, "-=2000")
+        .add({
             targets: "#guide",
             top: "-0.5%",
             scale: [0, 1],
@@ -96,6 +102,29 @@ export const showLandingPage = () => {
             targets: "#animal",
             top: "0.3%",
             scale: [0, 1],
+            easing: "easeOutQuint",
+            duration: 2000
+        });
+}
+
+export const showDetailsPage = () => {
+    anime({
+        targets: "#guide",
+        left: "6%",
+        easing: "easeOutQuint",
+        duration: 2000
+    });
+    anime
+        .timeline()
+        .add({
+            targets: "#board",
+            left: "63%",
+            easing: "easeOutQuint",
+            duration: 2000
+        })
+        .add({
+            targets: "#logout",
+            left: "94%",
             easing: "easeOutQuint",
             duration: 2000
         });
@@ -119,6 +148,15 @@ export const showAvatarPage = () => {
             easing: "linear",
             duration: 2000
         })
+        .add({
+            targets: "#logout",
+            left: "94%",
+            easing: "easeOutQuint",
+            duration: 2000,
+            complete: () => {
+                $("#logout").css("position", "sticky");
+            }
+        }, "-=2000")
         .add({
             targets: "#frame",
             scale: [0, 1],

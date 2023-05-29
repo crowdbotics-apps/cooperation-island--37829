@@ -1,7 +1,7 @@
 import { Fragment, useContext, useEffect, useState } from "react";
 import { makeStyles } from "@material-ui/core";
 import { useHistory } from "react-router-dom";
-import { showAvatarPage, showHomePage, showLandingPage, showLoginBoard, showReadingPane, showResetPassword } from "../libs/animations";
+import { showAvatarPage, showDetailsPage, showHomePage, showLandingPage, showLoginBoard, showReadingPane, showResetPassword } from "../libs/animations";
 import LoadAssets from "../components/LoadAssets";
 import { AppContext } from "../App";
 import anime from "animejs";
@@ -60,7 +60,7 @@ const HomePage = () => {
                 })
                 .add({
                     targets: "#logo",
-                    top: "58%",
+                    top: "50%",
                     easing: "easeOutElastic",
                     duration: 2000
                 }, "-=2000")
@@ -72,12 +72,16 @@ const HomePage = () => {
                         duration: 2000
                     });
                     if (!user.active) {
-                        if (window.location.pathname === "/")
+                        if (window.location.pathname === "/reset-password")
+                            showResetPassword();
+                        else if (window.location.pathname === "/terms-conditions" || window.location.pathname === "/privacy")
+                            showReadingPane(true);
+                        else if (window.location.pathname === "/") {
                             history.push("/login");
-
-                        showLoginBoard();
-                        showResetPassword();
-                        showReadingPane();
+                            showLoginBoard(true);
+                        }
+                        else
+                            showLoginBoard(true);
                     }
                     else {
                         if (window.location.pathname === "/access") {
@@ -93,6 +97,19 @@ const HomePage = () => {
                             });
                             showLandingPage();
                         }
+                        else if (window.location.pathname === "/details") {
+                            anime({
+                                targets: "#logo",
+                                top: "-12%",
+                                left: "-12%",
+                                scale: 0.45,
+                                translateX: ["-50%", "0%"],
+                                translateY: ["-50%", "0%"],
+                                easing: "easeOutQuint",
+                                duration: 2000
+                            });
+                            showDetailsPage();
+                        }
                         else if (window.location.pathname === "/avatar") {
                             anime({
                                 targets: "#logo",
@@ -105,33 +122,57 @@ const HomePage = () => {
                         else if (window.location.pathname === "/home") {
                             anime({
                                 targets: "#logo",
-                                opacity: 0.6,
-                                easing: "easeInQuint",
+                                top: "-12%",
+                                left: "-12%",
+                                scale: 0.45,
+                                translateX: ["-50%", "0%"],
+                                translateY: ["-50%", "0%"],
+                                easing: "easeOutQuint",
                                 duration: 2000
                             });
                             showHomePage();
                         }
                         else if (window.location.pathname === "/") {
                             if (user.access) {
-                                if (user.avatar) {
-                                    history.push("/home");
-                                    anime({
-                                        targets: "#logo",
-                                        opacity: 0.6,
-                                        easing: "easeInQuint",
-                                        duration: 2000
-                                    });
-                                    showHomePage();
+                                if (user.details) {
+                                    if (user.avatar) {
+                                        history.push("/home");
+                                        anime({
+                                            targets: "#logo",
+                                            top: "-12%",
+                                            left: "-12%",
+                                            scale: 0.45,
+                                            translateX: ["-50%", "0%"],
+                                            translateY: ["-50%", "0%"],
+                                            easing: "easeOutQuint",
+                                            duration: 2000
+                                        });
+                                        showHomePage();
+                                    }
+                                    else {
+                                        history.push("/avatar");
+                                        anime({
+                                            targets: "#logo",
+                                            top: "150%",
+                                            easing: "easeInElastic",
+                                            duration: 2000
+                                        });
+                                        showAvatarPage();
+                                    }
                                 }
                                 else {
-                                    history.push("/avatar");
+                                    history.push("/details");
                                     anime({
                                         targets: "#logo",
-                                        top: "150%",
-                                        easing: "easeInElastic",
+                                        top: "-12%",
+                                        left: "-12%",
+                                        scale: 0.45,
+                                        translateX: ["-50%", "0%"],
+                                        translateY: ["-50%", "0%"],
+                                        easing: "easeOutQuint",
                                         duration: 2000
                                     });
-                                    showAvatarPage();
+                                    showDetailsPage();
                                 }
                             }
                             else {
