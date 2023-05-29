@@ -1,3 +1,4 @@
+from datetime import date
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
@@ -16,7 +17,7 @@ from rest_auth.serializers import LoginSerializer as RestAuthLoginSerializer
 from rest_auth.serializers import PasswordResetConfirmSerializer as RestAuthPasswordResetConfirmSerializer
 from rest_auth.registration.serializers import VerifyEmailSerializer as RestAuthVerifyEmailSerializer
 from rest_auth.serializers import PasswordResetSerializer as RestAuthPasswordResetSerializer
-from users.models import ConsentAccessCode
+from users.models import ConsentAccessCode, Profile
 
 User = get_user_model()
 
@@ -85,13 +86,44 @@ class UserSerializer(serializers.ModelSerializer):
         user = User.objects.create_user(**validated_data)
         return user
 
+    # def update(self, instance, validated_data):
+    #     instance.avatar_id = validated_data.get('avatar_id', instance.avatar_id)
+    #     return instance
 
 class UserDetailsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['username', 'avatar_id', 'consent_status']
+        fields = ['username', 'avatar_id', 'consent_status', 'detail_status']
 
+
+class UserProfileSerializer(serializers.ModelSerializer):
+    GENDER_CHOICES = [
+        (0, 'Male'),
+        (1, 'Female'),
+    ]
+
+    class Meta:
+        model = Profile
+        fields = ['birth_month', 'birth_year', 'nationality', 'gender', 'zipcode' ]
+
+    def validate_gender(self, value):
+        if value not in [choice[0] for choice in self.GENDER_CHOICES]:
+            raise serializers.ValidationError('Invalid gender choice.')
+        return value
+    
+    def validate_birth_month(self, value):
+        if not 1 <= value <= 12:
+            raise serializers.ValidationError('Birth month should be between 1 and 12.')
+        return value
+
+    def validate_birth_year(self, value):
+        current_year = date.today().year
+        if current_year - value >= 18:
+            raise serializers.ValidationError('Users must be below 18 years old')
+        return value
+
+        
 
 
 class PasswordSerializer(RestAuthPasswordResetSerializer):

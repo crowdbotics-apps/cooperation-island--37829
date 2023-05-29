@@ -94,6 +94,8 @@ THIRD_PARTY_APPS = [
     'storages',
     # 'django_sendgrid',
     # 'fcm_django',
+    # 'corsheaders',
+
 ]
 MODULES_APPS = get_modules()
 
@@ -109,6 +111,9 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+CORS_ORIGIN_ALLOW_ALL = True
+
 
 ROOT_URLCONF = 'cooperation_island_37829.urls'
 
@@ -232,6 +237,7 @@ REST_AUTH_REGISTER_SERIALIZERS = {
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',
+        # 'rest_framework.authentication.SessionAuthentication',
     ],
 
 }

@@ -37,3 +37,4 @@ cb-terms-and-conditions = {editable = true, path = "./modules/terms_and_conditio
 cb-firebase-push-notifications = {editable = true, path = "./modules/firebase_push_notifications"}
 cb-django-signature = {editable = true, path = "./modules/django_signature"}
 pyjwt = "*"
+django-cors-headers = "*"
