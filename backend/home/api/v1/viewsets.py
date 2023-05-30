@@ -131,108 +131,30 @@ class ProfileViewSet(ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return Profile.objects.filter(participant=self.request.user)
+        if self.request.method == 'GET' :
+            return Profile.objects.filter(participant=self.request.user)
     
-
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        self.perform_create(serializer)
+        profile = serializer.save(participant=request.user)
+        serialized_profile = self.serializer_class(profile).data
 
-        user_detail_serializer = UserDetailsSerializer(request.user)
-        payload=encrypt_payload(user_detail_serializer.data)
-
-        
-        response_data = {
-            'user': payload
-        }
-        
-
-        return Response(response_data, status=200)
-
-    def perform_create(self, serializer):
-        user = self.request.user
-        profile, created = Profile.objects.get_or_create(participant=user)
-        
-        if not created:
-            serializer.instance = profile
-            serializer.is_valid(raise_exception=True)
-            serializer.save()
-        else:
-            serializer.save(participant=user)
-
-    def perform_update(self, serializer):
-        serializer.save(participant=self.request.user)
-
-
-
-
-
-
-
-
-
-
-class UserViewSet(ModelViewSet):
-    """Update the avatar_id"""
-    serializer_class = UserSerializer
-    queryset = User.objects.all()
-    permission_classes = [IsAuthenticated]
-
-    @action(detail=False, methods=['patch'])
-    def update_avatar_id(self, request):
-        user = request.user
-        avatar_id = request.data.get('avatar_id')
-        consent_status = request.user.consent_status
-        if avatar_id:
-            if consent_status:
-                user.avatar_id = avatar_id
-                user.save()
-                return Response({'message': 'Avatar ID updated successfully.'})
-            return Response({'message': 'User doesnt have consent to update'}, status=400)
-        else:
-            return Response({'message': 'No avatar provided.'}, status=400)
-
-    # def get_queryset(self):
-    #     user = User.objects.get(id = self.request.user.pk)
-    #     return user
-
-    # def partial_update(self, request, *args, **kwargs):
-        
-    #     user = self.get_queryset()
-    #     print(user)
-        # serializer = self.get_serializer(user, data=request.data, partial=True)
-        # if serializer.is_valid():
-        #     serializer.save()
-        #     return Response(serializer.data, status=200)
-        
-        # return Response(serializer.errors, status=400)
-    # def get_object(self):
-    #     user = User.objects.get(id=self.request.user.pk)
-    #     return user
+        user_data = UserDetailsSerializer(self.request.user)
+        encrypted_payload = encrypt_payload(user_data.data)
+        return Response({'encrypted_payload': encrypted_payload}, status=status.HTTP_201_CREATED)
     
-    # @csrf_exempt
-    # def patch(self, request, *args, **kwargs):
-    #     partial = kwargs.pop('partial', False)
-    #     # user = User.objects.get(id=request.user.id)
-    #     instance = self.get_object()
-    #     print(instance)
-    #     avatar_id = request.data.get('avatar_id')
-    #     print(avatar_id)
-    #     instance.avatar_id = avatar_id
-    #     serializer = self.get_serializer(instance, data=request.data, partial=partial)
-    #     serializer.is_valid(raise_exception=True)
-    #     self.perform_update(serializer)
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serialized_profile = self.get_serializer(instance).data
+        encrypted_payload = encrypt_payload(serialized_profile)
+        return Response({'encrypted_payload': encrypted_payload})
+    
+    def perform_update(self, serializer):
+        profile = serializer.save()
+        serialized_profile = self.serializer_class(profile).data
 
-    #     return Response(serializer.data, status=200)
+        encrypted_payload = encrypt_payload(serialized_profile)
+        return Response({'encrypted_payload': encrypted_payload})
 
-    # def patch(self, request):
-    #     user = request.user  
-    #     data = {'avatar_id': request.data.get('avatar_id')}
-    #     serializer = UserSerializer(user, data=request.data, partial=True)
-    #     if serializer.is_valid():
-    #         serializer.save()
-    #         return Response(serializer.data, statu=200)
-        
-    #     return Response(serializer.errors, status=400)

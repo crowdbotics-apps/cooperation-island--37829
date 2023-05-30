@@ -86,12 +86,8 @@ class UserSerializer(serializers.ModelSerializer):
         user = User.objects.create_user(**validated_data)
         return user
 
-    # def update(self, instance, validated_data):
-    #     instance.avatar_id = validated_data.get('avatar_id', instance.avatar_id)
-    #     return instance
 
 class UserDetailsSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = User
         fields = ['username', 'avatar_id', 'consent_status', 'detail_status']
@@ -124,8 +120,6 @@ class UserProfileSerializer(serializers.ModelSerializer):
         return value
 
         
-
-
 class PasswordSerializer(RestAuthPasswordResetSerializer):
     """Custom serializer for rest_auth to solve reset password error"""
     password_reset_form_class = ResetPasswordForm

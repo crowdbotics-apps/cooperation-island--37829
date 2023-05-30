@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth import admin as auth_admin
 from django.contrib.auth import get_user_model
-from .models import ConsentAccessCode
+from .models import ConsentAccessCode, Profile
 
 
 from users.forms import UserChangeForm, UserCreationForm
@@ -21,3 +21,5 @@ class UserAdmin(auth_admin.UserAdmin):
 
 
 admin.site.register(ConsentAccessCode)
+
+admin.site.register(Profile)
