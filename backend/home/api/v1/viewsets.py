@@ -143,7 +143,7 @@ class ProfileViewSet(ModelViewSet):
 
         user_data = UserDetailsSerializer(self.request.user)
         encrypted_payload = encrypt_payload(user_data.data)
-        return Response({'encrypted_payload': encrypted_payload}, status=status.HTTP_201_CREATED)
+        return Response({'user': encrypted_payload}, status=status.HTTP_201_CREATED)
     
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()

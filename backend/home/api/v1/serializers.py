@@ -90,7 +90,7 @@ class UserSerializer(serializers.ModelSerializer):
 class UserDetailsSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['username', 'avatar_id', 'consent_status', 'detail_status']
+        fields = ['username','age', 'avatar_id', 'consent_status', 'detail_status']
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
