@@ -171,7 +171,38 @@ export const showAvatarPage = () => {
         }, "-=4000");
 }
 
-export const showHomePage = () => { }
+export const showHomePage = () => {
+    anime({
+        targets: "#guide",
+        left: "6%",
+        easing: "easeOutQuint",
+        duration: 2000
+    });
+    anime({
+        targets: "#header",
+        top: "4%",
+        easing: "easeOutQuint",
+        duration: 2000
+    });
+    anime
+        .timeline()
+        .add({
+            targets: "#background",
+            width: "180vw",
+            height: "180vh",
+            marginTop: "-20vh",
+            marginLeft: "-20vw",
+            opacity: 0.3,
+            easing: "easeOutQuint",
+            duration: 2000
+        })
+        .add({
+            targets: "#module",
+            scale: [0, 1],
+            delay: anime.stagger(400),
+            duration: 2000
+        }, "-=1200");
+}
 
 export const showLogo = () => {
     anime({

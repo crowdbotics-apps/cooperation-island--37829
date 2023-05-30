@@ -1,7 +1,7 @@
 import { makeStyles } from "@material-ui/core";
-import { Howl } from "howler";
 import ButtonImg from "../assets/images/Button.png";
 import ButtonAltImg from "../assets/images/Button-alt.png";
+import { Howl } from "howler";
 import anime from "animejs";
 import clsx from "clsx";
 

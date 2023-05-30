@@ -68,12 +68,18 @@ const LoadAssets = ({ onLoad, progress }) => {
         <img className={cls.hidden} id="assets" onLoad={onLoad} src={require("../assets/images/Input-sm.png")} />
         <img className={cls.hidden} id="assets" onLoad={onLoad} src={require("../assets/images/Input-xs.png")} />
         <img className={cls.hidden} id="assets" onLoad={onLoad} src={require("../assets/images/Logo_Text.png")} />
+        <img className={cls.hidden} id="assets" onLoad={onLoad} src={require("../assets/images/Name_Plate.png")} />
         <img className={cls.hidden} id="assets" onLoad={onLoad} src={require("../assets/images/Pointer.png")} />
         <img className={cls.hidden} id="assets" onLoad={onLoad} src={require("../assets/images/Switch.png")} />
         <img className={cls.hidden} id="assets" onLoad={onLoad} src={require("../assets/images/Typer.png")} />
 
+        <img className={cls.hidden} id="assets" onLoad={onLoad} src={require("../assets/modules/Module_1.png")} />
+        <img className={cls.hidden} id="assets" onLoad={onLoad} src={require("../assets/modules/Module_2.png")} />
+
         <audio className={cls.hidden} id="assets" onCanPlay={onLoad} src={require("../assets/sounds/Avatar.mp3")} />
         <audio className={cls.hidden} id="assets" onCanPlay={onLoad} src={require("../assets/sounds/Click.mp3")} />
+        <audio className={cls.hidden} id="assets" onCanPlay={onLoad} src={require("../assets/sounds/Dashboard.mp3")} />
+        <audio className={cls.hidden} id="assets" onCanPlay={onLoad} src={require("../assets/sounds/Module.mp3")} />
         <audio className={cls.hidden} id="assets" onCanPlay={onLoad} src={require("../assets/sounds/Welcome.mp3")} />
     </div>
 }

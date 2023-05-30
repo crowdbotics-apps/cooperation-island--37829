@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 import { makeStyles } from "@material-ui/core";
 import { useHistory } from "react-router-dom";
-import { showAvatarPage, showLandingPage, showReadingPane } from "../libs/animations";
+import { showHomePage, showLandingPage, showReadingPane } from "../libs/animations";
 import BoardImg from "../assets/images/Board.png";
 import HeaderImg from "../assets/images/Header.png";
 import SwitchImg from "../assets/images/Switch.png";
@@ -324,7 +324,7 @@ const LoginBoard = () => {
     }
 
     const handleSign = () => {
-        if (window) {
+        if (!window) {
             anime({
                 targets: "#logo",
                 left: "-50%",
@@ -347,16 +347,22 @@ const LoginBoard = () => {
             .finished.then(() => {
                 setUser({ active: true, access: true });
                 setHowler({
+                    dashboard: new Howl({
+                        src: [require("../assets/sounds/Dashboard.mp3")],
+                        autoplay: true,
+                        loop: true
+                    }),
                     welcome: new Howl({
                         src: [require("../assets/sounds/Welcome.mp3")],
                         autoplay: true,
+                        volume: 0.2,
                         loop: true
                     })
                 });
 
                 if (window) {
-                    history.push("/avatar");
-                    showAvatarPage();
+                    history.push("/home");
+                    showHomePage();
                 }
                 else {
                     history.push("/access");

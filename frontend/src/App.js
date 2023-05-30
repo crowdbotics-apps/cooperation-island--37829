@@ -15,12 +15,12 @@ const AppContext = createContext();
 
 const App = () => {
   const [user, setUser] = useState({
-    id: "",
+    id: "TEST_USER",
     access: true,
-    active: true,
+    active: false,
     age: 18,
     avatar: 0,
-    details: false
+    details: true
   });
 
   const [howler, setHowler] = useState({});

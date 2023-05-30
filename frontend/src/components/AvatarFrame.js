@@ -113,6 +113,12 @@ const AvatarFrame = (props) => {
             easing: "linear",
             duration: 250
         });
+        anime({
+            targets: `#${avatarId} ~ .${cls.shadow}`,
+            opacity: props.active ? 1 : 0,
+            easing: "linear",
+            duration: 250
+        });
         if (props.active)
             anime({
                 targets: `#frame[prefix="${avatarId}"]`,
@@ -151,7 +157,7 @@ const AvatarFrame = (props) => {
             <path d="M7.41228 16.0013C6.03744 15.64 4.0415 17.995 5.38017 19.3622C6.72486 20.7354 8.79918 16.3507 7.41228 16.0013Z" fill="#543615" />
             <path d="M15.8453 17.7479C17.196 18.2358 17.4975 21.3015 15.6162 21.6629C13.7288 22.0363 14.5247 17.2601 15.8453 17.7479Z" fill="#543615" />
         </svg>
-        {props.active && <svg className={cls.shadow} viewBox="0 0 670 601">
+        <svg className={cls.shadow} viewBox="0 0 670 601">
             <g filter="url(#filter0_f_382_265)">
                 <g clipPath="url(#clip0_382_265)">
                     <g filter="url(#filter1_dd_382_265)">
@@ -209,7 +215,7 @@ const AvatarFrame = (props) => {
                     <rect x="200" y="87" width="314" height="314" rx="100" fill="white" />
                 </clipPath>
             </defs>
-        </svg>}
+        </svg>
         <div className={clsx(cls.container, "pointer")}>
             <img className={clsx(cls.avatar, cls[`avatar_${props.avatar}`], "pointer")} src={require(`../assets/avatars/xs/Avatar_${props.avatar}.png`)} />
         </div>
