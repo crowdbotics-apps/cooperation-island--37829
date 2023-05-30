@@ -27,6 +27,7 @@ class User(AbstractUser):
     age = models.PositiveIntegerField(default=0, blank=True, null=True)
     avatar_id = models.PositiveIntegerField(default=0, blank=True, null=True)
     consent_status = models.BooleanField(default=False)
+    detail_status = models.BooleanField(default=False)
 
     USERNAME_FIELD = 'username'
 
@@ -48,3 +49,27 @@ class ConsentAccessCode(models.Model):
 
     def __str__(self):
         return self.access_code
+    
+
+class Profile(models.Model):
+    GENDER_CHOICES = [
+        (0, 'Male'),
+        (1, 'Female'),
+    ]
+
+    participant = models.OneToOneField(User, on_delete=models.CASCADE)
+    birth_month = models.IntegerField()
+    birth_year = models.IntegerField()
+    nationality = models.CharField(max_length=100)
+    gender = models.IntegerField(choices=GENDER_CHOICES)
+    zipcode = models.CharField(max_length=10)
+
+    def save(self, *args, **kwargs):
+        self.participant.detail_status = True
+        self.participant.save()
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f'{self.participant.username}'
+
+    
