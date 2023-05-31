@@ -2,8 +2,9 @@ import { useContext, useEffect } from "react";
 import { makeStyles } from "@material-ui/core";
 import { useHistory } from "react-router-dom";
 import { AppContext } from "../App";
-import CILogout from "../shared/CILogout";
 import CILabel from "../shared/CILabel";
+import CILogout from "../shared/CILogout";
+import CIMusic from "../shared/CIMusic";
 import { Howl } from "howler";
 import anime from "animejs";
 import clsx from "clsx";
@@ -23,7 +24,7 @@ const useStyles = makeStyles({
     header: {
         position: "absolute",
         top: "-11.5%",
-        left: "70.5%"
+        left: "64.5%"
     },
     label: {
         position: "absolute",
@@ -35,7 +36,13 @@ const useStyles = makeStyles({
     logout: {
         position: "absolute",
         top: "15%",
-        left: "114%",
+        left: "144%",
+        width: "4vw"
+    },
+    music: {
+        position: "absolute",
+        top: "17%",
+        left: "112%",
         width: "4vw"
     },
     module: {
@@ -78,11 +85,22 @@ const Dashboard = () => {
 
     const history = useHistory();
 
-    const { user } = useContext(AppContext);
+    const { BGM, howler, user, setHowler } = useContext(AppContext);
 
     useEffect(() => {
         if (!user.avatar || !user.details)
             history.push("/");
+
+        if (BGM)
+            howler.welcome.fade(1, 0.2, 1000);
+        setHowler({
+            dashboard: new Howl({
+                src: [require("../assets/sounds/Dashboard.mp3")],
+                autoplay: true,
+                volume: BGM ? 1 : 0,
+                loop: true
+            })
+        });
     }, []);
 
     const handleClick = (event) => {
@@ -103,6 +121,7 @@ const Dashboard = () => {
             <img className={cls.board} src={require("../assets/images/Name_Plate.png")} />
             <CILabel className={cls.label}>{user.id}</CILabel>
             <CILogout className={cls.logout} checked />
+            <CIMusic className={cls.music} id="music" />
         </div>
         <img className={clsx(cls.module, "pointer")} id="module" onClick={handleClick} src={require("../assets/modules/Module_1.png")} />
         <img className={clsx(cls.module, cls.module2, "pointer")} onClick={handleClick} id="module" src={require("../assets/modules/Module_2.png")} />

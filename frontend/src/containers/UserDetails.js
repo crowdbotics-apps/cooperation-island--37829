@@ -5,11 +5,12 @@ import { makeStyles } from "@material-ui/core";
 import { useHistory } from "react-router-dom";
 import { AppContext } from "../App";
 import BoardImg from "../assets/images/Board.png";
-import CILabel from "../shared/CILabel";
-import CIInput from "../shared/CIInput";
 import CIButton from "../shared/CIButton";
 import CICheck from "../shared/CICheck";
+import CIInput from "../shared/CIInput";
+import CILabel from "../shared/CILabel";
 import CILogout from "../shared/CILogout";
+import CIMusic from "../shared/CIMusic";
 import { toast } from "react-toastify";
 import { Howl } from "howler";
 import clsx from "clsx";
@@ -58,6 +59,12 @@ const useStyles = makeStyles((theme) => ({
     logout: {
         position: "absolute",
         top: "4%",
+        left: "100%",
+        width: "4vw"
+    },
+    music: {
+        position: "absolute",
+        top: "17%",
         left: "100%",
         width: "4vw"
     },
@@ -183,6 +190,7 @@ const UserDetails = () => {
             <CIButton className={cls.button}>Next</CIButton>
         </div>
         <CILogout className={cls.logout} checked id="logout" />
+        <CIMusic className={cls.music} id="music" />
     </div>
 }
 

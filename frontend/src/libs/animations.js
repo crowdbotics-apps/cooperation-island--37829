@@ -86,7 +86,7 @@ export const showLandingPage = () => {
             duration: 2000
         })
         .add({
-            targets: "#logout",
+            targets: "#logout, #music",
             left: "94%",
             easing: "easeOutQuint",
             duration: 2000
@@ -118,16 +118,16 @@ export const showDetailsPage = () => {
         .timeline()
         .add({
             targets: "#board",
-            left: "63%",
+            left: "60%",
             easing: "easeOutQuint",
             duration: 2000
         })
         .add({
-            targets: "#logout",
+            targets: "#logout, #music",
             left: "94%",
             easing: "easeOutQuint",
             duration: 2000
-        });
+        }, "-=1200");
 }
 
 export const showAvatarPage = () => {
@@ -149,12 +149,12 @@ export const showAvatarPage = () => {
             duration: 2000
         })
         .add({
-            targets: "#logout",
+            targets: "#logout, #music",
             left: "94%",
             easing: "easeOutQuint",
             duration: 2000,
             complete: () => {
-                $("#logout").css("position", "sticky");
+                $("#logout, #music").css("position", "sticky");
             }
         }, "-=2000")
         .add({

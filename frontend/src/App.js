@@ -18,10 +18,12 @@ const App = () => {
     id: "TEST_USER",
     access: true,
     active: false,
-    age: 18,
-    avatar: 0,
+    age: 10,
+    avatar: 4,
     details: true
   });
+
+  const [BGM, setBGM] = useState(false);
 
   const [howler, setHowler] = useState({});
 
@@ -63,7 +65,7 @@ const App = () => {
     }
   }
 
-  return <AppContext.Provider value={{ howler, user, setHowler: handleHowler, setUser: handleUser }}>
+  return <AppContext.Provider value={{ BGM, howler, user, setBGM, setHowler: handleHowler, setUser: handleUser }}>
     <Route path="/" component={HomePage} />
     <Switch>
       {getRoutes()}

@@ -180,7 +180,7 @@ const LoginBoard = () => {
 
     const [active, setActive] = useState(window.location.pathname === "/login");
 
-    const { setHowler, setUser } = useContext(AppContext);
+    const { setBGM, setHowler, setUser } = useContext(AppContext);
 
     useEffect(() => {
         history.push(active ? "/login" : "/signup");
@@ -345,17 +345,13 @@ const LoginBoard = () => {
             duration: 2000
         })
             .finished.then(() => {
-                setUser({ active: true, access: true });
+                setUser({ active: true });
+
+                setBGM(true);
                 setHowler({
-                    dashboard: new Howl({
-                        src: [require("../assets/sounds/Dashboard.mp3")],
-                        autoplay: true,
-                        loop: true
-                    }),
                     welcome: new Howl({
                         src: [require("../assets/sounds/Welcome.mp3")],
                         autoplay: true,
-                        volume: 0.2,
                         loop: true
                     })
                 });

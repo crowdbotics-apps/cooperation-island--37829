@@ -4,6 +4,7 @@ import { useHistory } from "react-router-dom";
 import { showAvatarPage, showDetailsPage, showHomePage, showLandingPage, showLoginBoard, showReadingPane, showResetPassword } from "../libs/animations";
 import LoadAssets from "../components/LoadAssets";
 import { AppContext } from "../App";
+import { Howl } from "howler";
 import anime from "animejs";
 import $ from "jquery";
 
@@ -34,7 +35,7 @@ const HomePage = () => {
 
     const history = useHistory();
 
-    const { user } = useContext(AppContext);
+    const { user, setHowler } = useContext(AppContext);
 
     const [loadedItems, setLoaded] = useState(0);
 
@@ -84,6 +85,14 @@ const HomePage = () => {
                             showLoginBoard(true);
                     }
                     else {
+                        setHowler({
+                            welcome: new Howl({
+                                src: [require("../assets/sounds/Welcome.mp3")],
+                                autoplay: true,
+                                volume: 0,
+                                loop: true
+                            })
+                        }, 1000);
                         if (window.location.pathname === "/access") {
                             anime({
                                 targets: "#logo",

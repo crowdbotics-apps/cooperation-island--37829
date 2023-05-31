@@ -4,6 +4,7 @@ import CIButton from "../shared/CIButton";
 import CIInput from "../shared/CIInput";
 import CILabel from "../shared/CILabel";
 import CILogout from "../shared/CILogout";
+import CIMusic from "../shared/CIMusic";
 
 const useStyles = makeStyles({
     animal: {
@@ -64,6 +65,12 @@ const useStyles = makeStyles({
         top: "4%",
         left: "100%",
         width: "4vw"
+    },
+    music: {
+        position: "absolute",
+        top: "17%",
+        left: "100%",
+        width: "4vw"
     }
 });
 
@@ -82,6 +89,7 @@ const LandingPage = () => {
             </div>
         </div>
         <CILogout className={cls.logout} id="logout" />
+        <CIMusic className={cls.music} id="music" />
     </div>
 }
 

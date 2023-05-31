@@ -5,6 +5,7 @@ import { usePrevious } from "../libs/utils";
 import AvatarFrame from "../components/AvatarFrame";
 import CIButton from "../shared/CIButton";
 import CILogout from "../shared/CILogout";
+import CIMusic from "../shared/CIMusic";
 import { AppContext } from "../App";
 import { Howl } from "howler";
 import anime from "animejs";
@@ -72,6 +73,12 @@ const useStyles = makeStyles((theme) => ({
     logout: {
         position: "absolute",
         top: "4%",
+        left: "100%",
+        width: "4vw"
+    },
+    music: {
+        position: "absolute",
+        top: "17%",
         left: "100%",
         width: "4vw"
     }
@@ -151,10 +158,12 @@ const Avatar = () => {
             src: require("../assets/sounds/Avatar.mp3"),
             autoplay: true,
             onplay: () => {
-                howler.welcome?.fade(1, 0.1, 1000);
+                if (howler.welcome.volume())
+                    howler.welcome.fade(1, 0.1, 1000);
             },
             onend: () => {
-                howler.welcome?.fade(0.1, 1, 1000);
+                if (howler.welcome.volume())
+                    howler.welcome.fade(0.1, 1, 1000);
             }
         });
     }
@@ -175,6 +184,7 @@ const Avatar = () => {
             <AvatarFrame active={active === 10} avatar={10} className={cls.frame} onClick={handleClick(10)} variant={1} />
         </div>
         <CILogout className={cls.logout} id="logout" />
+        <CIMusic className={cls.music} id="music" />
         {Boolean(active) && <Fragment>
             <img className={cls.avatar} src={avatar && require(`../assets/avatars/Avatar_${avatar}.png`)} />
             <svg className={cls.svg} viewBox="0 0 370 87">
