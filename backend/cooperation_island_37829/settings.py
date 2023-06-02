@@ -53,7 +53,15 @@ except (DefaultCredentialsError, PermissionDenied):
 SECRET_KEY = env.str("SECRET_KEY")
 
 ALLOWED_HOSTS = env.list("HOST", default=["*"])
+
 SITE_ID = 1
+
+
+SITE_DOMAIN = {
+    'localhost': 'localhost:8000',
+    'production': 'cooperation-island-37829.botics.co',
+}
+
 
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 SECURE_SSL_REDIRECT = env.bool("SECURE_REDIRECT", default=False)
@@ -92,11 +100,11 @@ THIRD_PARTY_APPS = [
     'django_extensions',
     'drf_yasg',
     'storages',
+    'corsheaders',
     # 'django_sendgrid',
     # 'fcm_django',
-    # 'corsheaders',
-
 ]
+
 MODULES_APPS = get_modules()
 
 INSTALLED_APPS += LOCAL_APPS + THIRD_PARTY_APPS  + MODULES_APPS
@@ -104,16 +112,15 @@ INSTALLED_APPS += LOCAL_APPS + THIRD_PARTY_APPS  + MODULES_APPS
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
-    # 'corsheaders.middleware.CorsMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-CORS_ORIGIN_ALLOW_ALL = True
-
+CORS_ALLOW_ALL_ORIGINS = True
 
 ROOT_URLCONF = 'cooperation_island_37829.urls'
 
@@ -212,7 +219,7 @@ ACCOUNT_CONFIRM_EMAIL_ON_GET = True
 ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = False
 ACCOUNT_UNIQUE_EMAIL = False
 ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS=7
-LOGIN_REDIRECT_URL = "users:redirect"
+# LOGIN_REDIRECT_URL = "users:redirect"
 # ACCOUNT_EMAIL_CONFIRMATION_ANONYMOUS_REDIRECT_URL = None
 # ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = None
 # ACCOUNT_EMAIL_CONFIRMATION_HMAC = True
@@ -223,10 +230,10 @@ SOCIALACCOUNT_ADAPTER = "users.adapters.SocialAccountAdapter"
 ACCOUNT_ALLOW_REGISTRATION = env.bool("ACCOUNT_ALLOW_REGISTRATION", True)
 SOCIALACCOUNT_ALLOW_REGISTRATION = env.bool("SOCIALACCOUNT_ALLOW_REGISTRATION", True)
 
-REST_AUTH_SERIALIZERS = {
+# REST_AUTH_SERIALIZERS = {
 
-    "PASSWORD_RESET_SERIALIZER": "home.api.v1.serializers.PasswordSerializer",
-}
+#     "PASSWORD_RESET_SERIALIZER": "home.api.v1.serializers.PasswordSerializer",
+# }
 REST_AUTH_REGISTER_SERIALIZERS = {
     # Use custom serializer that has no username and matches web signup
     "REGISTER_SERIALIZER": "home.api.v1.serializers.SignupSerializer",
@@ -243,10 +250,6 @@ REST_FRAMEWORK = {
 }
 
 
-
-
-
-
 # Custom user model
 AUTH_USER_MODEL = "users.User"
 
@@ -257,17 +260,10 @@ EMAIL_HOST_PASSWORD = env.str("SENDGRID_API_KEY", "")
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 
+# if DEBUG:
+#     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
-# EMAIL_BACKEND = 'sendgrid_backends.SendgridBackend'
-# SENDGRID_API_KEY = env.str("SENDGRID_API_KEY", "")
-env.str("DEFAULT_FROM_EMAIL", "")
-DEFAULT_FROM_EMAIL = 'puneet20p@gmail.com'
-
-
-ACCOUNT_EMAIL_TEMPLATE_NAME = 'password_reset_email.txt'
-
-
-
+DEFAULT_FROM_EMAIL = env.str("DEFAULT_FROM_EMAIL", "")
 
 
 
@@ -298,12 +294,6 @@ if USE_S3:
 SWAGGER_SETTINGS = {
     "DEFAULT_INFO": f"{ROOT_URLCONF}.api_info",
 }
-
-# if DEBUG or not (EMAIL_HOST_USER and EMAIL_HOST_PASSWORD):
-#     # output email to console instead of sending
-#     if not DEBUG:
-#         logging.warning("You should setup `SENDGRID_USERNAME` and `SENDGRID_PASSWORD` env vars to send emails.")
-#     EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
 
 # GCP config 

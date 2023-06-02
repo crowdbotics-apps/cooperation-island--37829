@@ -1,9 +1,21 @@
+import base64
+import datetime
+import uuid
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.conf import settings
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 from allauth.account.models import EmailAddress
-import uuid
+from django.utils import timezone 
+from django.utils.crypto import get_random_string
+from django.contrib.sites.shortcuts import get_current_site
+from django.core.mail import EmailMessage
+from django.template.loader import render_to_string
+from django.utils.http import urlsafe_base64_encode
+from django.utils.encoding import force_bytes
+from django.core.mail import send_mail
+
 
 class User(AbstractUser):
     # WARNING!
@@ -72,4 +84,75 @@ class Profile(models.Model):
     def __str__(self):
         return f'{self.participant.username}'
 
-    
+
+class EmailVerification(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    verification_token = models.CharField(max_length=32)
+    created_at = models.DateTimeField(default=timezone.now)
+    expiry_date = models.DateTimeField()
+
+
+    def generate_token(self):
+        self.verification_token = get_random_string(length=32)
+        self.created_at = timezone.now()
+        self.expiry_date = self.created_at + timezone.timedelta(days=7)
+        self.save()
+
+    def is_token_valid(self, token):
+        return (
+            self.verification_token == token and
+            self.expiry_date > timezone.now()
+        )
+
+    def send_verification_email(self):
+        current_site = get_current_site(request=None)
+        domain = current_site.domain
+        mail_subject = 'Verify your email'
+        message = render_to_string('verification_email.html', {
+            'user': self.user,
+            # 'domain': 'localhost:8000', # set for local
+            'domain': domain,
+            'uidb64': urlsafe_base64_encode(force_bytes(self.user.pk)),
+            'token': self.verification_token,
+            'expiry_date': self.expiry_date
+        })
+        email = EmailMessage(mail_subject, message, to=[self.user.email])
+        email.content_subtype = 'html' 
+        email.send()
+
+
+class PasswordResetSession(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    session_id = models.CharField(max_length=100, unique=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField()
+
+    def save(self, *args, **kwargs):
+        # Generate a unique session ID for the user
+        self.session_id = self.generate_session_id()
+
+        # Calculate expiry time
+        self.expires_at = datetime.datetime.now() + datetime.timedelta(hours=1)
+
+        super().save(*args, **kwargs)
+
+        # Send email to the user with the reset URL
+        self.send_reset_email_notification()
+
+    def generate_session_id(self):
+        username = self.user.username
+        timestamp = str(int(datetime.datetime.now().timestamp()))
+        session_data = f"{username}_{timestamp}".encode()
+        encoded_session_id = base64.urlsafe_b64encode(session_data).decode()
+        return encoded_session_id
+
+    def send_reset_email_notification(self):
+        current_site = get_current_site(request=None)
+        domain = current_site.domain
+        reset_url = f"https://{domain}/reset-password/{self.session_id}"
+        # reset_url = f"http://localhost:8000/reset-password/{self.session_id}"
+        subject = 'Password Reset'
+        message = f'Click the following link to reset your password: {reset_url}. Your password reset link is valid for only 1 hour.'
+        send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [self.user.email])
+
+

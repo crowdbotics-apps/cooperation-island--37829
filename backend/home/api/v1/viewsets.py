@@ -1,39 +1,76 @@
+from datetime import datetime
 from django.contrib.auth import get_user_model
-from django.middleware.csrf import get_token
-from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.csrf import ensure_csrf_cookie
+from django.utils.http import urlsafe_base64_decode
+from django.utils.encoding import force_text
+from django.shortcuts import render
+from django.db import IntegrityError
 from rest_framework.viewsets import ModelViewSet, ViewSet
-from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from rest_framework import status
-from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework import status, generics
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
-from rest_auth.views import LoginView as RestAuthLoginView
-from rest_auth.registration.views import RegisterView as RestAuthRegisterView
-from allauth.account.utils import send_email_confirmation
-from allauth.account.views import ConfirmEmailView as AllauthConfirmEmailView
 from rest_framework.authtoken.serializers import AuthTokenSerializer
 from rest_framework.authtoken.models import Token
-from django.views.decorators.csrf import csrf_exempt
+from rest_framework import generics, status
+from rest_framework.response import Response
+from rest_framework.exceptions import AuthenticationFailed
 
 from home.utils import encrypt_payload
-from users.models import Profile
+from users.models import Profile, EmailVerification, PasswordResetSession
+from home.api.v1.serializers import (
+    SignupSerializer,
+    UserDetailsSerializer,
+    ConsentAccessCodeSerializer,
+    UserProfileSerializer,
+    ResetPasswordSerializer,
+    ResetPasswordSessionSerializer,
+)
+
 
 User = get_user_model()
 
 
+class ResetPasswordViewSet(ViewSet):
+    """Reset-password Functionality"""
+    def create(self, request):
+        serializer = ResetPasswordSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        username = serializer.validated_data['username']
 
-from home.api.v1.serializers import (
-    SignupSerializer,
-    UserSerializer,
-    UserDetailsSerializer,
-    ConsentAccessCodeSerializer,
-    UserProfileSerializer,
-)
+        try:
+            user = User.objects.get(username=username)
+            session = PasswordResetSession(user=user)
+            session.save()
+            return Response({'message': 'Password reset initiated successfully. Check your email for further instructions.'}, status=status.HTTP_200_OK)
+        except User.DoesNotExist:
+            return Response({'message': 'User not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+    def retrieve(self, request, session_id=None):
+        try:
+            session = PasswordResetSession.objects.get(session_id=session_id, expires_at__gte=datetime.now())
+            username = session.user.username
+            return Response({'username': username}, status=status.HTTP_200_OK)
+        except PasswordResetSession.DoesNotExist:
+            return Response({'message': 'Invalid session ID or session has expired.'}, status=status.HTTP_404_NOT_FOUND)
+
+    def update(self, request, session_id=None):
+        serializer = ResetPasswordSessionSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        new_password = serializer.validated_data['new_password']
+
+        try:
+            session = PasswordResetSession.objects.get(session_id=session_id, expires_at__gte=datetime.now())
+            user = session.user
+            user.set_password(new_password)
+            user.save()
+            session.delete()
+            return Response({'message': 'Password updated successfully.'}, status=status.HTTP_200_OK)
+        except PasswordResetSession.DoesNotExist:
+            return Response({'message': 'Invalid session ID or session has expired.'}, status=status.HTTP_404_NOT_FOUND)
 
 
 class SignupViewSet(ModelViewSet):
+    """User Signup"""
     serializer_class = SignupSerializer
     http_method_names = ["post"]
 
@@ -58,7 +95,7 @@ class SignupViewSet(ModelViewSet):
         
 
         return Response(response_data, status=200)
-
+    
 
 class LoginViewSet(ViewSet):
     """Based on rest_framework.authtoken.views.ObtainAuthToken"""
@@ -76,6 +113,17 @@ class LoginViewSet(ViewSet):
 
         payload=encrypt_payload(user_serializer.data)
         return Response({"token": token.key, "user": payload}, status=200)
+    
+
+class UserDetailView(APIView):
+    """Return user details"""
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, format=None):
+        user = request.user
+        serializer = UserDetailsSerializer(user)
+        payload=encrypt_payload(serializer.data)
+        return Response({"user": payload}, status=200)
 
 
 class ConsentAccessCodeViewSet(APIView):
@@ -106,8 +154,8 @@ class ConsentAccessCodeViewSet(APIView):
         return Response({'user': payload }, status=200)
     
 
-
 class UpdateAvatarIDView(APIView):
+    """update avatar_id"""
     permission_classes = [IsAuthenticated]
 
     def patch(self, request):
@@ -125,36 +173,74 @@ class UpdateAvatarIDView(APIView):
 
 
 
-
-class ProfileViewSet(ModelViewSet):
-    serializer_class = UserProfileSerializer
+class ProfileAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
-    def get_queryset(self):
-        if self.request.method == 'GET' :
-            return Profile.objects.filter(participant=self.request.user)
-    
-    def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
+    def get(self, request, *args, **kwargs):
+        user = request.user
+        try:
+            profile = Profile.objects.get(participant=user)
+        except Profile.DoesNotExist:
+            return Response({'error': 'Profile not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+        profile_serializer = UserProfileSerializer(profile)
+        encrypted_payload = encrypt_payload(profile_serializer.data)
+
+        return Response({'profile': encrypted_payload}, status=status.HTTP_200_OK)
+
+    def post(self, request, *args, **kwargs):
+        serializer = UserProfileSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        profile = serializer.save(participant=request.user)
-        serialized_profile = self.serializer_class(profile).data
+        try:
+            profile = serializer.save(participant=request.user)
+        except IntegrityError:
+            return Response({'error': 'Profile already exists.'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        user_data = UserDetailsSerializer(request.user).data
+        user_encrypted_payload = encrypt_payload(user_data)
+        
 
-        user_data = UserDetailsSerializer(self.request.user)
-        encrypted_payload = encrypt_payload(user_data.data)
-        return Response({'user': encrypted_payload}, status=status.HTTP_201_CREATED)
-    
-    def retrieve(self, request, *args, **kwargs):
-        instance = self.get_object()
-        serialized_profile = self.get_serializer(instance).data
-        encrypted_payload = encrypt_payload(serialized_profile)
-        return Response({'encrypted_payload': encrypted_payload})
-    
-    def perform_update(self, serializer):
-        profile = serializer.save()
-        serialized_profile = self.serializer_class(profile).data
+        return Response({'user': user_encrypted_payload}, status=status.HTTP_201_CREATED)
 
-        encrypted_payload = encrypt_payload(serialized_profile)
-        return Response({'encrypted_payload': encrypted_payload})
+    def put(self, request, *args, **kwargs):
+        user = request.user
+        try:
+            profile = Profile.objects.get(participant=user)
+        except Profile.DoesNotExist:
+            return Response({'error': 'Profile not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = UserProfileSerializer(profile, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        updated_profile = serializer.save()
+
+        updated_profile_serializer = UserProfileSerializer(updated_profile)
+        encrypted_payload = encrypt_payload(updated_profile_serializer.data)
+
+        return Response({'profile': encrypted_payload}, status=status.HTTP_200_OK)
+
+
+
+
+class UserVerificationView(generics.GenericAPIView):
+    def get(self, request, uidb64, token):
+        try:
+            user_id = force_text(urlsafe_base64_decode(uidb64))
+            email_verification = EmailVerification.objects.get(user_id=user_id)
+        except (TypeError, ValueError, OverflowError, EmailVerification.DoesNotExist):
+            return render(request, 'verification_error.html')
+        
+
+        if not email_verification.is_token_valid(token):
+            return render(request, 'verification_error.html')
+
+        user = email_verification.user
+        user.consent_status = True
+        user.save(update_fields=['consent_status'])
+
+        email_verification.delete()  
+        return render(request, 'verification_success.html')
+
+
+
 
