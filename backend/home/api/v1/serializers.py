@@ -17,10 +17,10 @@ from rest_auth.serializers import LoginSerializer as RestAuthLoginSerializer
 from rest_auth.serializers import PasswordResetConfirmSerializer as RestAuthPasswordResetConfirmSerializer
 from rest_auth.registration.serializers import VerifyEmailSerializer as RestAuthVerifyEmailSerializer
 from rest_auth.serializers import PasswordResetSerializer as RestAuthPasswordResetSerializer
-from users.models import ConsentAccessCode, Profile
+from users.models import ConsentAccessCode, Profile, EmailVerification
+
 
 User = get_user_model()
-
 
 
 class SignupSerializer(serializers.ModelSerializer):
@@ -66,6 +66,10 @@ class SignupSerializer(serializers.ModelSerializer):
         )
         user.set_password(validated_data.get('password'))
         user.save()
+
+        email_verification = EmailVerification(user=user)
+        email_verification.generate_token()
+        email_verification.send_verification_email()
 
         # request = self._get_request()
         # setup_user_email(request, user, [])
@@ -119,10 +123,13 @@ class UserProfileSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError('Users must be below 18 years old')
         return value
 
-        
-class PasswordSerializer(RestAuthPasswordResetSerializer):
-    """Custom serializer for rest_auth to solve reset password error"""
-    password_reset_form_class = ResetPasswordForm
+
+class ResetPasswordSerializer(serializers.Serializer):
+    username = serializers.CharField(required=True)
+
+
+class ResetPasswordSessionSerializer(serializers.Serializer):
+    new_password = serializers.CharField(required=True, max_length=128)
 
 
 class ConsentAccessCodeSerializer(serializers.Serializer):

@@ -53,7 +53,9 @@ except (DefaultCredentialsError, PermissionDenied):
 SECRET_KEY = env.str("SECRET_KEY")
 
 ALLOWED_HOSTS = env.list("HOST", default=["*"])
+
 SITE_ID = 1
+
 
 SITE_DOMAIN = {
     'localhost': 'localhost:8000',
@@ -98,11 +100,11 @@ THIRD_PARTY_APPS = [
     'django_extensions',
     'drf_yasg',
     'storages',
+    'corsheaders',
     # 'django_sendgrid',
     # 'fcm_django',
-    'corsheaders',
-
 ]
+
 MODULES_APPS = get_modules()
 
 INSTALLED_APPS += LOCAL_APPS + THIRD_PARTY_APPS  + MODULES_APPS
@@ -110,8 +112,8 @@ INSTALLED_APPS += LOCAL_APPS + THIRD_PARTY_APPS  + MODULES_APPS
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
     'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -248,10 +250,6 @@ REST_FRAMEWORK = {
 }
 
 
-
-
-
-
 # Custom user model
 AUTH_USER_MODEL = "users.User"
 
@@ -265,15 +263,7 @@ EMAIL_USE_TLS = True
 # if DEBUG:
 #     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
-# EMAIL_BACKEND = 'sendgrid_backends.SendgridBackend'
-# SENDGRID_API_KEY = env.str("SENDGRID_API_KEY", "")
-# env.str("DEFAULT_FROM_EMAIL", "")
-DEFAULT_FROM_EMAIL = 'puneet20p@gmail.com'
-
-
-# ACCOUNT_EMAIL_TEMPLATE_NAME = 'password_reset_email.txt'
-
-
+DEFAULT_FROM_EMAIL = env.str("DEFAULT_FROM_EMAIL", "")
 
 
 
@@ -304,12 +294,6 @@ if USE_S3:
 SWAGGER_SETTINGS = {
     "DEFAULT_INFO": f"{ROOT_URLCONF}.api_info",
 }
-
-# if DEBUG or not (EMAIL_HOST_USER and EMAIL_HOST_PASSWORD):
-#     # output email to console instead of sending
-#     if not DEBUG:
-#         logging.warning("You should setup `SENDGRID_USERNAME` and `SENDGRID_PASSWORD` env vars to send emails.")
-#     EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
 
 # GCP config 
