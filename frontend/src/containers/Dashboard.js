@@ -1,10 +1,12 @@
 import { useContext, useEffect } from "react";
 import { makeStyles } from "@material-ui/core";
 import { useHistory } from "react-router-dom";
-import { AppContext } from "../App";
+import { userState } from "../libs/utils";
+import { showLoginBoard } from "../libs/animations";
 import CILabel from "../shared/CILabel";
 import CILogout from "../shared/CILogout";
 import CIMusic from "../shared/CIMusic";
+import { AppContext } from "../App";
 import { Howl } from "howler";
 import anime from "animejs";
 import clsx from "clsx";
@@ -85,7 +87,7 @@ const Dashboard = () => {
 
     const history = useHistory();
 
-    const { BGM, howler, user, setHowler } = useContext(AppContext);
+    const { BGM, howler, user, setHowler, setUser } = useContext(AppContext);
 
     useEffect(() => {
         if (!user.avatar || !user.details)
@@ -108,11 +110,81 @@ const Dashboard = () => {
             src: require("../assets/sounds/Module.mp3"),
             autoplay: true
         });
+
         anime({
             targets: event.target,
             scale: [0.9, 1],
             duration: 1000
+        })
+            .finished.then(() => {
+                anime({
+                    targets: "#background",
+                    width: "100vw",
+                    height: "100vh",
+                    marginTop: "0vh",
+                    marginLeft: "0vw",
+                    opacity: 1,
+                    easing: "easeInQuint",
+                    duration: 2000
+                });
+                anime({
+                    targets: "#logo",
+                    left: "-50%",
+                    easing: "easeInQuint",
+                    duration: 2000
+                });
+                anime({
+                    targets: "#guide",
+                    left: "-30%",
+                    easing: "easeInQuint",
+                    duration: 2000
+                });
+                anime({
+                    targets: "#header",
+                    top: "-11.5%",
+                    easing: "easeInQuint",
+                    duration: 2000
+                });
+                anime({
+                    targets: "#module",
+                    scale: 0,
+                    easing: "easeInQuint",
+                    duration: 2000
+                });
+            });
+    }
+
+    const handleLogout = () => {
+        if (BGM) {
+            howler.welcome.fade(howler.welcome.volume(), 0, 1000);
+            howler.dashboard?.fade(1, 0, 1000);
+        }
+        localStorage.clear();
+
+        anime({
+            targets: "#background",
+            width: "100vw",
+            height: "100vh",
+            marginTop: "0vh",
+            marginLeft: "0vw",
+            opacity: 0.2,
+            easing: "easeOutQuint",
+            delay: 1000,
+            duration: 1000
         });
+        anime({
+            targets: "#guide, #header, #module",
+            opacity: [1, 0],
+            easing: "easeOutQuint",
+            delay: 1000,
+            duration: 1000
+        })
+            .finished.then(() => {
+                setUser(userState);
+
+                history.push("/login");
+                showLoginBoard();
+            });
     }
 
     return <div>
@@ -120,11 +192,11 @@ const Dashboard = () => {
         <div className={cls.header} id="header">
             <img className={cls.board} src={require("../assets/images/Name_Plate.png")} />
             <CILabel className={cls.label}>{user.id}</CILabel>
-            <CILogout className={cls.logout} checked />
+            <CILogout className={cls.logout} id="logout" onClick={handleLogout} />
             <CIMusic className={cls.music} id="music" />
         </div>
         <img className={clsx(cls.module, "pointer")} id="module" onClick={handleClick} src={require("../assets/modules/Module_1.png")} />
-        <img className={clsx(cls.module, cls.module2, "pointer")} onClick={handleClick} id="module" src={require("../assets/modules/Module_2.png")} />
+        <img className={clsx(cls.module, cls.module2, "pointer")} id="module" onClick={handleClick} src={require("../assets/modules/Module_2.png")} />
         <img className={clsx(cls.module, cls.module3)} id="module" src={require(`../assets/modules/Module_${anime.random(1, 2)}.png`)} />
         <img className={clsx(cls.module, cls.module4)} id="module" src={require("../assets/modules/Module_2.png")} />
         <img className={clsx(cls.module, cls.module5)} id="module" src={require("../assets/modules/Module_1.png")} />

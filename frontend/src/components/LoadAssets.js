@@ -3,7 +3,7 @@ import LogoText from "./LogoText";
 
 const useStyles = makeStyles((theme) => ({
     backdrop: {
-        zIndex: 0,
+        zIndex: 0
     },
     grid: {
         height: "100vh",

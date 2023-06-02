@@ -35,10 +35,16 @@ const CIInput = (props) => {
     delete params.error;
     delete params.helperText;
     delete params.InputProps;
+    delete params.onEnter;
     delete params.sm;
     delete params.xs;
 
-    return <input {...params} className={clsx(cls.root, props.className, props.disabled || "typer")} />
+    const handleKeyDown = (event) => {
+        if (event.key === "Enter")
+            props.onEnter && props.onEnter();
+    }
+
+    return <input {...params} className={clsx(cls.root, props.className, props.disabled || "typer")} onKeyDown={handleKeyDown} />
 }
 
 export default CIInput;

@@ -36,10 +36,7 @@ const CIMusic = (props) => {
             duration: 1000
         });
         if (BGM) {
-            if (window.location.pathname === "/home")
-                howler.welcome.fade(howler.welcome.volume(), 0, 1000);
-            else
-                howler.welcome.fade(howler.welcome.volume(), 0, 1000);
+            howler.welcome.fade(howler.welcome.volume(), 0, 1000);
             howler.dashboard?.fade(1, 0, 1000);
         }
         else {

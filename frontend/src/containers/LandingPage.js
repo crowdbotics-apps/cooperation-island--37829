@@ -1,10 +1,19 @@
+import { useContext, useState } from "react";
+import { useHistory } from "react-router-dom";
 import { makeStyles } from "@material-ui/core";
+import { mapUserData } from "../funnels/v1";
+import { formatCode, parseToken, userState } from "../libs/utils";
+import { access as handleAccess } from "../services/v1";
+import { showDetailsPage, showLoginBoard } from "../libs/animations";
 import BoardImg from "../assets/images/Board.png";
 import CIButton from "../shared/CIButton";
 import CIInput from "../shared/CIInput";
 import CILabel from "../shared/CILabel";
 import CILogout from "../shared/CILogout";
 import CIMusic from "../shared/CIMusic";
+import { AppContext } from "../App";
+import { toast } from "react-toastify";
+import anime from "animejs";
 
 const useStyles = makeStyles({
     animal: {
@@ -77,6 +86,82 @@ const useStyles = makeStyles({
 const LandingPage = () => {
     const cls = useStyles();
 
+    const history = useHistory();
+
+    const { BGM, howler, setUser } = useContext(AppContext);
+
+    const [text, setText] = useState("");
+
+    const handleChange = (event) => {
+        setText(formatCode(event.target.value, text));
+    }
+
+    const handleLogout = () => {
+        if (BGM) {
+            howler.welcome.fade(howler.welcome.volume(), 0, 1000);
+            howler.dashboard?.fade(1, 0, 1000);
+        }
+        localStorage.clear();
+
+        anime({
+            targets: "#animal, #board4, #guide, #logout, #music",
+            opacity: [1, 0],
+            easing: "easeOutQuint",
+            delay: 1000,
+            duration: 1000
+        })
+            .finished.then(() => {
+                setUser(userState);
+
+                history.push("/login");
+                showLoginBoard();
+            });
+    }
+
+    const handleSubmit = () => {
+        if (!text.length)
+            toast.error("The Access Code cannot be empty.");
+        else {
+            handleAccess(text)
+                .then(({ data }) => {
+                    const userData = parseToken(data.user);
+
+                    if (userData) {
+                        localStorage["UserState"] = data.user;
+
+                        anime({
+                            targets: "#board4",
+                            top: "76%",
+                            easing: "easeInQuint",
+                            duration: 2000
+                        });
+                        anime({
+                            targets: "#logout, #music",
+                            left: "100%",
+                            easing: "easeInQuint",
+                            duration: 2000
+                        });
+                        anime({
+                            targets: "#guide, #animal",
+                            top: "38%",
+                            opacity: [1, 0],
+                            easing: "easeInQuint",
+                            duration: 2000
+                        })
+                            .finished.then(() => {
+                                setUser(mapUserData((userData)));
+
+                                history.push("/details");
+                                showDetailsPage();
+                            });
+                    }
+                })
+                .catch(() => {
+                    toast.error("The Access Code is invalid.")
+                });
+        }
+    }
+
     return <div>
         <img className={cls.animal} id="animal" src={require("../assets/animals/Animal_1.png")} />
         <img className={cls.guide} id="guide" src={require("../assets/avatars/Avatar_6.png")} />
@@ -84,11 +169,11 @@ const LandingPage = () => {
             <div className={cls.body}>
                 <CILabel>Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam.</CILabel>
                 <CILabel>Access Code</CILabel>
-                <CIInput />
-                <CIButton>Submit</CIButton>
+                <CIInput onChange={handleChange} onEnter={handleSubmit} value={text} />
+                <CIButton onClick={handleSubmit}>Submit</CIButton>
             </div>
         </div>
-        <CILogout className={cls.logout} id="logout" />
+        <CILogout className={cls.logout} id="logout" onClick={handleLogout} />
         <CIMusic className={cls.music} id="music" />
     </div>
 }

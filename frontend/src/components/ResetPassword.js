@@ -88,7 +88,7 @@ const ResetPassword = () => {
                 <CILabel>Username</CILabel>
                 <CIInput disabled />
                 <CILabel>Password</CILabel>
-                <CIInput type="password" />
+                <CIInput onEnter={handleSave} type="password" />
                 <CIButton onClick={handleSave}>Save</CIButton>
             </div>
         </div>

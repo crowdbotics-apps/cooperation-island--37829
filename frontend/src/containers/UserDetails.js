@@ -3,7 +3,10 @@ import { differenceInYears, endOfMonth, endOfYear, startOfMonth, subYears } from
 import { DatePicker } from "@material-ui/pickers";
 import { makeStyles } from "@material-ui/core";
 import { useHistory } from "react-router-dom";
-import { AppContext } from "../App";
+import { mapUserData, mapUserDetails } from "../funnels/v1";
+import { formatNationality, formatZipCode, parseToken, userState, validateZipCode } from "../libs/utils";
+import { details as handleDetailsAPI } from "../services/v1";
+import { showAvatarPage, showLoginBoard } from "../libs/animations";
 import BoardImg from "../assets/images/Board.png";
 import CIButton from "../shared/CIButton";
 import CICheck from "../shared/CICheck";
@@ -11,8 +14,10 @@ import CIInput from "../shared/CIInput";
 import CILabel from "../shared/CILabel";
 import CILogout from "../shared/CILogout";
 import CIMusic from "../shared/CIMusic";
+import { AppContext } from "../App";
 import { toast } from "react-toastify";
 import { Howl } from "howler";
+import anime from "animejs";
 import clsx from "clsx";
 
 const useStyles = makeStyles((theme) => ({
@@ -104,7 +109,7 @@ const UserDetails = () => {
 
     const history = useHistory();
 
-    const { user } = useContext(AppContext);
+    const { BGM, howler, user, setUser } = useContext(AppContext);
 
     const [details, setDetails] = useState({
         nationality: "",
@@ -117,6 +122,29 @@ const UserDetails = () => {
         if (user.details)
             history.push("/");
     }, []);
+
+
+    const handleLogout = () => {
+        if (BGM) {
+            howler.welcome.fade(howler.welcome.volume(), 0, 1000);
+            howler.dashboard?.fade(1, 0, 1000);
+        }
+        localStorage.clear();
+
+        anime({
+            targets: "#board, #guide, #logout, #music",
+            opacity: [1, 0],
+            easing: "easeOutQuint",
+            delay: 1000,
+            duration: 1000
+        })
+            .finished.then(() => {
+                setUser(userState);
+
+                history.push("/login");
+                showLoginBoard();
+            });
+    }
 
     const handleDetails = (prop) => (event) => {
         if (prop === "male" || prop === "female") {
@@ -132,7 +160,7 @@ const UserDetails = () => {
         else
             setDetails({
                 ...details,
-                [prop]: event.target.value
+                [prop]: prop === "nationality" ? formatNationality(event.target.value, details.nationality) : formatZipCode(event.target.value, details.zipcode)
             });
     }
 
@@ -144,7 +172,7 @@ const UserDetails = () => {
             });
         else {
             setDetails({ ...details });
-            toast.error("Your selection is incorrect, as per your age.")
+            toast.error("The Month or Year is incorrect, based on your age.");
         }
     }
 
@@ -152,22 +180,75 @@ const UserDetails = () => {
         event.target.click();
     }
 
+    const handleNext = () => {
+        if (details.nationality.length === 0)
+            toast.error("The Nationality cannot be empty.");
+        else if (!validateZipCode(details.zipcode))
+            toast.error("The Zipcode is invalid.");
+        else if (!details.birthDay)
+            toast.error("The Birth Date cannot be empty.");
+        else {
+            handleDetailsAPI(mapUserDetails(details))
+                .then(({ data }) => {
+                    const userData = parseToken(data.user);
+
+                    if (userData) {
+                        localStorage["UserState"] = data.user;
+                    }
+
+                    anime({
+                        targets: "#logo",
+                        left: "-50%",
+                        easing: "easeInQuint",
+                        duration: 2000
+                    });
+                    anime({
+                        targets: "#guide",
+                        left: "-30%",
+                        easing: "easeInQuint",
+                        duration: 2000
+                    });
+                    anime({
+                        targets: "#board",
+                        left: "110%",
+                        easing: "easeInQuint",
+                        duration: 2000
+                    })
+                    anime({
+                        targets: "#logout, #music",
+                        left: "100%",
+                        easing: "easeInQuint",
+                        duration: 2000
+                    })
+                        .finished.then(() => {
+                            setUser(mapUserData((userData)));
+
+                            history.push("/avatar");
+                            showAvatarPage();
+                        });
+                })
+                .catch(() => {
+                    toast.error("The Access Code is invalid.")
+                });
+        }
+    }
+
     return <div>
         <img className={cls.guide} id="guide" src={require("../assets/avatars/Avatar_7.png")} />
         <div className={cls.board} id="board">
             <CILabel className={cls.title}>Tell us more about YOU</CILabel>
-            <CIInput className={cls.input} placeholder="Nationality" onChange={handleDetails("nationality")} />
+            <CIInput className={cls.input} placeholder="Nationality" onChange={handleDetails("nationality")} onEnter={handleNext} value={details.nationality} />
             <div className={clsx(cls.gender, "pointer")}>
-                <div onClick={handleDetails("male")}>
+                <div className="pointer" onClick={handleDetails("male")}>
                     <CILabel className="pointer">Male</CILabel>
                     <CICheck checked={details.gender === 0} />
                 </div>
-                <div onClick={handleDetails("female")}>
+                <div className="pointer" onClick={handleDetails("female")}>
                     <CILabel className="pointer">Female</CILabel>
                     <CICheck checked={details.gender === 1} />
                 </div>
             </div>
-            <CIInput className={cls.input} placeholder="Zip Code" onChange={handleDetails("zipcode")} />
+            <CIInput className={cls.input} placeholder="Zip Code" onChange={handleDetails("zipcode")} onEnter={handleNext} value={details.zipcode} />
             <DatePicker
                 autoOk
                 disableToolbar
@@ -187,9 +268,9 @@ const UserDetails = () => {
                 }}
                 TextFieldComponent={(params) => <CIInput {...params} onChange={handleBirthday} />}
             />
-            <CIButton className={cls.button}>Next</CIButton>
+            <CIButton className={cls.button} onClick={handleNext}>Next</CIButton>
         </div>
-        <CILogout className={cls.logout} checked id="logout" />
+        <CILogout className={cls.logout} id="logout" onClick={handleLogout} />
         <CIMusic className={cls.music} id="music" />
     </div>
 }

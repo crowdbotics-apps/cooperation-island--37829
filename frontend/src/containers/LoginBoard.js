@@ -1,7 +1,10 @@
 import { useContext, useEffect, useState } from "react";
 import { makeStyles } from "@material-ui/core";
 import { useHistory } from "react-router-dom";
-import { showHomePage, showLandingPage, showReadingPane } from "../libs/animations";
+import { mapUserData } from "../funnels/v1";
+import { formatAge, formatUsername, parseToken, validateEmail } from "../libs/utils";
+import { login as handleLogin, signup as handleSignup } from "../services/v1";
+import { showAvatarPage, showDetailsPage, showHomePage, showLandingPage, showReadingPane } from "../libs/animations";
 import BoardImg from "../assets/images/Board.png";
 import HeaderImg from "../assets/images/Header.png";
 import SwitchImg from "../assets/images/Switch.png";
@@ -10,6 +13,7 @@ import CIInput from "../shared/CIInput";
 import CILabel from "../shared/CILabel";
 import CILink from "../shared/CILink";
 import { AppContext } from "../App";
+import { toast } from "react-toastify";
 import { Howl } from "howler";
 import anime from "animejs";
 import clsx from "clsx";
@@ -178,6 +182,20 @@ const LoginBoard = () => {
 
     const history = useHistory();
 
+    const [login, setLogin] = useState({
+        username: "",
+        password: ""
+    });
+
+    const [signup, setSignup] = useState({
+        username: "",
+        password: "",
+        email: "",
+        age: ""
+    });
+
+    const [username, setUsername] = useState("");
+
     const [active, setActive] = useState(window.location.pathname === "/login");
 
     const { setBGM, setHowler, setUser } = useContext(AppContext);
@@ -216,6 +234,26 @@ const LoginBoard = () => {
             duration: 250
         });
     }, [active]);
+
+    const handleChange = (prop, parent) => (event) => {
+        if (prop === "age")
+            setSignup({
+                ...signup,
+                age: formatAge(event.target.value, signup.age)
+            });
+        else if (parent === "login")
+            setLogin({
+                ...login,
+                [prop]: prop === "username" ? formatUsername(event.target.value, login[prop]) : event.target.value
+            });
+        else if (parent === "signup")
+            setSignup({
+                ...signup,
+                [prop]: prop === "username" ? formatUsername(event.target.value, signup[prop]) : event.target.value
+            });
+        else
+            setUsername(formatUsername(event.target.value, username));
+    }
 
     const handleSwitch = () => {
         setActive(!active);
@@ -272,6 +310,27 @@ const LoginBoard = () => {
         });
     }
 
+    const handleClick = (path) => () => {
+        anime
+            .timeline()
+            .add({
+                targets: "#guide",
+                left: "-30%",
+                easing: "easeInQuint",
+                duration: 2000
+            })
+            .add({
+                targets: "#board",
+                left: "110%",
+                easing: "easeInQuint",
+                duration: 2000
+            }, "-=2000")
+            .finished.then(() => {
+                history.push(path);
+                showReadingPane();
+            });
+    }
+
     const handleCancel = () => {
         anime({
             targets: "#guide",
@@ -323,8 +382,56 @@ const LoginBoard = () => {
         });
     }
 
-    const handleSign = () => {
-        if (!window) {
+    const handleSign = (isLogin) => () => {
+        if (isLogin) {
+            if (validateLogin()) {
+                handleLogin(login)
+                    .then(({ data }) => {
+                        const userData = parseToken(data.user);
+
+                        if (userData) {
+                            localStorage["AccessToken"] = data.token;
+                            localStorage["UserState"] = data.user;
+                            playAnimations(mapUserData(userData));
+                        }
+                        else
+                            toast.error("Something went wrong.");
+                    })
+                    .catch(() => {
+                        toast.error("The Username or Password is incorrect.");
+                    });
+            }
+        }
+        else {
+            if (validateSignup()) {
+                handleSignup(signup)
+                    .then(({ data }) => {
+                        const userData = parseToken(data.user);
+
+                        if (userData) {
+                            localStorage["AccessToken"] = data.token;
+                            localStorage["UserState"] = data.user;
+                            playAnimations(mapUserData((userData)));
+                        }
+                        else
+                            toast.error("Something went wrong.");
+                    })
+                    .catch(() => {
+                        toast.error("Something went wrong.");
+                    });
+            }
+        }
+    }
+
+    const handleSend = () => {
+        if (validateUsername()) {
+            toast.success("Reset Password link has been sent to your Email.");
+            handleCancel();
+        }
+    }
+
+    const playAnimations = (data) => {
+        if (data.access && data.details && !data.avatar) {
             anime({
                 targets: "#logo",
                 left: "-50%",
@@ -345,8 +452,7 @@ const LoginBoard = () => {
             duration: 2000
         })
             .finished.then(() => {
-                setUser({ active: true });
-
+                setUser(data);
                 setBGM(true);
                 setHowler({
                     welcome: new Howl({
@@ -356,9 +462,21 @@ const LoginBoard = () => {
                     })
                 });
 
-                if (window) {
-                    history.push("/home");
-                    showHomePage();
+                if (data.access) {
+                    if (data.details) {
+                        if (data.avatar) {
+                            history.push("/home");
+                            showHomePage();
+                        }
+                        else {
+                            history.push("/avatar");
+                            showAvatarPage();
+                        }
+                    }
+                    else {
+                        history.push("/details");
+                        showDetailsPage();
+                    }
                 }
                 else {
                     history.push("/access");
@@ -367,25 +485,35 @@ const LoginBoard = () => {
             });
     }
 
-    const handleClick = (path) => () => {
-        anime
-            .timeline()
-            .add({
-                targets: "#guide",
-                left: "-30%",
-                easing: "easeInQuint",
-                duration: 2000
-            })
-            .add({
-                targets: "#board",
-                left: "110%",
-                easing: "easeInQuint",
-                duration: 2000
-            }, "-=2000")
-            .finished.then(() => {
-                history.push(path);
-                showReadingPane();
-            });
+    const validateLogin = () => {
+        if (login.username.length < 6)
+            toast.error("Username must be more than 5 characters.");
+        else if (login.password.trim().length < 8)
+            toast.error("Password must be at least 8 characters.");
+        else
+            return true;
+    }
+
+    const validateSignup = () => {
+        if (signup.username.length < 6)
+            toast.error("Username must be more than 5 characters.");
+        else if (signup.password.trim().length < 8)
+            toast.error("Password must be at least 8 characters.");
+        else if (!validateEmail(signup.email))
+            toast.error("The Email is invalid.");
+        else if (!signup.age)
+            toast.error("The Age cannot be empty or 0");
+        else if (signup.age > 18)
+            toast.error("Children above 18 are not allowed.");
+        else
+            return true;
+    }
+
+    const validateUsername = () => {
+        if (username.length < 6)
+            toast.error("Username must be more than 5 characters.");
+        else
+            return true;
     }
 
     return <div>
@@ -404,20 +532,20 @@ const LoginBoard = () => {
             <div className={cls.body}>
                 <div className={cls.signInSection}>
                     <CILabel>Username</CILabel>
-                    <CIInput />
+                    <CIInput onChange={handleChange("username", "login")} onEnter={handleSign(true)} value={login.username} />
                     <CILabel>Password</CILabel>
-                    <CIInput type="password" />
+                    <CIInput onChange={handleChange("password", "login")} onEnter={handleSign(true)} type="password" value={login.password} />
                     <CILink onClick={handleLink}>Forgot Password?</CILink>
-                    <CIButton onClick={handleSign}>Sign In</CIButton>
+                    <CIButton onClick={handleSign(true)}>Sign In</CIButton>
                 </div>
                 <div className={cls.signUpSection}>
-                    <CIInput placeholder="Username" />
-                    <CIInput placeholder="Password" type="password" />
+                    <CIInput onChange={handleChange("username", "signup")} onEnter={handleSign(false)} placeholder="Username" value={signup.username} />
+                    <CIInput onChange={handleChange("password", "signup")} onEnter={handleSign(false)} placeholder="Password" type="password" value={signup.password} />
                     <div className={cls.grid}>
-                        <CIInput className={cls.email} placeholder="Email" sm />
-                        <CIInput className={cls.age} placeholder="Age" xs />
+                        <CIInput className={cls.email} onChange={handleChange("email", "signup")} onEnter={handleSign(false)} placeholder="Email" sm value={signup.email} />
+                        <CIInput className={cls.age} onChange={handleChange("age", "signup")} onEnter={handleSign(false)} placeholder="Age" xs value={signup.age} />
                     </div>
-                    <CIButton onClick={handleSign}>Sign Up</CIButton>
+                    <CIButton onClick={handleSign(false)}>Sign Up</CIButton>
                     <CILabel className={cls.footerText}>
                         By Signing Up, you are agreeing to our
                     </CILabel>
@@ -428,9 +556,9 @@ const LoginBoard = () => {
                 <div className={cls.resetSection}>
                     <CILabel>Forgot Password?</CILabel>
                     <CILabel>Username</CILabel>
-                    <CIInput />
+                    <CIInput onChange={handleChange("username")} onEnter={handleSend} value={username} />
                     <div>
-                        <CIButton>Send</CIButton>
+                        <CIButton onClick={handleSend}>Send</CIButton>
                         <CIButton onClick={handleCancel}>Cancel</CIButton>
                     </div>
                 </div>
