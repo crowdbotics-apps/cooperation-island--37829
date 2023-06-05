@@ -6,7 +6,6 @@ import LoadAssets from "../components/LoadAssets";
 import { AppContext } from "../App";
 import { Howl } from "howler";
 import anime from "animejs";
-import $ from "jquery";
 
 const useStyles = makeStyles((theme) => ({
     BG: {
@@ -41,7 +40,7 @@ const HomePage = () => {
 
     const [fetchStatus, setStatus] = useState(true);
 
-    const allItems = $("#assets").length;
+    const allItems = document.querySelectorAll("#assets").length;
 
     const isLoaded = loadedItems === allItems && allItems !== 0;
 
