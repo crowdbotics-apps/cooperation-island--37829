@@ -5,7 +5,7 @@ import { mapUserData } from "../funnels/v1";
 import { formatCode, parseToken, userState } from "../libs/utils";
 import { access as handleAccess, refresh as handleRefresh } from "../services/v1";
 import { showDetailsPage, showLoginBoard } from "../libs/animations";
-import BoardImg from "../assets/images/Board.png";
+import BoardImg from "../assets/images/Board-alt.png";
 import CIButton from "../shared/CIButton";
 import CIInput from "../shared/CIInput";
 import CILabel from "../shared/CILabel";
@@ -19,66 +19,60 @@ const useStyles = makeStyles({
     animal: {
         position: "absolute",
         zIndex: 2,
-        top: "38%",
-        left: "48%",
+        top: "18vh",
+        left: "48vw",
         height: "41vh",
         width: "11vw",
         transform: "scale(0)"
     },
     guide: {
         position: "absolute",
-        top: "38%",
-        left: "71%",
+        top: "38vh",
+        left: "71vw",
         height: "58vh",
         width: "20vw",
         transform: "scale(0)"
     },
     board: {
         position: "absolute",
-        top: "76%",
-        left: "52%",
-        height: "110vh",
-        width: "30vw",
-        rotate: "90deg",
+        top: "110vh",
+        left: "42vw",
+        height: "60vh",
+        width: "50vw",
         background: `url(${BoardImg})`,
         backgroundRepeat: "no-repeat",
-        backgroundSize: "100% 100%"
+        backgroundSize: "50vw 60vh"
     },
     body: {
-        "& button": {
-            width: "26%"
-        },
         "& input": {
             marginTop: "1vh",
-            marginBottom: "3vh",
-            marginLeft: "9vw"
+            marginBottom: "6vh"
         },
-        "& label": {
-            "&:first-child": {
-                fontSize: "2.5vh",
-                letterSpacing: "0.1vw",
-                paddingTop: "3vh",
-                marginBottom: "14vh"
-            },
-            width: "100%"
+        "& label:first-child": {
+            fontSize: "2.5vh",
+            letterSpacing: "0.1vw",
+            paddingTop: "2vh",
+            marginBottom: "12vh"
         },
-        rotate: "-90deg",
-        height: "48vh",
-        width: "126%",
-        marginTop: "47%",
-        marginLeft: "-12%",
-        textAlign: "center"
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        textAlign: "center",
+        padding: "0vh 6.5vw",
+        height: "50vh",
+        width: "37vw",
+        marginTop: "8vh"
     },
     logout: {
         position: "absolute",
-        top: "4%",
-        left: "100%",
+        top: "4vh",
+        left: "100vw",
         width: "4vw"
     },
     music: {
         position: "absolute",
-        top: "17%",
-        left: "100%",
+        top: "17vh",
+        left: "100vw",
         width: "4vw"
     }
 });
@@ -96,7 +90,7 @@ const LandingPage = () => {
         window.RefreshTimer = setInterval(() => {
             if (localStorage["AccessToken"])
                 handleRefresh()
-                    .then(handleMove);
+                    .then(handleSave);
             else
                 clearInterval(window.RefreshTimer);
         }, 1000);
@@ -128,7 +122,7 @@ const LandingPage = () => {
             });
     }
 
-    const handleMove = ({ data }) => {
+    const handleSave = ({ data }) => {
         const userData = parseToken(data.user);
 
         if (userData && userData.consent_status) {
@@ -137,19 +131,19 @@ const LandingPage = () => {
 
             anime({
                 targets: "#board4",
-                top: "76%",
+                top: "110vh",
                 easing: "easeInQuint",
                 duration: 2000
             });
             anime({
                 targets: "#logout, #music",
-                left: "100%",
+                left: "100vw",
                 easing: "easeInQuint",
                 duration: 2000
             });
             anime({
                 targets: "#guide, #animal",
-                top: "38%",
+                top: "38vw",
                 opacity: [1, 0],
                 easing: "easeInQuint",
                 duration: 2000
@@ -168,7 +162,7 @@ const LandingPage = () => {
             toast.error("The Access Code cannot be empty.");
         else {
             handleAccess(text)
-                .then(handleMove)
+                .then(handleSave)
                 .catch(() => {
                     toast.error("The Access Code is invalid.")
                 });

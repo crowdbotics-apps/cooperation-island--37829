@@ -13,70 +13,72 @@ import clsx from "clsx";
 
 const useStyles = makeStyles({
     board: {
+        height: "11.9vh",
         width: "20vw"
     },
     guide: {
         position: "absolute",
-        top: "33.5%",
-        left: "-30%",
+        top: "33.5vh",
+        left: "-30vw",
         height: "70vh",
         width: "24vw",
         transform: "scaleX(-1)"
     },
     header: {
         position: "absolute",
-        top: "-11.5%",
-        left: "64.5%"
+        top: "-11.5vh",
+        left: "64.5vw"
     },
     label: {
         position: "absolute",
         fontWeight: "bold",
         textAlign: "center",
-        top: "35%",
+        top: "4.5vh",
         width: "20vw"
     },
     logout: {
         position: "absolute",
-        top: "15%",
-        left: "144%",
+        top: "0vh",
+        left: "29vw",
         width: "4vw"
     },
     music: {
         position: "absolute",
-        top: "17%",
-        left: "112%",
+        top: "0vh",
+        left: "22.6vw",
         width: "4vw"
     },
     module: {
         position: "absolute",
-        top: "26%",
-        left: "32%",
+        top: "26vh",
+        left: "32vw",
+        height: "50.3vh",
         width: "20vw",
         filter: "drop-shadow(0.33vh 0.66vh 1.2vh black)",
         transform: "scale(0)"
     },
     module2: {
-        left: "55%"
+        left: "55vw"
     },
     module3: {
-        left: "78%",
+        left: "78vw",
         filter: "drop-shadow(0.33vh 0.66vh 0.8vh black) grayscale(1)"
     },
     module4: {
-        top: "84%",
-        left: "32%",
+        top: "84vh",
+        left: "32vw",
         display: "none",
         filter: "drop-shadow(0.33vh 0.66vh 0.8vh black) grayscale(1)"
     },
     module5: {
-        top: "84%",
-        left: "55%",
+        top: "84vh",
+        left: "55vw",
         display: "none",
         filter: "drop-shadow(0.33vh 0.66vh 0.8vh black) grayscale(1)"
     },
     module6: {
-        top: "84%",
-        left: "78%",
+        top: "84vh",
+        left: "78vw",
         display: "none",
         filter: "drop-shadow(0.33vh 0.66vh 0.8vh black) grayscale(1)"
     }
@@ -129,19 +131,19 @@ const Dashboard = () => {
                 });
                 anime({
                     targets: "#logo",
-                    left: "-50%",
+                    left: "-50vw",
                     easing: "easeInQuint",
                     duration: 2000
                 });
                 anime({
                     targets: "#guide",
-                    left: "-30%",
+                    left: "-30vw",
                     easing: "easeInQuint",
                     duration: 2000
                 });
                 anime({
                     targets: "#header",
-                    top: "-11.5%",
+                    top: "-11.5vh",
                     easing: "easeInQuint",
                     duration: 2000
                 });

@@ -10,22 +10,22 @@ import clsx from "clsx";
 const useStyles = makeStyles((theme) => ({
     guide: {
         position: "absolute",
-        top: "33.5%",
-        left: "-30%",
+        top: "33.5vh",
+        left: "-30vw",
         height: "88vh",
         width: "30vw",
         transform: "scaleX(-1)"
     },
     board: {
         position: "absolute",
-        top: "1.5%",
-        left: "110%",
+        top: "1.5vh",
+        left: "110vw",
         height: "94vh",
         width: "54vw",
         textAlign: "center",
         background: `url(${BoardImg})`,
         backgroundRepeat: "no-repeat",
-        backgroundSize: "100% 100%"
+        backgroundSize: "54vw 94vh"
     },
     title: {
         fontSize: "4.5vh",
@@ -51,8 +51,8 @@ const useStyles = makeStyles((theme) => ({
         overflowY: "scroll"
     },
     button: {
-        marginLeft: "4%",
-        width: "18% !important"
+        marginTop: "2vh",
+        marginLeft: "2vw"
     }
 }));
 
@@ -68,13 +68,13 @@ const ReadingPane = () => {
             .timeline()
             .add({
                 targets: "#guide",
-                left: "-30%",
+                left: "-30vw",
                 easing: "easeInQuint",
                 duration: 2000
             })
             .add({
                 targets: "#board3",
-                left: "110%",
+                left: "110vw",
                 easing: "easeInQuint",
                 duration: 2000
             }, "-=2000")

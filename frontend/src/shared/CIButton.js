@@ -6,19 +6,22 @@ import anime from "animejs";
 import clsx from "clsx";
 
 const useStyles = (alt) => makeStyles((theme) => ({
-    root: {
-        border: "none",
-        backgroundPositionY: "2vh",
+    label: {
         color: theme.palette.primary.light,
         fontFamily: "Summer Show",
         fontSize: "3.3vh",
         fontWeight: "400",
+        marginTop: "-1.25vh"
+    },
+    root: {
+        border: "none",
         outline: "none",
-        height: "10vh",
-        width: "50%",
+        height: "7vh",
+        width: "8vw",
+        padding: "0 2vw",
         background: `url(${alt ? ButtonAltImg : ButtonImg})`,
         backgroundRepeat: "no-repeat",
-        backgroundSize: "contain"
+        backgroundSize: "8vw 7vh"
     }
 }));
 
@@ -40,7 +43,9 @@ const CIButton = (props) => {
         props.onClick && props.onClick();
     }
 
-    return <button {...props} className={clsx(cls.root, props.className, "pointer")} id={buttonId} onClick={handleClick} />
+    return <button {...props} className={clsx(cls.root, props.className, "pointer")} id={buttonId} onClick={handleClick}>
+        <div className={clsx(cls.label, "pointer")}>{props.children}</div>
+    </button>
 }
 
 export default CIButton;

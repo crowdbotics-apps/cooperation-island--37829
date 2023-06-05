@@ -4,23 +4,23 @@ import $ from "jquery";
 export const showLoginBoard = (alt) => {
     anime({
         targets: "#logo",
-        top: "-12%",
-        left: "-12%",
+        top: "-12vh",
+        left: "-12vw",
         scale: 0.45,
-        translateX: alt ? ["-50%", "0%"] : "0%",
-        translateY: alt ? ["-50%", "0%"] : "0%",
+        translateX: alt ? ["-30vw", "0vw"] : "0vw",
+        translateY: alt ? ["-30vh", "0vh"] : "0vh",
         easing: "easeOutQuint",
         duration: 2000
     });
     anime({
         targets: "#guide",
-        left: "6%",
+        left: "6vw",
         easing: "easeOutQuint",
         duration: 2000
     });
     anime({
         targets: "#board",
-        left: "63%",
+        left: "63vw",
         easing: "easeOutQuint",
         duration: 2000
     });
@@ -29,23 +29,23 @@ export const showLoginBoard = (alt) => {
 export const showResetPassword = () => {
     anime({
         targets: "#logo",
-        top: "-12%",
-        left: "-12%",
+        top: "-12vh",
+        left: "-12vw",
         scale: 0.45,
-        translateX: ["-50%", "0%"],
-        translateY: ["-50%", "0%"],
+        translateX: ["-30vw", "0vw"],
+        translateY: ["-30vh", "0vh"],
         easing: "easeOutQuint",
         duration: 2000
     });
     anime({
         targets: "#guide",
-        left: "3%",
+        left: "3vw",
         easing: "easeOutQuint",
         duration: 2000
     });
     anime({
         targets: "#board2",
-        left: "50%",
+        left: "40vw",
         easing: "easeOutQuint",
         duration: 2000
     });
@@ -54,23 +54,23 @@ export const showResetPassword = () => {
 export const showReadingPane = (alt) => {
     anime({
         targets: "#logo",
-        top: "-12%",
-        left: "-12%",
+        top: "-12vh",
+        left: "-12vw",
         scale: 0.45,
-        translateX: alt ? ["-50%", "0%"] : "0%",
-        translateY: alt ? ["-50%", "0%"] : "0%",
+        translateX: alt ? ["-30vw", "0vw"] : "0vw",
+        translateY: alt ? ["-30vh", "0vh"] : "0vh",
         easing: "easeOutQuint",
         duration: 2000
     });
     anime({
         targets: "#guide",
-        left: "2.5%",
+        left: "2.5vw",
         easing: "easeOutQuint",
         duration: 2000
     });
     anime({
         targets: "#board3",
-        left: "42%",
+        left: "42vw",
         easing: "easeOutQuint",
         duration: 2000
     });
@@ -81,26 +81,26 @@ export const showLandingPage = () => {
         .timeline()
         .add({
             targets: "#board4",
-            top: ["76%", "10%"],
+            top: ["110vh", "33.4vh"],
             easing: "easeOutQuint",
             duration: 2000
         })
         .add({
             targets: "#logout, #music",
-            left: "94%",
+            left: "94vw",
             easing: "easeOutQuint",
             duration: 2000
         }, "-=2000")
         .add({
             targets: "#guide",
-            top: "-0.5%",
+            top: "-0.5vh",
             scale: [0, 1],
             easing: "easeOutQuint",
             duration: 2000
         })
         .add({
             targets: "#animal",
-            top: "0.3%",
+            top: "0.3vh",
             scale: [0, 1],
             easing: "easeOutQuint",
             duration: 2000
@@ -110,7 +110,7 @@ export const showLandingPage = () => {
 export const showDetailsPage = () => {
     anime({
         targets: "#guide",
-        left: "6%",
+        left: "6vw",
         easing: "easeOutQuint",
         duration: 2000
     });
@@ -118,13 +118,13 @@ export const showDetailsPage = () => {
         .timeline()
         .add({
             targets: "#board",
-            left: "60%",
+            left: "60vw",
             easing: "easeOutQuint",
             duration: 2000
         })
         .add({
             targets: "#logout, #music",
-            left: "94%",
+            left: "94vw",
             easing: "easeOutQuint",
             duration: 2000
         }, "-=1200");
@@ -150,7 +150,7 @@ export const showAvatarPage = () => {
         })
         .add({
             targets: "#logout, #music",
-            left: "94%",
+            left: "94vw",
             easing: "easeOutQuint",
             duration: 2000,
             complete: () => {
@@ -174,13 +174,19 @@ export const showAvatarPage = () => {
 export const showHomePage = () => {
     anime({
         targets: "#guide",
-        left: "6%",
+        left: "6vw",
         easing: "easeOutQuint",
         duration: 2000
     });
     anime({
         targets: "#header",
-        top: "4%",
+        top: "4vh",
+        easing: "easeOutQuint",
+        duration: 2000
+    });
+    anime({
+        targets: "#logout, #music",
+        top: "1.75vh",
         easing: "easeOutQuint",
         duration: 2000
     });

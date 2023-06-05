@@ -21,105 +21,104 @@ import clsx from "clsx";
 const useStyles = makeStyles({
     board: {
         position: "absolute",
-        top: "3%",
-        left: "110%",
+        top: "3vh",
+        left: "110vw",
         height: "94vh",
         width: "30vw",
         background: `url(${BoardImg})`,
         backgroundRepeat: "no-repeat",
-        backgroundSize: "100% 100%"
+        backgroundSize: "30vw 94vh"
     },
     guide: {
         position: "absolute",
-        top: "33.5%",
-        left: "-30%",
+        top: "33.5vh",
+        left: "-30vw",
         height: "70vh",
         width: "24vw",
         transform: "scaleX(-1)"
     },
     guide2: {
         position: "absolute",
-        top: "44%",
-        left: "50%",
+        top: "44vh",
+        left: "50vw",
         height: "70vh",
         width: "24vw",
         transform: "scale(0)"
     },
     header: {
-        marginTop: "18.4%",
-        marginLeft: "18.4%",
+        marginTop: "12vh",
+        marginLeft: "5.5vw",
         height: "10vh",
-        width: "75vw",
+        width: "20vw",
         background: `url(${HeaderImg})`,
         backgroundRepeat: "no-repeat",
-        backgroundSize: "contain"
+        backgroundSize: "20vw 10vh"
     },
     title: {
         "&#sign-up": {
-            marginLeft: "38.5%"
+            marginLeft: "12.2vw"
         },
         position: "absolute",
-        marginTop: "4%",
-        marginLeft: "11.5%",
+        marginTop: "2.55vh",
+        marginLeft: "3.48vw",
         fontSize: "3.3vh",
         textAlign: "center"
     },
     tab: {
         position: "absolute",
-        top: "11.1%",
-        left: "14.3%",
+        top: "10.25vh",
         height: "10vh",
         width: "10vw",
         background: `url(${SwitchImg})`,
         backgroundRepeat: "no-repeat",
-        backgroundSize: "contain"
+        backgroundSize: "10vw 10vh"
     },
     body: {
+        "& > div": {
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            height: "62vh",
+            width: "25.75vw"
+        },
         position: "relative",
-        height: "61vh",
-        marginLeft: "8%",
-        marginRight: "4%",
+        marginLeft: "2.7vw",
         overflow: "hidden",
-        textAlign: "center"
+        textAlign: "center",
+        height: "62vh",
+        width: "25.75vw"
     },
     signInSection: {
         "& button": {
-            marginTop: "2vh",
-            marginLeft: "1%"
+            marginTop: "3vh",
+            width: "auto"
         },
         "& input": {
             marginTop: "0.7vh"
         },
         "& label": {
             "&:nth-child(5)": {
-                marginTop: "5.6vh",
-                marginLeft: "1%"
+                marginTop: "5.6vh"
             },
             marginTop: "2.7vh"
         },
         position: "absolute",
         zIndex: 2,
-        marginTop: "2vh",
-        marginLeft: "12.5%"
+        marginTop: "2vh"
     },
     signUpSection: {
-        position: "absolute",
         "& button": {
-            width: "9.65vw",
-            marginTop: "1vh",
+            marginTop: "3vh",
+            width: "auto"
         },
         "& input": {
             marginBottom: "1vh"
         },
-        "& label": {
-            marginLeft: "3%"
-        },
+        position: "absolute",
         zIndex: 2,
-        marginTop: "5%",
-        marginLeft: "105%"
+        marginTop: "4vh"
     },
     resetSection: {
-        position: "absolute",
         "& label": {
             "&:first-child": {
                 fontSize: "4.5vh",
@@ -128,30 +127,32 @@ const useStyles = makeStyles({
             },
             "&:nth-child(2)": {
                 marginTop: "8vh",
-                marginBottom: "0.7vh"
-            },
-            width: "100%"
+                marginBottom: "2vh"
+            }
         },
         "& button": {
-            width: "45%"
-        },
-        "& div": {
-            display: "flex",
-            justifyContent: "space-between",
-            width: "95.5%"
+            margin: "0vh 3vw"
         },
         "& input": {
-            marginBottom: "3vh",
-            marginLeft: "2.5vw"
+            marginBottom: "6vh",
         },
+        position: "absolute",
         opacity: 0,
         rotate: "-90deg",
-        height: "43.3vh",
-        width: "105%",
-        marginTop: "9%",
-        marginLeft: "-100%"
+        height: "44vh !important",
+        width: "36vw !important",
+        marginTop: "25vh",
+        marginLeft: "-7vw"
     },
     grid: {
+        "& input": {
+            "&:first-child": {
+                height: "11.7vh",
+                width: "8.7vw"
+            },
+            height: "10.5vh",
+            width: "3vw"
+        },
         display: "flex"
     },
     age: {
@@ -167,12 +168,15 @@ const useStyles = makeStyles({
         marginTop: "1.7vh",
         marginBottom: "-1.33vh"
     },
+    panel: {
+        display: "flex",
+        marginTop: "0.5vh"
+    },
     link: {
-        display: "inline",
         fontSize: "2vh"
     },
     pipe: {
-        display: "inline",
+        margin: "-0.25vh 0.5vw",
         fontSize: "2.5vh"
     }
 });
@@ -205,7 +209,7 @@ const LoginBoard = () => {
 
         anime({
             targets: `.${cls.tab}`,
-            left: active ? "6.2vw" : "14.3vw",
+            left: active ? "6.3vw" : "14.6vw",
             easing: "linear",
             duration: 250
         });
@@ -223,13 +227,13 @@ const LoginBoard = () => {
         });
         anime({
             targets: `.${cls.signInSection}`,
-            marginLeft: active ? "12.5%" : "-105%",
+            marginLeft: active ? "0vw" : "-27.6vw",
             easing: "linear",
             duration: 250
         });
         anime({
             targets: `.${cls.signUpSection}`,
-            marginLeft: active ? "105%" : "12.5%",
+            marginLeft: active ? "27.6vw" : "0vw",
             easing: "linear",
             duration: 250
         });
@@ -255,73 +259,18 @@ const LoginBoard = () => {
             setUsername(formatUsername(event.target.value, username));
     }
 
-    const handleSwitch = () => {
-        setActive(!active);
-    }
-
-    const handleLink = () => {
-        anime({
-            targets: "#guide",
-            scaleX: [-1, 0],
-            scaleY: 0,
-            left: "30%",
-            easing: "easeOutQuint",
-            duration: 2000
-        });
-        anime({
-            targets: "#guide2",
-            scale: [0, 1],
-            top: "2%",
-            easing: "easeOutQuint",
-            duration: 2000
-        });
-        anime({
-            targets: "#board",
-            top: "16%",
-            left: "38%",
-            width: "27vw",
-            height: "97vh",
-            rotate: 90,
-            easing: "easeOutQuint",
-            duration: 2000
-        });
-        anime({
-            targets: [`.${cls.header}`, `.${cls.signInSection}`, `.${cls.signUpSection}`],
-            opacity: 0,
-            easing: "easeOutQuint",
-            duration: 2000
-        });
-        anime({
-            targets: `.${cls.body}`,
-            height: "80vh",
-            duration: 0
-        });
-        anime({
-            targets: [`.${cls.resetSection}`, `.${cls.signInSection}`, `.${cls.signUpSection}`],
-            zIndex: (_, i) => i ? 1 : 2,
-            duration: 0
-        });
-        anime({
-            targets: `.${cls.resetSection}`,
-            opacity: 1,
-            marginLeft: "1%",
-            easing: "easeOutQuint",
-            duration: 2000
-        });
-    }
-
     const handleClick = (path) => () => {
         anime
             .timeline()
             .add({
                 targets: "#guide",
-                left: "-30%",
+                left: "-30vw",
                 easing: "easeInQuint",
                 duration: 2000
             })
             .add({
                 targets: "#board",
-                left: "110%",
+                left: "110vw",
                 easing: "easeInQuint",
                 duration: 2000
             }, "-=2000")
@@ -331,29 +280,50 @@ const LoginBoard = () => {
             });
     }
 
-    const handleCancel = () => {
+    const handleClose = () => {
         anime({
             targets: "#guide",
             scaleX: -1,
             scaleY: 1,
-            left: "6%",
+            left: "6vw",
             easing: "easeOutQuint",
             duration: 2000
         });
         anime({
             targets: "#guide2",
             scale: 0,
-            top: "44%",
+            top: "44vh",
             easing: "easeOutQuint",
             duration: 2000
         });
         anime({
             targets: "#board",
-            top: "3%",
-            left: "63%",
-            width: "30vw",
+            top: "3vh",
+            left: "63vw",
             height: "94vh",
-            rotate: 0,
+            width: "30vw",
+            backgroundSize: "30vw 94vh",
+            rotate: "0deg",
+            easing: "easeOutQuint",
+            duration: 2000
+        });
+        anime({
+            targets: `.${cls.body}`,
+            height: "62vh",
+            width: "25.75vw",
+            easing: "easeOutQuint",
+            duration: 2000
+        });
+        anime({
+            targets: `.${cls.header}`,
+            height: "10vh",
+            marginTop: "12vh",
+            easing: "easeOutQuint",
+            duration: 2000
+        });
+        anime({
+            targets: `.${cls.resetSection}`,
+            opacity: 0,
             easing: "easeOutQuint",
             duration: 2000
         });
@@ -364,22 +334,77 @@ const LoginBoard = () => {
             duration: 2000
         });
         anime({
-            targets: `.${cls.body}`,
-            height: "61vh",
-            duration: 0
-        });
-        anime({
             targets: [`.${cls.resetSection}`, `.${cls.signInSection}`, `.${cls.signUpSection}`],
             zIndex: (_, i) => i ? 2 : 1,
             duration: 0
         });
+    }
+
+    const handleLink = () => {
         anime({
-            targets: `.${cls.resetSection}`,
-            opacity: 0,
-            marginLeft: "-100%",
-            easing: "easeOutQuint",
+            targets: "#guide",
+            scaleX: [-1, 0],
+            scaleY: 0,
+            left: "30vw",
+            easing: "easeInQuint",
             duration: 2000
         });
+        anime({
+            targets: "#guide2",
+            scale: [0, 1],
+            top: "4vh",
+            easing: "easeInQuint",
+            duration: 2000
+        });
+        anime({
+            targets: "#board",
+            top: "20vh",
+            left: "38vw",
+            height: "96vh",
+            width: "26vw",
+            backgroundSize: ["30vw 94vh", "26vw 96vh"],
+            rotate: "90deg",
+            easing: "easeInQuint",
+            duration: 2000
+        });
+        anime({
+            targets: `.${cls.body}`,
+            height: "87vh",
+            width: "26.5vw",
+            easing: "easeInQuint",
+            duration: 2000
+        });
+        anime({
+            targets: `.${cls.header}`,
+            height: "0vh",
+            marginTop: "0vh",
+            easing: "easeInQuint",
+            duration: 2000
+        });
+        anime({
+            targets: `.${cls.resetSection}`,
+            opacity: 1,
+            easing: "easeInQuint",
+            duration: 2000
+        });
+        anime({
+            targets: [`.${cls.header}`, `.${cls.signInSection}`, `.${cls.signUpSection}`],
+            opacity: 0,
+            easing: "easeInQuint",
+            duration: 2000
+        });
+        anime({
+            targets: [`.${cls.resetSection}`, `.${cls.signInSection}`, `.${cls.signUpSection}`],
+            zIndex: (_, i) => i ? 1 : 2,
+            duration: 0
+        });
+    }
+
+    const handleSend = () => {
+        if (validateUsername()) {
+            toast.success("Reset Password link has been sent to your Email.");
+            handleClose();
+        }
     }
 
     const handleSign = (isLogin) => () => {
@@ -423,31 +448,28 @@ const LoginBoard = () => {
         }
     }
 
-    const handleSend = () => {
-        if (validateUsername()) {
-            toast.success("Reset Password link has been sent to your Email.");
-            handleCancel();
-        }
+    const handleSwitch = () => {
+        setActive(!active);
     }
 
     const playAnimations = (data) => {
         if (data.access && data.details && !data.avatar) {
             anime({
                 targets: "#logo",
-                left: "-50%",
+                left: "-50vw",
                 easing: "easeInQuint",
                 duration: 2000
             });
         }
         anime({
             targets: "#guide",
-            left: "-30%",
+            left: "-30vw",
             easing: "easeInQuint",
             duration: 2000
         });
         anime({
             targets: "#board",
-            left: "110%",
+            left: "110vw",
             easing: "easeInQuint",
             duration: 2000
         })
@@ -501,9 +523,9 @@ const LoginBoard = () => {
             toast.error("Password must be at least 8 characters.");
         else if (!validateEmail(signup.email))
             toast.error("The Email is invalid.");
-        else if (!signup.age)
+        else if (!parseInt(signup.age))
             toast.error("The Age cannot be empty or 0");
-        else if (signup.age > 18)
+        else if (parseInt(signup.age) > 18)
             toast.error("Children above 18 are not allowed.");
         else
             return true;
@@ -549,9 +571,11 @@ const LoginBoard = () => {
                     <CILabel className={cls.footerText}>
                         By Signing Up, you are agreeing to our
                     </CILabel>
-                    <CILink className={cls.link} onClick={handleClick("/terms-conditions")}>Terms & Conditions</CILink>
-                    <CILabel className={cls.pipe}>|</CILabel>
-                    <CILink className={cls.link} onClick={handleClick("/privacy")}>Privacy Policy</CILink>
+                    <div className={cls.panel}>
+                        <CILink className={cls.link} onClick={handleClick("/terms-conditions")}>Terms & Conditions</CILink>
+                        <CILabel className={cls.pipe}>|</CILabel>
+                        <CILink className={cls.link} onClick={handleClick("/privacy")}>Privacy Policy</CILink>
+                    </div>
                 </div>
                 <div className={cls.resetSection}>
                     <CILabel>Forgot Password?</CILabel>
@@ -559,7 +583,7 @@ const LoginBoard = () => {
                     <CIInput onChange={handleChange("username")} onEnter={handleSend} value={username} />
                     <div>
                         <CIButton onClick={handleSend}>Send</CIButton>
-                        <CIButton onClick={handleCancel}>Cancel</CIButton>
+                        <CIButton onClick={handleClose}>Cancel</CIButton>
                     </div>
                 </div>
             </div>

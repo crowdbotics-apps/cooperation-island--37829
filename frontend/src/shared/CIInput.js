@@ -19,9 +19,10 @@ const useStyles = (InputImg) => makeStyles((theme) => ({
         outline: "none",
         padding: "0 1.6vw",
         height: "11.7vh",
+        width: "16.1vw",
         background: `url(${InputImg})`,
         backgroundRepeat: "no-repeat",
-        backgroundSize: "contain"
+        backgroundSize: "100% 100%"
     }
 }));
 

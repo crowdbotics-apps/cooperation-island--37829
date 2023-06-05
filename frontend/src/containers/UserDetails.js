@@ -23,14 +23,23 @@ import clsx from "clsx";
 const useStyles = makeStyles((theme) => ({
     board: {
         position: "absolute",
-        top: "3%",
-        left: "110%",
+        top: "3vh",
+        left: "110vw",
         height: "94vh",
         width: "30vw",
-        textAlign: "center",
         background: `url(${BoardImg})`,
         backgroundRepeat: "no-repeat",
-        backgroundSize: "100% 100%"
+        backgroundSize: "30vw 94vh"
+    },
+    body: {
+        height: "76vh",
+        width: "26vw",
+        marginTop: "8vh",
+        marginLeft: "2.5vw",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        textAlign: "center"
     },
     dialog: {
         "& div:has(button)": {
@@ -55,27 +64,26 @@ const useStyles = makeStyles((theme) => ({
     },
     guide: {
         position: "absolute",
-        top: "33.5%",
-        left: "-30%",
+        top: "33.5vh",
+        left: "-30vw",
         height: "70vh",
         width: "24vw",
         transform: "scaleX(-1)"
     },
     logout: {
         position: "absolute",
-        top: "4%",
-        left: "100%",
+        top: "4vh",
+        left: "100vw",
         width: "4vw"
     },
     music: {
         position: "absolute",
-        top: "17%",
-        left: "100%",
+        top: "17vh",
+        left: "100vw",
         width: "4vw"
     },
     button: {
-        width: "34% !important",
-        marginLeft: "1.8vw"
+        marginTop: "2vh"
     },
     gender: {
         "& div": {
@@ -83,24 +91,24 @@ const useStyles = makeStyles((theme) => ({
                 marginRight: "1.25vw"
             },
             display: "flex",
+            justifyContent: "space-between",
             alignItems: "center"
         },
         display: "flex",
         justifyContent: "space-evenly",
-        width: "86%",
-        marginTop: "2.8vh",
-        marginBottom: "1.8vh",
-        marginLeft: "2.7vw",
+        height: "8vh",
+        width: "25.75vw",
+        marginTop: "1vh",
+        marginBottom: "1.8vh"
     },
     input: {
-        marginBottom: "1.8vh",
-        marginLeft: "6vw"
+        marginBottom: "1.8vh"
     },
     title: {
         fontSize: "4vh",
         fontWeight: "bold",
         letterSpacing: "0.1vw",
-        margin: "12vh 0 6vh 1.8vw"
+        margin: "4vh 0 6vh 1.8vw"
     }
 }));
 
@@ -198,25 +206,25 @@ const UserDetails = () => {
 
                     anime({
                         targets: "#logo",
-                        left: "-50%",
+                        left: "-50vw",
                         easing: "easeInQuint",
                         duration: 2000
                     });
                     anime({
                         targets: "#guide",
-                        left: "-30%",
+                        left: "-30vw",
                         easing: "easeInQuint",
                         duration: 2000
                     });
                     anime({
                         targets: "#board",
-                        left: "110%",
+                        left: "110vw",
                         easing: "easeInQuint",
                         duration: 2000
                     })
                     anime({
                         targets: "#logout, #music",
-                        left: "100%",
+                        left: "100vw",
                         easing: "easeInQuint",
                         duration: 2000
                     })
@@ -236,39 +244,41 @@ const UserDetails = () => {
     return <div>
         <img className={cls.guide} id="guide" src={require("../assets/avatars/Avatar_7.png")} />
         <div className={cls.board} id="board">
-            <CILabel className={cls.title}>Tell us more about YOU</CILabel>
-            <CIInput className={cls.input} placeholder="Nationality" onChange={handleDetails("nationality")} onEnter={handleNext} value={details.nationality} />
-            <div className={clsx(cls.gender, "pointer")}>
-                <div className="pointer" onClick={handleDetails("male")}>
-                    <CILabel className="pointer">Male</CILabel>
-                    <CICheck checked={details.gender === 0} />
+            <div className={cls.body}>
+                <CILabel className={cls.title}>Tell us more about YOU</CILabel>
+                <CIInput className={cls.input} placeholder="Nationality" onChange={handleDetails("nationality")} onEnter={handleNext} value={details.nationality} />
+                <div className={clsx(cls.gender, "pointer")}>
+                    <div className="pointer" onClick={handleDetails("male")}>
+                        <CILabel className="pointer">Male</CILabel>
+                        <CICheck checked={details.gender === 0} />
+                    </div>
+                    <div className="pointer" onClick={handleDetails("female")}>
+                        <CILabel className="pointer">Female</CILabel>
+                        <CICheck checked={details.gender === 1} />
+                    </div>
                 </div>
-                <div className="pointer" onClick={handleDetails("female")}>
-                    <CILabel className="pointer">Female</CILabel>
-                    <CICheck checked={details.gender === 1} />
-                </div>
+                <CIInput className={cls.input} placeholder="Zip Code" onChange={handleDetails("zipcode")} onEnter={handleNext} value={details.zipcode} />
+                <DatePicker
+                    autoOk
+                    disableToolbar
+                    className={clsx(cls.input, "pointer")}
+                    maxDate={endOfYear(new Date)}
+                    minDate={subYears(new Date, 19)}
+                    format="MMM yyyy"
+                    views={["month", "year"]}
+                    onFocus={handleFocus}
+                    onChange={handleBirthday}
+                    placeholder="Birthday"
+                    value={details.birthDay}
+                    DialogProps={{
+                        PaperProps: {
+                            className: clsx(cls.dialog, "pointer"),
+                        }
+                    }}
+                    TextFieldComponent={(params) => <CIInput {...params} onChange={handleBirthday} />}
+                />
+                <CIButton className={cls.button} onClick={handleNext}>Next</CIButton>
             </div>
-            <CIInput className={cls.input} placeholder="Zip Code" onChange={handleDetails("zipcode")} onEnter={handleNext} value={details.zipcode} />
-            <DatePicker
-                autoOk
-                disableToolbar
-                className={clsx(cls.input, "pointer")}
-                maxDate={endOfYear(new Date)}
-                minDate={subYears(new Date, 19)}
-                format="MMM yyyy"
-                views={["month", "year"]}
-                onFocus={handleFocus}
-                onChange={handleBirthday}
-                placeholder="Birthday"
-                value={details.birthDay}
-                DialogProps={{
-                    PaperProps: {
-                        className: clsx(cls.dialog, "pointer"),
-                    }
-                }}
-                TextFieldComponent={(params) => <CIInput {...params} onChange={handleBirthday} />}
-            />
-            <CIButton className={cls.button} onClick={handleNext}>Next</CIButton>
         </div>
         <CILogout className={cls.logout} id="logout" onClick={handleLogout} />
         <CIMusic className={cls.music} id="music" />

@@ -23,6 +23,7 @@ const useStyles = makeStyles((theme) => ({
         margin: "0 auto",
         opacity: 0,
         zIndex: 2,
+        height: "74.4vh",
         width: "25vw",
         top: "12vh"
     },
@@ -63,6 +64,7 @@ const useStyles = makeStyles((theme) => ({
         display: "block",
         transform: "scale(0)",
         margin: "0 auto",
+        height: "10vh",
         width: "20vw",
         marginTop: "-6vh",
         top: "79vh"
@@ -72,19 +74,18 @@ const useStyles = makeStyles((theme) => ({
         display: "block",
         transform: "scale(0)",
         margin: "0 auto",
-        width: "10% !important",
-        top: "90vh"
+        top: "91.5vh"
     },
     logout: {
         position: "absolute",
-        top: "4%",
-        left: "100%",
+        top: "4vh",
+        left: "100vw",
         width: "4vw"
     },
     music: {
         position: "absolute",
-        top: "17%",
-        left: "100%",
+        top: "17vh",
+        left: "100vw",
         width: "4vw"
     }
 }));
@@ -236,7 +237,7 @@ const Avatar = () => {
                     })
                     .add({
                         targets: "#logout, #music",
-                        left: "100%",
+                        left: "100vw",
                         easing: "easeInQuint",
                         duration: 2000,
                         begin: () => {
@@ -268,11 +269,11 @@ const Avatar = () => {
                         history.push("/home");
                         anime({
                             targets: "#logo",
-                            top: "-12%",
-                            left: "-12%",
+                            top: "-12vh",
+                            left: "-12vw",
                             scale: 0.45,
-                            translateX: ["-50%", "0%"],
-                            translateY: ["-50%", "0%"],
+                            translateX: ["-30vw", "0vw"],
+                            translateY: ["-30vh", "0vh"],
                             easing: "easeOutQuint",
                             duration: 2000
                         });
