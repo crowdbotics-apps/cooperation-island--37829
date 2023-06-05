@@ -7,7 +7,7 @@ const API = axios.create({
 API.interceptors.request.use((config) => {
     const token = localStorage["AccessToken"];
 
-    if (!config.headers.has("X-No-Loading"))
+    if (!config.url.includes("/refresh"))
         window.setLoader(true);
 
     if (token)

@@ -23,5 +23,11 @@ export const details = (data) => {
 }
 
 export const avatar = (id) => {
-    return API.patch(base + "/users/update_avatar_id/", { avatar_id: id });
+    return API.patch(base + "/users/update_avatar_id/", {
+        avatar_id: id
+    });
+}
+
+export const refresh = () => {
+    return API.get(base + "/refresh/");
 }

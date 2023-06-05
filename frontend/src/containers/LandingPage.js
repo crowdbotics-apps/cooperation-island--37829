@@ -1,9 +1,9 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { makeStyles } from "@material-ui/core";
 import { mapUserData } from "../funnels/v1";
 import { formatCode, parseToken, userState } from "../libs/utils";
-import { access as handleAccess } from "../services/v1";
+import { access as handleAccess, refresh as handleRefresh } from "../services/v1";
 import { showDetailsPage, showLoginBoard } from "../libs/animations";
 import BoardImg from "../assets/images/Board.png";
 import CIButton from "../shared/CIButton";
@@ -92,6 +92,16 @@ const LandingPage = () => {
 
     const [text, setText] = useState("");
 
+    useEffect(() => {
+        window.RefreshTimer = setInterval(() => {
+            if (localStorage["AccessToken"])
+                handleRefresh()
+                    .then(handleMove);
+            else
+                clearInterval(window.RefreshTimer);
+        }, 1000);
+    }, []);
+
     const handleChange = (event) => {
         setText(formatCode(event.target.value, text));
     }
@@ -118,44 +128,47 @@ const LandingPage = () => {
             });
     }
 
+    const handleMove = ({ data }) => {
+        const userData = parseToken(data.user);
+
+        if (userData && userData.consent_status) {
+            clearInterval(window.RefreshTimer);
+            localStorage["UserState"] = data.user;
+
+            anime({
+                targets: "#board4",
+                top: "76%",
+                easing: "easeInQuint",
+                duration: 2000
+            });
+            anime({
+                targets: "#logout, #music",
+                left: "100%",
+                easing: "easeInQuint",
+                duration: 2000
+            });
+            anime({
+                targets: "#guide, #animal",
+                top: "38%",
+                opacity: [1, 0],
+                easing: "easeInQuint",
+                duration: 2000
+            })
+                .finished.then(() => {
+                    setUser(mapUserData((userData)));
+
+                    history.push("/details");
+                    showDetailsPage();
+                });
+        }
+    }
+
     const handleSubmit = () => {
         if (!text.length)
             toast.error("The Access Code cannot be empty.");
         else {
             handleAccess(text)
-                .then(({ data }) => {
-                    const userData = parseToken(data.user);
-
-                    if (userData) {
-                        localStorage["UserState"] = data.user;
-
-                        anime({
-                            targets: "#board4",
-                            top: "76%",
-                            easing: "easeInQuint",
-                            duration: 2000
-                        });
-                        anime({
-                            targets: "#logout, #music",
-                            left: "100%",
-                            easing: "easeInQuint",
-                            duration: 2000
-                        });
-                        anime({
-                            targets: "#guide, #animal",
-                            top: "38%",
-                            opacity: [1, 0],
-                            easing: "easeInQuint",
-                            duration: 2000
-                        })
-                            .finished.then(() => {
-                                setUser(mapUserData((userData)));
-
-                                history.push("/details");
-                                showDetailsPage();
-                            });
-                    }
-                })
+                .then(handleMove)
                 .catch(() => {
                     toast.error("The Access Code is invalid.")
                 });
