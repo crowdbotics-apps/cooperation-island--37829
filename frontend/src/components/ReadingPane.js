@@ -5,26 +5,27 @@ import BoardImg from "../assets/images/Board-lg.png";
 import CILabel from "../shared/CILabel";
 import CIButton from "../shared/CIButton";
 import anime from "animejs";
+import clsx from "clsx";
 
 const useStyles = makeStyles((theme) => ({
     guide: {
         position: "absolute",
-        top: "33.5%",
-        left: "-30%",
+        top: "33.5vh",
+        left: "-30vw",
         height: "88vh",
         width: "30vw",
         transform: "scaleX(-1)"
     },
     board: {
         position: "absolute",
-        top: "1.5%",
-        left: "110%",
+        top: "1.5vh",
+        left: "110vw",
         height: "94vh",
         width: "54vw",
         textAlign: "center",
         background: `url(${BoardImg})`,
         backgroundRepeat: "no-repeat",
-        backgroundSize: "100% 100%"
+        backgroundSize: "54vw 94vh"
     },
     title: {
         fontSize: "4.5vh",
@@ -50,8 +51,8 @@ const useStyles = makeStyles((theme) => ({
         overflowY: "scroll"
     },
     button: {
-        marginLeft: "4%",
-        width: "18% !important"
+        marginTop: "2vh",
+        marginLeft: "2vw"
     }
 }));
 
@@ -67,13 +68,13 @@ const ReadingPane = () => {
             .timeline()
             .add({
                 targets: "#guide",
-                left: "-30%",
+                left: "-30vw",
                 easing: "easeInQuint",
                 duration: 2000
             })
             .add({
                 targets: "#board3",
-                left: "110%",
+                left: "110vw",
                 easing: "easeInQuint",
                 duration: 2000
             }, "-=2000")
@@ -89,7 +90,7 @@ const ReadingPane = () => {
             <CILabel className={cls.title}>
                 {pageType ? "Terms & Conditions" : "Privacy Policy"}
             </CILabel>
-            <div className={cls.body}>
+            <div className={clsx(cls.body, "typer")}>
                 Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi.
                 Lorem ipsum dolor sit amet, cons ectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea.Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi.
                 Lorem ipsum dolor sit amet, cons ectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea.Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi.

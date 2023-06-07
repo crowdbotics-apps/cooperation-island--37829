@@ -1,7 +1,7 @@
 import { makeStyles } from "@material-ui/core";
 import { useHistory } from "react-router-dom";
 import { showLoginBoard } from "../libs/animations";
-import BoardImg from "../assets/images/Board.png";
+import BoardImg from "../assets/images/Board-alt.png";
 import CILabel from "../shared/CILabel";
 import CIInput from "../shared/CIInput";
 import CIButton from "../shared/CIButton";
@@ -10,47 +10,39 @@ import anime from "animejs";
 const useStyles = makeStyles({
     guide: {
         position: "absolute",
-        top: "33.5%",
-        left: "-30%",
+        top: "33.5vh",
+        left: "-30vw",
         height: "88vh",
         width: "30vw",
         transform: "scaleX(-1)"
     },
     board: {
         position: "absolute",
-        top: "-1%",
-        left: "110%",
-        height: "100vh",
-        width: "30vw",
-        rotate: "90deg",
+        top: "15vh",
+        left: "110vw",
+        height: "68vh",
+        width: "48vw",
         background: `url(${BoardImg})`,
         backgroundRepeat: "no-repeat",
-        backgroundSize: "100% 100%"
+        backgroundSize: "48vw 68vh"
     },
     body: {
-        "& button": {
-            width: "36%"
-        },
         "& input": {
             marginTop: "1vh",
-            marginBottom: "1vh",
-            marginLeft: "5.25vw"
+            marginBottom: "3vh",
         },
-        "& label": {
-            "&:first-child": {
-                fontSize: "4.5vh",
-                fontWeight: "bold",
-                letterSpacing: "0.1vw",
-                marginBottom: "4vh"
-            },
-            width: "100%"
+        "& label:first-child": {
+            fontSize: "4.5vh",
+            fontWeight: "bold",
+            letterSpacing: "0.1vw",
+            marginBottom: "6vh"
         },
-        rotate: "-90deg",
-        height: "61vh",
-        width: "100%",
-        marginTop: "30%",
-        marginLeft: "9%",
-        textAlign: "center"
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        height: "68vh",
+        width: "48vw",
+        marginTop: "8vh"
     }
 });
 
@@ -64,13 +56,13 @@ const ResetPassword = () => {
             .timeline()
             .add({
                 targets: "#guide",
-                left: "-30%",
+                left: "-30vw",
                 easing: "easeInQuint",
                 duration: 2000
             })
             .add({
                 targets: "#board2",
-                left: "110%",
+                left: "110vw",
                 easing: "easeInQuint",
                 duration: 2000
             }, "-=2000")
@@ -88,7 +80,7 @@ const ResetPassword = () => {
                 <CILabel>Username</CILabel>
                 <CIInput disabled />
                 <CILabel>Password</CILabel>
-                <CIInput type="password" />
+                <CIInput onEnter={handleSave} type="password" />
                 <CIButton onClick={handleSave}>Save</CIButton>
             </div>
         </div>

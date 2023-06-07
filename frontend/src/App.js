@@ -1,11 +1,14 @@
-import { createContext, useState } from "react";
+import { createContext, useEffect, useState } from "react";
 import { Redirect, Route, Switch } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
+import { parseToken, userState } from "./libs/utils";
+import { mapUserData } from "./funnels/v1";
+import CILoader from "./shared/CILoader";
 import HomePage from "./containers/HomePage";
 import LoginBoard from "./containers/LoginBoard";
 import LandingPage from "./containers/LandingPage";
 import UserDetails from "./containers/UserDetails";
-import Avatar from "./containers/Avatar";
+import AvatarPage from "./containers/AvatarPage";
 import Dashboard from "./containers/Dashboard";
 import ResetPassword from "./components/ResetPassword";
 import ReadingPane from "./components/ReadingPane";
@@ -14,16 +17,19 @@ import "react-toastify/dist/ReactToastify.min.css";
 const AppContext = createContext();
 
 const App = () => {
-  const [user, setUser] = useState({
-    id: "TEST_USER",
-    access: true,
-    active: false,
-    age: 18,
-    avatar: 0,
-    details: true
-  });
+  const localData = parseToken(localStorage["UserState"]);
+
+  const [user, setUser] = useState(localData ? mapUserData(localData) : userState);
+
+  const [BGM, setBGM] = useState(false);
 
   const [howler, setHowler] = useState({});
+
+  const [loader, setLoader] = useState(false);
+
+  useEffect(() => {
+    window.setLoader = setLoader;
+  }, []);
 
   const handleUser = (data) => {
     setUser({
@@ -44,7 +50,7 @@ const App = () => {
       if (user.access)
         return <Switch>
           <Route path="/home" component={Dashboard} />
-          <Route path="/avatar" component={Avatar} />
+          <Route path="/avatar" component={AvatarPage} />
           <Route path="/details" component={UserDetails} />
           <Redirect to="/" />
         </Switch>
@@ -63,12 +69,13 @@ const App = () => {
     }
   }
 
-  return <AppContext.Provider value={{ howler, user, setHowler: handleHowler, setUser: handleUser }}>
+  return <AppContext.Provider value={{ BGM, howler, user, setBGM, setHowler: handleHowler, setUser: handleUser }}>
     <Route path="/" component={HomePage} />
     <Switch>
       {getRoutes()}
       <Redirect to="/" />
     </Switch>
+    <CILoader open={loader} />
     <ToastContainer
       position="bottom-right"
       autoClose={2000}

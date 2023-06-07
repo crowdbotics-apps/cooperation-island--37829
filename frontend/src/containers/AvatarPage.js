@@ -1,14 +1,20 @@
 import { Fragment, useContext, useEffect, useState } from "react";
 import { makeStyles } from "@material-ui/core";
 import { useHistory } from "react-router-dom";
-import { usePrevious } from "../libs/utils";
+import { mapUserData } from "../funnels/v1";
+import { parseToken, usePrevious, userState } from "../libs/utils";
+import { avatar as handleAvatar } from "../services/v1";
+import { showHomePage, showLoginBoard } from "../libs/animations";
 import AvatarFrame from "../components/AvatarFrame";
 import CIButton from "../shared/CIButton";
 import CILogout from "../shared/CILogout";
+import CIMusic from "../shared/CIMusic";
 import { AppContext } from "../App";
+import { toast } from "react-toastify";
 import { Howl } from "howler";
 import anime from "animejs";
 import clsx from "clsx";
+import $ from "jquery";
 
 const useStyles = makeStyles((theme) => ({
     avatar: {
@@ -17,6 +23,7 @@ const useStyles = makeStyles((theme) => ({
         margin: "0 auto",
         opacity: 0,
         zIndex: 2,
+        height: "74.4vh",
         width: "25vw",
         top: "12vh"
     },
@@ -57,6 +64,7 @@ const useStyles = makeStyles((theme) => ({
         display: "block",
         transform: "scale(0)",
         margin: "0 auto",
+        height: "10vh",
         width: "20vw",
         marginTop: "-6vh",
         top: "79vh"
@@ -66,13 +74,18 @@ const useStyles = makeStyles((theme) => ({
         display: "block",
         transform: "scale(0)",
         margin: "0 auto",
-        width: "10% !important",
-        top: "90vh"
+        top: "91.5vh"
     },
     logout: {
         position: "absolute",
-        top: "4%",
-        left: "100%",
+        top: "4vh",
+        left: "100vw",
+        width: "4vw"
+    },
+    music: {
+        position: "absolute",
+        top: "17vh",
+        left: "100vw",
         width: "4vw"
     }
 }));
@@ -86,7 +99,7 @@ const Avatar = () => {
 
     const [avatar, setAvatar] = useState(0);
 
-    const { howler, user } = useContext(AppContext);
+    const { BGM, howler, user, setUser } = useContext(AppContext);
 
     const prevActive = usePrevious(active);
 
@@ -146,17 +159,130 @@ const Avatar = () => {
         setActive(id);
     }
 
+    const handleLogout = () => {
+        if (BGM) {
+            howler.welcome.fade(howler.welcome.volume(), 0, 1000);
+            howler.dashboard?.fade(1, 0, 1000);
+        }
+        localStorage.clear();
+
+        anime
+            .timeline()
+            .add({
+                targets: "#background",
+                opacity: 0,
+                easing: "linear",
+                duration: 2000,
+                complete: () => {
+                    $("#background").attr("src", require("../assets/images/Application_BG.jpg"));
+                }
+            })
+            .add({
+                targets: "#background",
+                opacity: 1,
+                easing: "linear",
+                duration: 2000
+            })
+            .add({
+                targets: "#avatar-page",
+                opacity: [1, 0],
+                easing: "easeOutQuint",
+                duration: 2000
+            }, "-=2000")
+            .finished.then(() => {
+                setUser(userState);
+
+                history.push("/login");
+                showLoginBoard();
+            });
+    }
+
     const handleSave = () => {
         new Howl({
             src: require("../assets/sounds/Avatar.mp3"),
             autoplay: true,
             onplay: () => {
-                howler.welcome?.fade(1, 0.1, 1000);
+                if (howler.welcome.volume())
+                    howler.welcome.fade(1, 0.1, 1000);
             },
             onend: () => {
-                howler.welcome?.fade(0.1, 1, 1000);
+                if (howler.welcome.volume())
+                    howler.welcome.fade(0.1, 1, 1000);
             }
         });
+        handleAvatar(active)
+            .then(({ data }) => {
+                const userData = parseToken(data.user);
+
+                if (userData) {
+                    localStorage["UserState"] = data.user;
+                }
+
+                anime
+                    .timeline()
+                    .add({
+                        targets: "#background",
+                        opacity: 0,
+                        easing: "linear",
+                        duration: 2000,
+                        complete: () => {
+                            $("#background").attr("src", require("../assets/images/Application_BG.jpg"));
+                        }
+                    })
+                    .add({
+                        targets: "#background",
+                        opacity: 1,
+                        easing: "linear",
+                        duration: 2000
+                    })
+                    .add({
+                        targets: "#logout, #music",
+                        left: "100vw",
+                        easing: "easeInQuint",
+                        duration: 2000,
+                        begin: () => {
+                            $("#logout, #music").css("position", "absolute");
+                        }
+                    }, "-=4000")
+                    .add({
+                        targets: "#frame",
+                        scale: 0,
+                        easing: "easeInQuint",
+                        delay: (_, i) => i % 5 * 300,
+                        duration: 2000
+                    }, "-=4000")
+                    .add({
+                        targets: `.${cls.avatar}`,
+                        opacity: 0,
+                        easing: "easeInQuint",
+                        duration: 2000
+                    }, "-=4000")
+                    .add({
+                        targets: [`.${cls.svg}`, `.${cls.button}`],
+                        scale: 0,
+                        easing: "easeInQuint",
+                        duration: 2000
+                    }, "-=4000")
+                    .finished.then(() => {
+                        setUser(mapUserData((userData)));
+
+                        history.push("/home");
+                        anime({
+                            targets: "#logo",
+                            top: "-12vh",
+                            left: "-12vw",
+                            scale: 0.45,
+                            translateX: ["-30vw", "0vw"],
+                            translateY: ["-30vh", "0vh"],
+                            easing: "easeOutQuint",
+                            duration: 2000
+                        });
+                        showHomePage();
+                    });
+            })
+            .catch(() => {
+                toast.error("The Access Code is invalid.")
+            });
     }
 
     return <div className={cls.root} id="avatar-page">
@@ -174,7 +300,8 @@ const Avatar = () => {
             <AvatarFrame active={active === 9} avatar={9} className={cls.frame} onClick={handleClick(9)} variant={3} />
             <AvatarFrame active={active === 10} avatar={10} className={cls.frame} onClick={handleClick(10)} variant={1} />
         </div>
-        <CILogout className={cls.logout} id="logout" />
+        <CILogout className={cls.logout} id="logout" onClick={handleLogout} />
+        <CIMusic className={cls.music} id="music" />
         {Boolean(active) && <Fragment>
             <img className={cls.avatar} src={avatar && require(`../assets/avatars/Avatar_${avatar}.png`)} />
             <svg className={cls.svg} viewBox="0 0 370 87">

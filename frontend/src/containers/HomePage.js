@@ -4,8 +4,8 @@ import { useHistory } from "react-router-dom";
 import { showAvatarPage, showDetailsPage, showHomePage, showLandingPage, showLoginBoard, showReadingPane, showResetPassword } from "../libs/animations";
 import LoadAssets from "../components/LoadAssets";
 import { AppContext } from "../App";
+import { Howl } from "howler";
 import anime from "animejs";
-import $ from "jquery";
 
 const useStyles = makeStyles((theme) => ({
     BG: {
@@ -15,11 +15,11 @@ const useStyles = makeStyles((theme) => ({
     },
     logo: {
         position: "absolute",
-        top: "-80%",
-        left: "50%",
+        top: "-80vh",
+        left: "50vw",
         height: "60vh",
         width: "60vw",
-        transform: "translateX(-50%) translateY(-50%)"
+        transform: "translateX(-30vw) translateY(-30vh)"
     },
     root: {
         background: theme.palette.primary.BG
@@ -34,13 +34,13 @@ const HomePage = () => {
 
     const history = useHistory();
 
-    const { user } = useContext(AppContext);
+    const { user, setHowler } = useContext(AppContext);
 
     const [loadedItems, setLoaded] = useState(0);
 
     const [fetchStatus, setStatus] = useState(true);
 
-    const allItems = $("#assets").length;
+    const allItems = document.querySelectorAll("#assets").length;
 
     const isLoaded = loadedItems === allItems && allItems !== 0;
 
@@ -60,7 +60,7 @@ const HomePage = () => {
                 })
                 .add({
                     targets: "#logo",
-                    top: "50%",
+                    top: "50vh",
                     easing: "easeOutElastic",
                     duration: 2000
                 }, "-=2000")
@@ -84,14 +84,22 @@ const HomePage = () => {
                             showLoginBoard(true);
                     }
                     else {
+                        setHowler({
+                            welcome: new Howl({
+                                src: [require("../assets/sounds/Welcome.mp3")],
+                                autoplay: true,
+                                volume: 0,
+                                loop: true
+                            })
+                        }, 1000);
                         if (window.location.pathname === "/access") {
                             anime({
                                 targets: "#logo",
-                                top: "-12%",
-                                left: "-12%",
+                                top: "-12vh",
+                                left: "-12vw",
                                 scale: 0.45,
-                                translateX: ["-50%", "0%"],
-                                translateY: ["-50%", "0%"],
+                                translateX: ["-30vw", "0vw"],
+                                translateY: ["-30vh", "0vh"],
                                 easing: "easeOutQuint",
                                 duration: 2000
                             });
@@ -100,11 +108,11 @@ const HomePage = () => {
                         else if (window.location.pathname === "/details") {
                             anime({
                                 targets: "#logo",
-                                top: "-12%",
-                                left: "-12%",
+                                top: "-12vh",
+                                left: "-12vw",
                                 scale: 0.45,
-                                translateX: ["-50%", "0%"],
-                                translateY: ["-50%", "0%"],
+                                translateX: ["-30vw", "0vw"],
+                                translateY: ["-30vh", "0vh"],
                                 easing: "easeOutQuint",
                                 duration: 2000
                             });
@@ -113,7 +121,7 @@ const HomePage = () => {
                         else if (window.location.pathname === "/avatar") {
                             anime({
                                 targets: "#logo",
-                                top: "150%",
+                                top: "150vh",
                                 easing: "easeInElastic",
                                 duration: 2000
                             });
@@ -122,11 +130,11 @@ const HomePage = () => {
                         else if (window.location.pathname === "/home") {
                             anime({
                                 targets: "#logo",
-                                top: "-12%",
-                                left: "-12%",
+                                top: "-12vh",
+                                left: "-12vw",
                                 scale: 0.45,
-                                translateX: ["-50%", "0%"],
-                                translateY: ["-50%", "0%"],
+                                translateX: ["-30vw", "0vw"],
+                                translateY: ["-30vh", "0vh"],
                                 easing: "easeOutQuint",
                                 duration: 2000
                             });
@@ -139,11 +147,11 @@ const HomePage = () => {
                                         history.push("/home");
                                         anime({
                                             targets: "#logo",
-                                            top: "-12%",
-                                            left: "-12%",
+                                            top: "-12vh",
+                                            left: "-12vw",
                                             scale: 0.45,
-                                            translateX: ["-50%", "0%"],
-                                            translateY: ["-50%", "0%"],
+                                            translateX: ["-30vw", "0vw"],
+                                            translateY: ["-30vh", "0vh"],
                                             easing: "easeOutQuint",
                                             duration: 2000
                                         });
@@ -153,7 +161,7 @@ const HomePage = () => {
                                         history.push("/avatar");
                                         anime({
                                             targets: "#logo",
-                                            top: "150%",
+                                            top: "150vh",
                                             easing: "easeInElastic",
                                             duration: 2000
                                         });
@@ -164,11 +172,11 @@ const HomePage = () => {
                                     history.push("/details");
                                     anime({
                                         targets: "#logo",
-                                        top: "-12%",
-                                        left: "-12%",
+                                        top: "-12vh",
+                                        left: "-12vw",
                                         scale: 0.45,
-                                        translateX: ["-50%", "0%"],
-                                        translateY: ["-50%", "0%"],
+                                        translateX: ["-30vw", "0vw"],
+                                        translateY: ["-30vh", "0vh"],
                                         easing: "easeOutQuint",
                                         duration: 2000
                                     });
@@ -179,11 +187,11 @@ const HomePage = () => {
                                 history.push("/access");
                                 anime({
                                     targets: "#logo",
-                                    top: "-12%",
-                                    left: "-12%",
+                                    top: "-12vh",
+                                    left: "-12vw",
                                     scale: 0.45,
-                                    translateX: ["-50%", "0%"],
-                                    translateY: ["-50%", "0%"],
+                                    translateX: ["-30vw", "0vw"],
+                                    translateY: ["-30vh", "0vh"],
                                     easing: "easeOutQuint",
                                     duration: 2000
                                 });
@@ -204,7 +212,7 @@ const HomePage = () => {
             <img className={cls.BG} id="background" src={require("../assets/images/Application_BG.jpg")} />
             <img className={cls.logo} id="logo" src={require("../assets/images/Logo_Text.png")} />
         </div>
-        {(!isLoaded && fetchStatus) && <LoadAssets onLoad={handleLoaded} progress={Math.round((loadedItems / allItems) * 100)} />}
+        {<LoadAssets onLoad={handleLoaded} progress={Math.round((loadedItems / allItems) * 100)} show={!isLoaded && fetchStatus} />}
     </Fragment>
 }
 

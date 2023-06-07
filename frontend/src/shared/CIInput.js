@@ -19,9 +19,10 @@ const useStyles = (InputImg) => makeStyles((theme) => ({
         outline: "none",
         padding: "0 1.6vw",
         height: "11.7vh",
+        width: "16.1vw",
         background: `url(${InputImg})`,
         backgroundRepeat: "no-repeat",
-        backgroundSize: "contain"
+        backgroundSize: "100% 100%"
     }
 }));
 
@@ -35,10 +36,16 @@ const CIInput = (props) => {
     delete params.error;
     delete params.helperText;
     delete params.InputProps;
+    delete params.onEnter;
     delete params.sm;
     delete params.xs;
 
-    return <input {...params} className={clsx(cls.root, props.className, props.disabled || "typer")} />
+    const handleKeyDown = (event) => {
+        if (event.key === "Enter")
+            props.onEnter && props.onEnter();
+    }
+
+    return <input {...params} className={clsx(cls.root, props.className, props.disabled || "typer")} onKeyDown={handleKeyDown} />
 }
 
 export default CIInput;

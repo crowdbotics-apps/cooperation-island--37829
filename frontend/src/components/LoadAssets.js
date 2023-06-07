@@ -1,9 +1,10 @@
 import { makeStyles, Backdrop, LinearProgress } from "@material-ui/core";
 import LogoText from "./LogoText";
+import clsx from "clsx";
 
 const useStyles = makeStyles((theme) => ({
     backdrop: {
-        zIndex: 0,
+        zIndex: 0
     },
     grid: {
         height: "100vh",
@@ -22,14 +23,14 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const LoadAssets = ({ onLoad, progress }) => {
+const LoadAssets = ({ onLoad, progress, show }) => {
     const cls = useStyles();
 
     return <div className={cls.grid}>
-        <Backdrop className={cls.backdrop} open>
+        <Backdrop className={cls.backdrop} open={show}>
             <LogoText />
         </Backdrop>
-        <LinearProgress classes={{ root: cls.progress, bar2Buffer: cls.bar }} variant="buffer" value={progress} valueBuffer={Math.round(progress + (Math.random() * 10))} />
+        <LinearProgress classes={{ root: clsx(cls.progress, !show && cls.hidden), bar2Buffer: cls.bar }} variant="buffer" value={progress} valueBuffer={Math.round(progress + (Math.random() * 10))} />
 
         <img className={cls.hidden} id="assets" onLoad={onLoad} src={require("../assets/animals/Animal_1.png")} />
 
@@ -57,10 +58,13 @@ const LoadAssets = ({ onLoad, progress }) => {
 
         <img className={cls.hidden} id="assets" onLoad={onLoad} src={require("../assets/images/Application_BG.jpg")} />
         <img className={cls.hidden} id="assets" onLoad={onLoad} src={require("../assets/images/Avatar_BG.png")} />
-        <img className={cls.hidden} id="assets" onLoad={onLoad} src={require("../assets/images/Board-lg.png")} />
         <img className={cls.hidden} id="assets" onLoad={onLoad} src={require("../assets/images/Board.png")} />
-        <img className={cls.hidden} id="assets" onLoad={onLoad} src={require("../assets/images/Button-alt.png")} />
+        <img className={cls.hidden} id="assets" onLoad={onLoad} src={require("../assets/images/Board-alt.png")} />
+        <img className={cls.hidden} id="assets" onLoad={onLoad} src={require("../assets/images/Board-lg.png")} />
         <img className={cls.hidden} id="assets" onLoad={onLoad} src={require("../assets/images/Button.png")} />
+        <img className={cls.hidden} id="assets" onLoad={onLoad} src={require("../assets/images/Button-alt.png")} />
+        <img className={cls.hidden} id="assets" onLoad={onLoad} src={require("../assets/images/Frame.png")} />
+        <img className={cls.hidden} id="assets" onLoad={onLoad} src={require("../assets/images/Frame-alt.png")} />
         <img className={cls.hidden} id="assets" onLoad={onLoad} src={require("../assets/images/Cursor.png")} />
         <img className={cls.hidden} id="assets" onLoad={onLoad} src={require("../assets/images/Header.png")} />
         <img className={cls.hidden} id="assets" onLoad={onLoad} src={require("../assets/images/Input-disabled.png")} />
@@ -70,6 +74,7 @@ const LoadAssets = ({ onLoad, progress }) => {
         <img className={cls.hidden} id="assets" onLoad={onLoad} src={require("../assets/images/Logo_Text.png")} />
         <img className={cls.hidden} id="assets" onLoad={onLoad} src={require("../assets/images/Name_Plate.png")} />
         <img className={cls.hidden} id="assets" onLoad={onLoad} src={require("../assets/images/Pointer.png")} />
+        <img className={cls.hidden} id="assets" onLoad={onLoad} src={require("../assets/images/Spinner.png")} />
         <img className={cls.hidden} id="assets" onLoad={onLoad} src={require("../assets/images/Switch.png")} />
         <img className={cls.hidden} id="assets" onLoad={onLoad} src={require("../assets/images/Typer.png")} />
 
