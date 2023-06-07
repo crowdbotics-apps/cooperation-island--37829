@@ -72,7 +72,7 @@ const HomePage = () => {
                         duration: 2000
                     });
                     if (!user.active) {
-                        if (window.location.pathname === "/reset-password")
+                        if (window.location.pathname.includes("/reset-password"))
                             showResetPassword();
                         else if (window.location.pathname === "/terms-conditions" || window.location.pathname === "/privacy")
                             showReadingPane(true);

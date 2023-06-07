@@ -1,10 +1,13 @@
+import { useEffect, useState } from "react";
 import { makeStyles } from "@material-ui/core";
 import { useHistory } from "react-router-dom";
 import { showLoginBoard } from "../libs/animations";
+import { getUsername, savePassword } from "../services/v1";
 import BoardImg from "../assets/images/Board-alt.png";
 import CILabel from "../shared/CILabel";
 import CIInput from "../shared/CIInput";
 import CIButton from "../shared/CIButton";
+import { toast } from "react-toastify";
 import anime from "animejs";
 
 const useStyles = makeStyles({
@@ -51,25 +54,58 @@ const ResetPassword = () => {
 
     const history = useHistory();
 
-    const handleSave = () => {
-        anime
-            .timeline()
-            .add({
-                targets: "#guide",
-                left: "-30vw",
-                easing: "easeInQuint",
-                duration: 2000
+    const [username, setUsername] = useState("");
+
+    const [password, setPassword] = useState("");
+
+    const sessionId = window.location.pathname.split("/").pop();
+
+    useEffect(() => {
+        getUsername(sessionId)
+            .then(({ data }) => {
+                setUsername(data.username);
             })
-            .add({
-                targets: "#board2",
-                left: "110vw",
-                easing: "easeInQuint",
-                duration: 2000
-            }, "-=2000")
-            .finished.then(() => {
+            .catch(() => {
+                toast.error("The Session ID is invalid or expired.");
                 history.push("/login");
-                showLoginBoard();
             });
+    }, []);
+
+    const handlePassword = (event) => {
+        setPassword(event.target.value);
+    }
+
+    const handleSave = () => {
+        if (password.trim().length < 8)
+            toast.error("Password must be at least 8 characters.");
+        else {
+            savePassword(sessionId, password)
+                .then(() => {
+                    toast.success("Your Password has been updated.");
+                    anime
+                        .timeline()
+                        .add({
+                            targets: "#guide",
+                            left: "-30vw",
+                            easing: "easeInQuint",
+                            duration: 2000
+                        })
+                        .add({
+                            targets: "#board2",
+                            left: "110vw",
+                            easing: "easeInQuint",
+                            duration: 2000
+                        }, "-=2000")
+                        .finished.then(() => {
+
+                            history.push("/login");
+                            showLoginBoard();
+                        });
+                })
+                .catch(() => {
+                    toast.error("Something went wrong.");
+                });
+        }
     }
 
     return <div>
@@ -78,9 +114,9 @@ const ResetPassword = () => {
             <div className={cls.body}>
                 <CILabel>Reset Password</CILabel>
                 <CILabel>Username</CILabel>
-                <CIInput disabled />
+                <CIInput disabled value={username} />
                 <CILabel>Password</CILabel>
-                <CIInput onEnter={handleSave} type="password" />
+                <CIInput onChange={handlePassword} onEnter={handleSave} type="password" value={password} />
                 <CIButton onClick={handleSave}>Save</CIButton>
             </div>
         </div>
