@@ -152,7 +152,7 @@ class PasswordResetSession(models.Model):
         reset_url = f"https://{domain}/reset-password/{self.session_id}"
         # reset_url = f"http://localhost:8000/reset-password/{self.session_id}"
         subject = 'Password Reset'
-        message = f'Click the following link to reset your password: {reset_url}. Your password reset link is valid for only 1 hour.'
+        message = f'Your password reset link is valid for only 1 hour. Click the following link to reset your password: {reset_url}'
         send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [self.user.email])
 
 

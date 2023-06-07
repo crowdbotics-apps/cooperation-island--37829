@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth import admin as auth_admin
 from django.contrib.auth import get_user_model
-from .models import ConsentAccessCode, Profile, EmailVerification
+from .models import ConsentAccessCode, Profile, EmailVerification, PasswordResetSession
 
 
 from users.forms import UserChangeForm, UserCreationForm
@@ -25,3 +25,5 @@ admin.site.register(ConsentAccessCode)
 admin.site.register(Profile)
 
 admin.site.register(EmailVerification)
+
+admin.site.register(PasswordResetSession)
