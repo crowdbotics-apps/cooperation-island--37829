@@ -31,3 +31,19 @@ export const avatar = (id) => {
 export const refresh = () => {
     return API.get(base + "/refresh/");
 }
+
+export const resetPassword = (id) => {
+    return API.post(base + "/reset-password/", {
+        username: id
+    });
+}
+
+export const getUsername = (sessionId) => {
+    return API.get(base + `/reset-password/${sessionId}/`);
+}
+
+export const savePassword = (sessionId, password) => {
+    return API.post(base + `/reset-password/${sessionId}/`, {
+        new_password: password
+    });
+}

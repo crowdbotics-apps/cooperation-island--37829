@@ -12,11 +12,9 @@ const useStyles = makeStyles({
 const CICheck = (props) => {
     const cls = useStyles();
 
-    const checkId = "check" + anime.random(1, 100);
-
     useEffect(() => {
         anime({
-            targets: `#${checkId} path[fill="#04826A"],#${checkId} path[fill="#1AC1A1"],#${checkId} path[fill="#46E0C2"]`,
+            targets: `#${props.id} path[fill="#04826A"],#${props.id} path[fill="#1AC1A1"],#${props.id} path[fill="#46E0C2"]`,
             opacity: props.checked ? 1 : 0,
             easing: "linear",
             duration: 250
@@ -25,14 +23,14 @@ const CICheck = (props) => {
 
     const handleClick = () => {
         anime({
-            targets: "#" + checkId,
+            targets: "#" + props.id,
             scale: [0.9, 1],
             duration: 1000
         });
         props.onClick && props.onClick();
     }
 
-    return <svg className={clsx(cls.svg, "pointer")} id={checkId} onClick={handleClick} viewBox="0 0 56 62">
+    return <svg className={clsx(cls.svg, "pointer")} id={props.id} onClick={handleClick} viewBox="0 0 56 62">
         <path className="pointer" opacity="0.3" d="M55.9993 32.8402C56.1099 48.8366 43.6665 61.8903 28.2036 61.9993C12.7386 62.1104 0.111406 49.2307 0.000732565 33.2343C-0.109941 17.2379 12.3335 4.18214 27.7985 4.07524C43.2614 3.96625 55.8865 16.8439 55.9993 32.8402Z" fill="black" />
         <path className="pointer" d="M55.9993 28.7678C56.1099 44.7642 43.6665 57.8178 28.2036 57.9268C12.7386 58.0379 0.111406 45.1582 0.000732565 29.1618C-0.109941 13.1654 12.3335 0.109677 27.7985 0.000686646C43.2614 -0.108303 55.8865 12.7714 55.9993 28.7678Z" fill="#552800" />
         <path className="pointer" d="M5.41465 14.6724C4.54806 17.3155 12.6502 12.7546 27.2152 13.2367C41.7823 13.7167 46.8795 12.8511 47.6814 11.0695C48.4832 9.28792 40.3936 2.67725 32.375 1.31487C24.3565 -0.0475073 9.32162 2.76108 5.41465 14.6724Z" fill="#A85C09" />

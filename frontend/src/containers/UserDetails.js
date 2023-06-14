@@ -250,11 +250,11 @@ const UserDetails = () => {
                 <div className={clsx(cls.gender, "pointer")}>
                     <div className="pointer" onClick={handleDetails("male")}>
                         <CILabel className="pointer">Male</CILabel>
-                        <CICheck checked={details.gender === 0} />
+                        <CICheck checked={details.gender === 0} id="male" />
                     </div>
                     <div className="pointer" onClick={handleDetails("female")}>
                         <CILabel className="pointer">Female</CILabel>
-                        <CICheck checked={details.gender === 1} />
+                        <CICheck checked={details.gender === 1} id="female" />
                     </div>
                 </div>
                 <CIInput className={cls.input} placeholder="Zip Code" onChange={handleDetails("zipcode")} onEnter={handleNext} value={details.zipcode} />

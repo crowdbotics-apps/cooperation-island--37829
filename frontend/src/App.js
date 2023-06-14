@@ -61,7 +61,7 @@ const App = () => {
       return <Switch>
         <Route path="/login" component={LoginBoard} />
         <Route path="/signup" component={LoginBoard} />
-        <Route path="/reset-password" component={ResetPassword} />
+        <Route path="/reset-password/:id" component={ResetPassword} />
         <Route path="/terms-conditions" component={ReadingPane} />
         <Route path="/privacy" component={ReadingPane} />
         <Redirect to="/" />

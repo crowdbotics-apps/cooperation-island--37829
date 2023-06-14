@@ -3,7 +3,7 @@ import { makeStyles } from "@material-ui/core";
 import { useHistory } from "react-router-dom";
 import { mapUserData } from "../funnels/v1";
 import { formatAge, formatUsername, parseToken, validateEmail } from "../libs/utils";
-import { login as handleLogin, signup as handleSignup } from "../services/v1";
+import { login as handleLogin, signup as handleSignup, resetPassword } from "../services/v1";
 import { showAvatarPage, showDetailsPage, showHomePage, showLandingPage, showReadingPane } from "../libs/animations";
 import BoardImg from "../assets/images/Board.png";
 import HeaderImg from "../assets/images/Header.png";
@@ -142,7 +142,7 @@ const useStyles = makeStyles({
         height: "44vh !important",
         width: "36vw !important",
         marginTop: "25vh",
-        marginLeft: "-7vw"
+        marginLeft: "-6.5vw"
     },
     grid: {
         "& input": {
@@ -402,8 +402,14 @@ const LoginBoard = () => {
 
     const handleSend = () => {
         if (validateUsername()) {
-            toast.success("Reset Password link has been sent to your Email.");
-            handleClose();
+            resetPassword(username)
+                .then(() => {
+                    toast.success("Reset-Password link has been sent to your Email.");
+                    handleClose();
+                })
+                .catch(() => {
+                    toast.error("The Username does not exist.");
+                });
         }
     }
 
@@ -524,7 +530,7 @@ const LoginBoard = () => {
         else if (!validateEmail(signup.email))
             toast.error("The Email is invalid.");
         else if (!parseInt(signup.age))
-            toast.error("The Age cannot be empty or 0");
+            toast.error("The Age cannot be empty or 0.");
         else if (parseInt(signup.age) > 18)
             toast.error("Children above 18 are not allowed.");
         else
