@@ -17,7 +17,7 @@ from rest_auth.serializers import LoginSerializer as RestAuthLoginSerializer
 from rest_auth.serializers import PasswordResetConfirmSerializer as RestAuthPasswordResetConfirmSerializer
 from rest_auth.registration.serializers import VerifyEmailSerializer as RestAuthVerifyEmailSerializer
 from rest_auth.serializers import PasswordResetSerializer as RestAuthPasswordResetSerializer
-from users.models import ConsentAccessCode, Profile, EmailVerification
+from users.models import ConsentAccessCode, Profile, PrivacyPolicy, TermAndCondition
 
 
 User = get_user_model()
@@ -67,10 +67,6 @@ class SignupSerializer(serializers.ModelSerializer):
         user.set_password(validated_data.get('password'))
         user.save()
 
-        email_verification = EmailVerification(user=user)
-        email_verification.generate_token()
-        email_verification.send_verification_email()
-
         # request = self._get_request()
         # setup_user_email(request, user, [])
         return user
@@ -94,23 +90,15 @@ class UserSerializer(serializers.ModelSerializer):
 class UserDetailsSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['username','age', 'avatar_id', 'consent_status', 'detail_status']
+        fields = ['username','age', 'avatar_id', 'consent_status', 'detail_status', 'consent_email']
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
-    GENDER_CHOICES = [
-        (0, 'Male'),
-        (1, 'Female'),
-    ]
 
     class Meta:
         model = Profile
         fields = ['birth_month', 'birth_year', 'nationality', 'gender', 'zipcode' ]
 
-    def validate_gender(self, value):
-        if value not in [choice[0] for choice in self.GENDER_CHOICES]:
-            raise serializers.ValidationError('Invalid gender choice.')
-        return value
     
     def validate_birth_month(self, value):
         if not 1 <= value <= 12:
@@ -148,3 +136,13 @@ class ConsentAccessCodeSerializer(serializers.Serializer):
         return access_code
     
 
+class PrivacyPolicySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PrivacyPolicy
+        fields = ('body', 'author', 'created_at', 'updated_at')
+
+
+class TermAndConditionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TermAndCondition
+        fields = ('body', 'author', 'created_at', 'updated_at')

@@ -4,7 +4,7 @@ from django.utils.http import urlsafe_base64_decode
 from django.utils.encoding import force_text
 from django.shortcuts import render
 from django.db import IntegrityError
-from rest_framework.viewsets import ModelViewSet, ViewSet
+from rest_framework.viewsets import ModelViewSet, ViewSet, ReadOnlyModelViewSet
 from rest_framework.response import Response
 from rest_framework import status, generics
 from rest_framework.permissions import IsAuthenticated
@@ -14,9 +14,8 @@ from rest_framework.authtoken.models import Token
 from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.exceptions import AuthenticationFailed
-
 from home.utils import encrypt_payload
-from users.models import Profile, EmailVerification, PasswordResetSession
+from users.models import Profile, EmailVerification, PasswordResetSession, PrivacyPolicy, TermAndCondition
 from home.api.v1.serializers import (
     SignupSerializer,
     UserDetailsSerializer,
@@ -24,6 +23,8 @@ from home.api.v1.serializers import (
     UserProfileSerializer,
     ResetPasswordSerializer,
     ResetPasswordSessionSerializer,
+    PrivacyPolicySerializer,
+    TermAndConditionSerializer,
 )
 
 
@@ -113,7 +114,7 @@ class LoginViewSet(ViewSet):
 
         payload=encrypt_payload(user_serializer.data)
         return Response({"token": token.key, "user": payload}, status=200)
-    
+
 
 class UserDetailView(APIView):
     """Return user details"""
@@ -136,8 +137,10 @@ class ConsentAccessCodeViewSet(APIView):
         serializer.is_valid(raise_exception=True)
         access_code = serializer.validated_data['access_code']
         
-        if request.user in access_code.used_by_users.all():
-            return Response({'error': 'Access code already used by this user'}, status=401)
+        if request.user.consent_status:
+            return Response({'error': 'User consent already verified'}, status=401)
+        # if request.user in access_code.used_by_users.all():
+        #     return Response({'error': 'Access code already used by this user'}, status=401)
         if access_code.is_expired:
             return Response({'error': 'Access code has expired'}, status=401)
         
@@ -170,7 +173,6 @@ class UpdateAvatarIDView(APIView):
             return Response({'user': payload }, status=200)
         else:
             return Response({'message': 'No avatar ID provided.'}, status=400)
-
 
 
 class ProfileAPIView(APIView):
@@ -220,8 +222,6 @@ class ProfileAPIView(APIView):
         return Response({'profile': encrypted_payload}, status=status.HTTP_200_OK)
 
 
-
-
 class UserVerificationView(generics.GenericAPIView):
     def get(self, request, uidb64, token):
         try:
@@ -238,9 +238,74 @@ class UserVerificationView(generics.GenericAPIView):
         user.consent_status = True
         user.save(update_fields=['consent_status'])
 
-        email_verification.delete()  
+        email_verification.delete()
         return render(request, 'verification_success.html')
 
 
+class EmailConsentView(APIView):
+    permission_classes = [IsAuthenticated]
+
+class EmailConsentView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        user = request.user
+        email_verification = EmailVerification.objects.filter(user=user).first()
+        if email_verification: 
+            token = email_verification.verification_token
+            if email_verification.is_token_valid(token=token): 
+                if request.data.get('resend_email', False):
+                    try:
+                        email_verification.send_verification_email()
+                    except Exception as e:
+                        print(e, flush=True)
+                        return Response({'error': 'Failed to send email'}, status=status.HTTP_400_BAD_REQUEST)
+                    user_detail_serializer = UserDetailsSerializer(user)
+                    payload=encrypt_payload(user_detail_serializer.data)
+                    return Response({'user': payload }, status=status.HTTP_200_OK)
+                return Response({'error': 'Consent email is already sent'}, status=status.HTTP_400_BAD_REQUEST)
+        email_verification = EmailVerification(user=user)
+        email_verification.generate_token()
+        email_verification.save()
+        try:
+            email_verification.send_verification_email()
+        except Exception as e:
+            print(e, flush=True)
+            return Response({'error': 'Failed to send email'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        user.consent_email=True
+        user.save()
+        user_detail_serializer = UserDetailsSerializer(user)
+        payload=encrypt_payload(user_detail_serializer.data)
+        return Response({'user': payload }, status=status.HTTP_200_OK)
 
 
+class PrivacyPolicyViewSet(ReadOnlyModelViewSet):
+    serializer_class = PrivacyPolicySerializer
+
+    def get_queryset(self):
+        return PrivacyPolicy.objects.filter(is_active=True).order_by('-created_at')[:1]
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        if queryset.exists():
+            serializer = self.get_serializer(queryset.first())
+            return Response(serializer.data)
+        
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+        
+
+class TermAndConditionViewSet(ReadOnlyModelViewSet):
+    serializer_class = TermAndConditionSerializer
+
+    def get_queryset(self):
+        return TermAndCondition.objects.filter(is_active=True).order_by('-created_at')[:1]
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+
+        if queryset.exists():
+            serializer = self.get_serializer(queryset.first())
+            return Response(serializer.data)
+        
+        return Response(status=status.HTTP_400_BAD_REQUEST)

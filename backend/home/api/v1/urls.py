@@ -11,6 +11,9 @@ from home.api.v1.viewsets import (
     UserDetailView,
     ResetPasswordViewSet,
     ProfileAPIView,
+    EmailConsentView,
+    PrivacyPolicyViewSet,
+    TermAndConditionViewSet,
 )
 
 
@@ -31,4 +34,8 @@ urlpatterns = [
     path('reset-password/<str:session_id>/', ResetPasswordViewSet.as_view({'get': 'retrieve', 'post': 'update'}), name='reset-password-session'),
     path('details/<int:pk>/', ProfileAPIView.as_view(), name='profile-detail'),
     path('details/', ProfileAPIView.as_view(), name='profile-create'),
+    path('email/', EmailConsentView.as_view(), name='email-consent'),
+    path('privacy/', PrivacyPolicyViewSet.as_view({'get':'list'}), name='privacy-policy'),
+    path('term-and-condition/', TermAndConditionViewSet.as_view({'get':'list'}), name='term-and-condition'),
+
 ]

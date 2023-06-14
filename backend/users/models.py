@@ -34,12 +34,13 @@ class User(AbstractUser):
     # First Name and Last Name do not cover name patterns
     # around the globe.
     name = models.CharField(_("Name of User"), blank=True, null=True, max_length=255)
-    identifier = models.UUIDField( default=uuid.uuid4, editable=False)
+    identifier = models.UUIDField( default=uuid.uuid4, editable=False, unique=True, db_index=True)
     email = models.EmailField(unique=False)
     age = models.PositiveIntegerField(default=0, blank=True, null=True)
     avatar_id = models.PositiveIntegerField(default=0, blank=True, null=True)
     consent_status = models.BooleanField(default=False)
     detail_status = models.BooleanField(default=False)
+    consent_email = models.BooleanField(default=False)
 
     USERNAME_FIELD = 'username'
 
@@ -64,16 +65,12 @@ class ConsentAccessCode(models.Model):
     
 
 class Profile(models.Model):
-    GENDER_CHOICES = [
-        (0, 'Male'),
-        (1, 'Female'),
-    ]
-
+    """user profile information"""
     participant = models.OneToOneField(User, on_delete=models.CASCADE)
     birth_month = models.IntegerField()
     birth_year = models.IntegerField()
     nationality = models.CharField(max_length=100)
-    gender = models.IntegerField(choices=GENDER_CHOICES)
+    gender = models.CharField(max_length=50)
     zipcode = models.CharField(max_length=10)
 
     def save(self, *args, **kwargs):
@@ -86,6 +83,7 @@ class Profile(models.Model):
 
 
 class EmailVerification(models.Model):
+    """send verification email to adult for consent"""
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     verification_token = models.CharField(max_length=32)
     created_at = models.DateTimeField(default=timezone.now)
@@ -95,7 +93,7 @@ class EmailVerification(models.Model):
     def generate_token(self):
         self.verification_token = get_random_string(length=32)
         self.created_at = timezone.now()
-        self.expiry_date = self.created_at + timezone.timedelta(days=7)
+        self.expiry_date = self.created_at + timezone.timedelta(days=3)
         self.save()
 
     def is_token_valid(self, token):
@@ -122,6 +120,7 @@ class EmailVerification(models.Model):
 
 
 class PasswordResetSession(models.Model):
+    """Resetting user password"""
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     session_id = models.CharField(max_length=100, unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -156,3 +155,18 @@ class PasswordResetSession(models.Model):
         send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [self.user.email])
 
 
+
+class PrivacyPolicy(models.Model):
+    body = models.TextField()
+    author = models.ForeignKey(User, on_delete=models.PROTECT)
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+
+class TermAndCondition(models.Model):
+    body = models.TextField()
+    author = models.ForeignKey(User, on_delete=models.PROTECT)
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
