@@ -29,7 +29,11 @@ export const avatar = (id) => {
 }
 
 export const refresh = () => {
-    return API.get(base + "/refresh/");
+    return API.get(base + "/refresh/", {
+        env: {
+            noLoader: true
+        }
+    });
 }
 
 export const resetPassword = (id) => {
@@ -46,4 +50,18 @@ export const savePassword = (sessionId, password) => {
     return API.post(base + `/reset-password/${sessionId}/`, {
         new_password: password
     });
+}
+
+export const email = (resend = false) => {
+    return API.post(base + "/email/", {
+        resend_email: resend
+    });
+}
+
+export const terms = () => {
+    return API.get(base + "/terms-conditions/");
+}
+
+export const privacy = () => {
+    return API.get(base + "/privacy/");
 }

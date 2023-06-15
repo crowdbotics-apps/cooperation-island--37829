@@ -203,11 +203,11 @@ const Avatar = () => {
             autoplay: true,
             onplay: () => {
                 if (howler.welcome.volume())
-                    howler.welcome.fade(1, 0.1, 1000);
+                    howler.welcome.fade(howler.welcome.volume(), 0.1, 1000);
             },
             onend: () => {
                 if (howler.welcome.volume())
-                    howler.welcome.fade(0.1, 1, 1000);
+                    howler.welcome.fade(0.1, 0.2, 1000);
             }
         });
         handleAvatar(active)

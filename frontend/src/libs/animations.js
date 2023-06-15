@@ -77,11 +77,17 @@ export const showReadingPane = (alt) => {
 }
 
 export const showLandingPage = () => {
+    anime({
+        targets: "#guide2",
+        left: "6vw",
+        easing: "easeOutQuint",
+        duration: 2000
+    });
     anime
         .timeline()
         .add({
-            targets: "#board4",
-            top: ["110vh", "33.4vh"],
+            targets: "#board5",
+            top: "10vh",
             easing: "easeOutQuint",
             duration: 2000
         })
@@ -90,21 +96,7 @@ export const showLandingPage = () => {
             left: "94vw",
             easing: "easeOutQuint",
             duration: 2000
-        }, "-=2000")
-        .add({
-            targets: "#guide",
-            top: "-0.5vh",
-            scale: [0, 1],
-            easing: "easeOutQuint",
-            duration: 2000
-        })
-        .add({
-            targets: "#animal",
-            top: "0.3vh",
-            scale: [0, 1],
-            easing: "easeOutQuint",
-            duration: 2000
-        });
+        }, "-=1200");
 }
 
 export const showDetailsPage = () => {

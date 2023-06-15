@@ -4,19 +4,17 @@ import { DatePicker } from "@material-ui/pickers";
 import { makeStyles } from "@material-ui/core";
 import { useHistory } from "react-router-dom";
 import { mapUserData, mapUserDetails } from "../funnels/v1";
-import { formatNationality, formatZipCode, parseToken, userState, validateZipCode } from "../libs/utils";
+import { formatText, formatZipCode, parseToken, userState, validateZipCode } from "../libs/utils";
 import { details as handleDetailsAPI } from "../services/v1";
 import { showAvatarPage, showLoginBoard } from "../libs/animations";
 import BoardImg from "../assets/images/Board.png";
 import CIButton from "../shared/CIButton";
-import CICheck from "../shared/CICheck";
 import CIInput from "../shared/CIInput";
 import CILabel from "../shared/CILabel";
 import CILogout from "../shared/CILogout";
 import CIMusic from "../shared/CIMusic";
 import { AppContext } from "../App";
 import { toast } from "react-toastify";
-import { Howl } from "howler";
 import anime from "animejs";
 import clsx from "clsx";
 
@@ -85,22 +83,6 @@ const useStyles = makeStyles((theme) => ({
     button: {
         marginTop: "2vh"
     },
-    gender: {
-        "& div": {
-            "& label": {
-                marginRight: "1.25vw"
-            },
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center"
-        },
-        display: "flex",
-        justifyContent: "space-evenly",
-        height: "8vh",
-        width: "25.75vw",
-        marginTop: "1vh",
-        marginBottom: "1.8vh"
-    },
     input: {
         marginBottom: "1.8vh"
     },
@@ -121,7 +103,7 @@ const UserDetails = () => {
 
     const [details, setDetails] = useState({
         nationality: "",
-        gender: 0,
+        gender: "",
         zipcode: "",
         birthDay: null
     });
@@ -155,20 +137,15 @@ const UserDetails = () => {
     }
 
     const handleDetails = (prop) => (event) => {
-        if (prop === "male" || prop === "female") {
-            new Howl({
-                src: require("../assets/sounds/Click.mp3"),
-                autoplay: true
-            });
+        if (prop === "zipcode")
             setDetails({
                 ...details,
-                gender: prop === "male" ? 0 : 1
+                [prop]: formatZipCode(event.target.value, details.zipcode)
             });
-        }
         else
             setDetails({
                 ...details,
-                [prop]: prop === "nationality" ? formatNationality(event.target.value, details.nationality) : formatZipCode(event.target.value, details.zipcode)
+                [prop]: formatText(event.target.value, details[prop])
             });
     }
 
@@ -236,7 +213,7 @@ const UserDetails = () => {
                         });
                 })
                 .catch(() => {
-                    toast.error("The Access Code is invalid.")
+                    toast.error("The Access Code is invalid.");
                 });
         }
     }
@@ -247,16 +224,7 @@ const UserDetails = () => {
             <div className={cls.body}>
                 <CILabel className={cls.title}>Tell us more about YOU</CILabel>
                 <CIInput className={cls.input} placeholder="Nationality" onChange={handleDetails("nationality")} onEnter={handleNext} value={details.nationality} />
-                <div className={clsx(cls.gender, "pointer")}>
-                    <div className="pointer" onClick={handleDetails("male")}>
-                        <CILabel className="pointer">Male</CILabel>
-                        <CICheck checked={details.gender === 0} id="male" />
-                    </div>
-                    <div className="pointer" onClick={handleDetails("female")}>
-                        <CILabel className="pointer">Female</CILabel>
-                        <CICheck checked={details.gender === 1} id="female" />
-                    </div>
-                </div>
+                <CIInput className={cls.input} placeholder="Gender" onChange={handleDetails("gender")} onEnter={handleNext} value={details.gender} />
                 <CIInput className={cls.input} placeholder="Zip Code" onChange={handleDetails("zipcode")} onEnter={handleNext} value={details.zipcode} />
                 <DatePicker
                     autoOk

@@ -96,7 +96,7 @@ const Dashboard = () => {
             history.push("/");
 
         if (BGM)
-            howler.welcome.fade(1, 0.2, 1000);
+            howler.welcome.fade(howler.welcome.volume(), 0.2, 1000);
         setHowler({
             dashboard: new Howl({
                 src: [require("../assets/sounds/Dashboard.mp3")],

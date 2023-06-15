@@ -1,14 +1,16 @@
 import { useContext, useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
-import { makeStyles } from "@material-ui/core";
+import { Backdrop, makeStyles } from "@material-ui/core";
 import { mapUserData } from "../funnels/v1";
 import { formatCode, parseToken, userState } from "../libs/utils";
-import { access as handleAccess, refresh as handleRefresh } from "../services/v1";
+import { email, access as handleAccess, refresh as handleRefresh } from "../services/v1";
 import { showDetailsPage, showLoginBoard } from "../libs/animations";
 import BoardImg from "../assets/images/Board-alt.png";
+import BoardLgImg from "../assets/images/Board-lg.png";
 import CIButton from "../shared/CIButton";
 import CIInput from "../shared/CIInput";
 import CILabel from "../shared/CILabel";
+import CILink from "../shared/CILink";
 import CILogout from "../shared/CILogout";
 import CIMusic from "../shared/CIMusic";
 import { AppContext } from "../App";
@@ -33,6 +35,14 @@ const useStyles = makeStyles({
         width: "20vw",
         transform: "scale(0)"
     },
+    guide2: {
+        position: "absolute",
+        top: "33.5vh",
+        left: "-30vw",
+        height: "70vh",
+        width: "24vw",
+        transform: "scaleX(-1)"
+    },
     board: {
         position: "absolute",
         top: "110vh",
@@ -43,15 +53,30 @@ const useStyles = makeStyles({
         backgroundRepeat: "no-repeat",
         backgroundSize: "50vw 60vh"
     },
+    board2: {
+        position: "absolute",
+        top: "110vh",
+        left: "34vw",
+        height: "80vh",
+        width: "54vw",
+        textAlign: "center",
+        background: `url(${BoardLgImg})`,
+        backgroundRepeat: "no-repeat",
+        backgroundSize: "54vw 80vh"
+    },
     body: {
         "& input": {
             marginTop: "1vh",
-            marginBottom: "6vh"
+            marginBottom: "5vh"
         },
         "& label:first-child": {
+            "& label": {
+                display: "inline",
+                fontWeight: "bold"
+            },
             fontSize: "2.5vh",
-            letterSpacing: "0.1vw",
-            paddingTop: "2vh",
+            letterSpacing: "0.1vw !important",
+            paddingTop: "3vh",
             marginBottom: "12vh"
         },
         display: "flex",
@@ -62,6 +87,24 @@ const useStyles = makeStyles({
         height: "50vh",
         width: "37vw",
         marginTop: "8vh"
+    },
+    backdrop: {
+        zIndex: 5
+    },
+    title: {
+        fontSize: "4.5vh",
+        fontWeight: "bold",
+        letterSpacing: "0.1vw",
+        marginTop: "10vh",
+        marginBottom: "8vh"
+    },
+    content: {
+        textAlign: "left",
+        margin: "2vh 5vw 1vh 7vw"
+    },
+    button: {
+        marginTop: "3vh",
+        marginLeft: "1vw"
     },
     logout: {
         position: "absolute",
@@ -82,9 +125,11 @@ const LandingPage = () => {
 
     const history = useHistory();
 
-    const { BGM, howler, setUser } = useContext(AppContext);
+    const { BGM, howler, user, setUser } = useContext(AppContext);
 
     const [text, setText] = useState("");
+
+    const [showBackdrop, hideBackdrop] = useState(true);
 
     useEffect(() => {
         window.RefreshTimer = setInterval(() => {
@@ -95,6 +140,52 @@ const LandingPage = () => {
                 clearInterval(window.RefreshTimer);
         }, 1000);
     }, []);
+
+    const handleClick = () => {
+        anime({
+            targets: "#guide2",
+            left: "-30vw",
+            easing: "easeInQuint",
+            duration: 2000
+        });
+        anime({
+            targets: "#backdrop",
+            opacity: 0,
+            easing: "linear",
+            duration: 2000
+        });
+        anime
+            .timeline()
+            .add({
+                targets: "#board5",
+                top: "110vh",
+                easing: "easeInQuint",
+                duration: 2000,
+                complete: () => {
+                    hideBackdrop(false);
+                }
+            })
+            .add({
+                targets: "#board4",
+                top: "33.4vh",
+                easing: "easeOutQuint",
+                duration: 2000
+            })
+            .add({
+                targets: "#guide",
+                top: "-0.5vh",
+                scale: [0, 1],
+                easing: "easeOutQuint",
+                duration: 2000
+            }, "-=1000")
+            .add({
+                targets: "#animal",
+                top: "0.3vh",
+                scale: [0, 1],
+                easing: "easeOutQuint",
+                duration: 2000
+            }, "-=1000");
+    }
 
     const handleChange = (event) => {
         setText(formatCode(event.target.value, text));
@@ -122,6 +213,23 @@ const LandingPage = () => {
             });
     }
 
+    const handleLink = (resend) => () => {
+        email(resend)
+            .then(({ data }) => {
+                const userData = parseToken(data.user);
+
+                if (userData) {
+                    localStorage["UserState"] = data.user;
+                    setUser(mapUserData((userData)));
+
+                    toast.success("The User-Consent document has been sent to your registered email.");
+                }
+            })
+            .catch(() => {
+                toast.error("Something went wrong.");
+            });
+    }
+
     const handleSave = ({ data }) => {
         const userData = parseToken(data.user);
 
@@ -130,8 +238,20 @@ const LandingPage = () => {
             localStorage["UserState"] = data.user;
 
             anime({
-                targets: "#board4",
+                targets: "#board4, #board5",
                 top: "110vh",
+                easing: "easeInQuint",
+                duration: 2000
+            });
+            anime({
+                targets: "#backdrop",
+                opacity: 0,
+                easing: "linear",
+                duration: 2000
+            });
+            anime({
+                targets: "#guide2",
+                left: "-30vw",
                 easing: "easeInQuint",
                 duration: 2000
             });
@@ -172,14 +292,29 @@ const LandingPage = () => {
     return <div>
         <img className={cls.animal} id="animal" src={require("../assets/animals/Animal_1.png")} />
         <img className={cls.guide} id="guide" src={require("../assets/avatars/Avatar_6.png")} />
+        <img className={cls.guide2} id="guide2" src={require("../assets/avatars/Avatar_9.png")} />
         <div className={cls.board} id="board4">
             <div className={cls.body}>
-                <CILabel>Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam.</CILabel>
+                {user.email ? <CILabel>Please Accept or <CILink onClick={handleLink(true)}>Click Here</CILink> to resend the <b className="typer">User-Consent</b> document, sent on your registered email or If you already have an <b className="typer">Access-Code</b>, Please enter below.</CILabel> :
+                    <CILabel>Please <CILink onClick={handleLink(false)}>Click Here</CILink> to receive the <b className="typer">User-Consent</b> document or If you already have an <b className="typer">Access-Code</b>, Please enter below.</CILabel>}
                 <CILabel>Access Code</CILabel>
                 <CIInput onChange={handleChange} onEnter={handleSubmit} value={text} />
                 <CIButton onClick={handleSubmit}>Submit</CIButton>
             </div>
         </div>
+        <Backdrop className={cls.backdrop} id="backdrop" open={showBackdrop}>
+            <div className={cls.board2} id="board5">
+                <CILabel className={cls.title}>
+                    Disclaimer
+                </CILabel>
+                <div className={cls.content}>
+                    <h4 className="typer">Welcome to Cooperation Island!</h4>
+                    <p className="typer">Cooperation Island is a set of different activities made for children, just like you. On Cooperation Island, you will have the opportunity to explore different activities. For the most part, you will make decisions that can help you earn shells.</p>
+                    <p className="typer">Unlike some activities you may play, your responses to these questions and your decisions help us with scientific research. That means that your responses to these activities will be used to help us better understand how children and adults make decisions and think about the world and will likely be a part of a scientific research project, so you should take your decisions seriously. You can be a part of this research project if you want to be. You do not have to be a part of it if you do not want to be. You should feel free to stop the activity at any point, and your name will not be put on any reports written about this project.</p>
+                </div>
+                <CIButton className={cls.button} onClick={handleClick}>Okay</CIButton>
+            </div>
+        </Backdrop>
         <CILogout className={cls.logout} id="logout" onClick={handleLogout} />
         <CIMusic className={cls.music} id="music" />
     </div>

@@ -6,7 +6,8 @@ export const mapUserData = (data) => ({
     active: true,
     age: data.age,
     avatar: data.avatar_id,
-    details: data.detail_status
+    details: data.detail_status,
+    email: data.consent_email
 });
 
 export const mapUserDetails = (data) => ({

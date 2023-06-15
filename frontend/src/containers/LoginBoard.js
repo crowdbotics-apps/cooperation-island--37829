@@ -570,7 +570,7 @@ const LoginBoard = () => {
                     <CIInput onChange={handleChange("username", "signup")} onEnter={handleSign(false)} placeholder="Username" value={signup.username} />
                     <CIInput onChange={handleChange("password", "signup")} onEnter={handleSign(false)} placeholder="Password" type="password" value={signup.password} />
                     <div className={cls.grid}>
-                        <CIInput className={cls.email} onChange={handleChange("email", "signup")} onEnter={handleSign(false)} placeholder="Email" sm value={signup.email} />
+                        <CIInput className={cls.email} onChange={handleChange("email", "signup")} onEnter={handleSign(false)} placeholder="Parent's Email" sm value={signup.email} />
                         <CIInput className={cls.age} onChange={handleChange("age", "signup")} onEnter={handleSign(false)} placeholder="Age" xs value={signup.age} />
                     </div>
                     <CIButton onClick={handleSign(false)}>Sign Up</CIButton>
