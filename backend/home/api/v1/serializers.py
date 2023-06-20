@@ -17,7 +17,12 @@ from rest_auth.serializers import LoginSerializer as RestAuthLoginSerializer
 from rest_auth.serializers import PasswordResetConfirmSerializer as RestAuthPasswordResetConfirmSerializer
 from rest_auth.registration.serializers import VerifyEmailSerializer as RestAuthVerifyEmailSerializer
 from rest_auth.serializers import PasswordResetSerializer as RestAuthPasswordResetSerializer
-from users.models import ConsentAccessCode, Profile, PrivacyPolicy, TermAndCondition
+from users.models import (  ConsentAccessCode, 
+                            Profile, 
+                            PrivacyPolicy, 
+                            TermAndCondition, 
+                            FishGameTrial,
+                        )
 
 
 User = get_user_model()
@@ -146,3 +151,10 @@ class TermAndConditionSerializer(serializers.ModelSerializer):
     class Meta:
         model = TermAndCondition
         fields = ('body', 'author', 'created_at', 'updated_at')
+
+
+class FishGameTrialSerializer(serializers.ModelSerializer):
+    participant = serializers.PrimaryKeyRelatedField(read_only=True)
+    class Meta:
+        model = FishGameTrial
+        fields = ['id','participant', 'trial_number', 'match', 'trial_response_time']

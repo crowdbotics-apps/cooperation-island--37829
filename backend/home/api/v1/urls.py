@@ -14,6 +14,7 @@ from home.api.v1.viewsets import (
     EmailConsentView,
     PrivacyPolicyViewSet,
     TermAndConditionViewSet,
+    FishGameTrialAPIView,
 )
 
 
@@ -36,6 +37,7 @@ urlpatterns = [
     path('details/', ProfileAPIView.as_view(), name='profile-create'),
     path('email/', EmailConsentView.as_view(), name='email-consent'),
     path('privacy/', PrivacyPolicyViewSet.as_view({'get':'list'}), name='privacy-policy'),
-    path('term-and-condition/', TermAndConditionViewSet.as_view({'get':'list'}), name='term-and-condition'),
+    path('terms-conditions/', TermAndConditionViewSet.as_view({'get':'list'}), name='term-and-condition'),
+    path('score/fish-mind-reading/', FishGameTrialAPIView.as_view(), name='fish-trial-list'),
 
 ]

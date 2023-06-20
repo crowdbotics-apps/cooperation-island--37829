@@ -15,7 +15,13 @@ from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.exceptions import AuthenticationFailed
 from home.utils import encrypt_payload
-from users.models import Profile, EmailVerification, PasswordResetSession, PrivacyPolicy, TermAndCondition
+from users.models import (  Profile, 
+                            EmailVerification, 
+                            PasswordResetSession, 
+                            PrivacyPolicy, 
+                            TermAndCondition, 
+                            FishGameTrial,
+                        )
 from home.api.v1.serializers import (
     SignupSerializer,
     UserDetailsSerializer,
@@ -25,6 +31,7 @@ from home.api.v1.serializers import (
     ResetPasswordSessionSerializer,
     PrivacyPolicySerializer,
     TermAndConditionSerializer,
+    FishGameTrialSerializer,
 )
 
 
@@ -309,3 +316,11 @@ class TermAndConditionViewSet(ReadOnlyModelViewSet):
             return Response(serializer.data)
         
         return Response(status=status.HTTP_400_BAD_REQUEST)
+    
+
+class FishGameTrialAPIView(generics.ListCreateAPIView):
+    queryset = FishGameTrial.objects.all()
+    serializer_class = FishGameTrialSerializer
+
+    def perform_create(self, serializer):
+        serializer.save(participant=self.request.user)

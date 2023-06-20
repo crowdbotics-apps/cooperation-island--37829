@@ -108,8 +108,8 @@ class EmailVerification(models.Model):
         mail_subject = 'Verify your email'
         message = render_to_string('verification_email.html', {
             'user': self.user,
-            # 'domain': 'localhost:8000', # set for local
-            'domain': domain,
+            'domain': 'localhost:8000', # set for local
+            # 'domain': domain,
             'uidb64': urlsafe_base64_encode(force_bytes(self.user.pk)),
             'token': self.verification_token,
             'expiry_date': self.expiry_date
@@ -148,8 +148,8 @@ class PasswordResetSession(models.Model):
     def send_reset_email_notification(self):
         current_site = get_current_site(request=None)
         domain = current_site.domain
-        reset_url = f"https://{domain}/reset-password/{self.session_id}"
-        # reset_url = f"http://localhost:8000/reset-password/{self.session_id}"
+        # reset_url = f"https://{domain}/reset-password/{self.session_id}"
+        reset_url = f"http://localhost:8000/reset-password/{self.session_id}"
         subject = 'Password Reset'
         message = f'Your password reset link is valid for only 1 hour. Click the following link to reset your password: {reset_url}'
         send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [self.user.email])
@@ -170,3 +170,20 @@ class TermAndCondition(models.Model):
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+
+class FishGameTrial(models.Model):
+    participant = models.ForeignKey(User, on_delete=models.PROTECT, related_name='participant')
+    trial_number = models.IntegerField()
+    match = models.BooleanField()
+    trial_response_time = models.DecimalField(max_digits=5, decimal_places=2)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def save(self, *args, **kwargs):
+        # Convert milliseconds to seconds
+        self.trial_response_time = self.trial_response_time / 1000
+
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"Participant: {self.participant.id} - Trial: {self.trial_number}"
