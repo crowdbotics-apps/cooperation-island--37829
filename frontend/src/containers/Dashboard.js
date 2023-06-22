@@ -151,7 +151,15 @@ const Dashboard = () => {
                     targets: "#module",
                     scale: 0,
                     easing: "easeInQuint",
-                    duration: 2000
+                    duration: 2000,
+                    complete: () => {
+                        switch (parseInt(event.target.getAttribute("module"))) {
+                            case 1:
+                                history.push("/fish-mind-reading", {
+                                    module: 1
+                                });
+                        }
+                    }
                 });
             });
     }
@@ -197,12 +205,12 @@ const Dashboard = () => {
             <CILogout className={cls.logout} id="logout" onClick={handleLogout} />
             <CIMusic className={cls.music} id="music" />
         </div>
-        <img className={clsx(cls.module, "pointer")} id="module" onClick={handleClick} src={require("../assets/modules/Module_1.png")} />
-        <img className={clsx(cls.module, cls.module2, "pointer")} id="module" onClick={handleClick} src={require("../assets/modules/Module_2.png")} />
-        <img className={clsx(cls.module, cls.module3)} id="module" src={require(`../assets/modules/Module_${anime.random(1, 2)}.png`)} />
-        <img className={clsx(cls.module, cls.module4)} id="module" src={require("../assets/modules/Module_2.png")} />
-        <img className={clsx(cls.module, cls.module5)} id="module" src={require("../assets/modules/Module_1.png")} />
-        <img className={clsx(cls.module, cls.module6)} id="module" src={require("../assets/modules/Module_2.png")} />
+        <img className={clsx(cls.module, "pointer")} id="module" module={1} onClick={handleClick} src={require("../assets/modules/Module_1.png")} />
+        <img className={clsx(cls.module, cls.module2, "pointer")} id="module" module={2} onClick={handleClick} src={require("../assets/modules/Module_2.png")} />
+        <img className={clsx(cls.module, cls.module3)} id="module" src={require("../assets/modules/Module_3.png")} />
+        <img className={clsx(cls.module, cls.module4)} id="module" src={require("../assets/modules/Module_1.png")} />
+        <img className={clsx(cls.module, cls.module5)} id="module" src={require("../assets/modules/Module_2.png")} />
+        <img className={clsx(cls.module, cls.module6)} id="module" src={require("../assets/modules/Module_3.png")} />
     </div>
 }
 

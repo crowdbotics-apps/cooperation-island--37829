@@ -27,6 +27,13 @@ const useStyles = makeStyles({
         width: "11vw",
         transform: "scale(0)"
     },
+    animal2: {
+        position: "absolute",
+        top: "140vh",
+        left: "51vw",
+        height: "16.7vh",
+        width: "20vw"
+    },
     guide: {
         position: "absolute",
         top: "38vh",
@@ -166,6 +173,12 @@ const LandingPage = () => {
                 }
             })
             .add({
+                targets: "#animal2",
+                top: "101vh",
+                easing: "easeInQuint",
+                duration: 2000
+            }, "-=2000")
+            .add({
                 targets: "#board4",
                 top: "33.4vh",
                 easing: "easeOutQuint",
@@ -244,6 +257,12 @@ const LandingPage = () => {
                 duration: 2000
             });
             anime({
+                targets: "#animal2",
+                top: "101vh",
+                easing: "easeInQuint",
+                duration: 2000
+            });
+            anime({
                 targets: "#backdrop",
                 opacity: 0,
                 easing: "linear",
@@ -303,6 +322,7 @@ const LandingPage = () => {
             </div>
         </div>
         <Backdrop className={cls.backdrop} id="backdrop" open={showBackdrop}>
+            <img className={cls.animal2} id="animal2" src={require("../assets/animals/Animal_2.png")} />
             <div className={cls.board2} id="board5">
                 <CILabel className={cls.title}>
                     Disclaimer

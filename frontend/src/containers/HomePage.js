@@ -45,6 +45,10 @@ const HomePage = () => {
     const isLoaded = loadedItems === allItems && allItems !== 0;
 
     useEffect(() => {
+        window.addEventListener("beforeunload", () => {
+            window.history.replaceState({}, document.title);
+        });
+
         if (isLoaded && fetchStatus) {
             setStatus(false);
 

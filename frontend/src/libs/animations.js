@@ -92,6 +92,12 @@ export const showLandingPage = () => {
             duration: 2000
         })
         .add({
+            targets: "#animal2",
+            top: "1vh",
+            easing: "easeOutQuint",
+            duration: 2000
+        }, "-=2000")
+        .add({
             targets: "#logout, #music",
             left: "94vw",
             easing: "easeOutQuint",
