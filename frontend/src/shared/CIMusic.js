@@ -36,16 +36,20 @@ const CIMusic = (props) => {
             duration: 1000
         });
         if (BGM) {
-            howler.welcome.fade(howler.welcome.volume(), 0, 1000);
-            howler.dashboard?.fade(1, 0, 1000);
+            if (window.location.pathname === "/fish-mind-reading")
+                howler.module_1.fade(howler.module_1.volume(), 0, 1000);
+            else if (window.location.pathname === "/tree-shaking")
+                howler.module_2.fade(howler.module_2.volume(), 0, 1000);
+            else
+                howler.welcome.fade(howler.welcome.volume(), 0, 1000);
         }
-        else {
-            if (window.location.pathname === "/home")
-                howler.welcome.fade(0, 0.2, 1000);
+        else
+            if (window.location.pathname === "/fish-mind-reading")
+                howler.module_1.fade(0, 1, 1000);
+            else if (window.location.pathname === "/tree-shaking")
+                howler.module_2.fade(0, 1, 1000);
             else
                 howler.welcome.fade(0, 1, 1000);
-            howler.dashboard?.fade(0, 1, 1000);
-        }
         setBGM(!BGM);
     }
 

@@ -178,12 +178,12 @@ export const showHomePage = () => {
     });
     anime({
         targets: "#header",
-        top: "4vh",
+        top: "2.25vh",
         easing: "easeOutQuint",
         duration: 2000
     });
     anime({
-        targets: "#logout, #music",
+        targets: "#shell, #avatar, #music, #logout",
         top: "1.75vh",
         easing: "easeOutQuint",
         duration: 2000

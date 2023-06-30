@@ -7,10 +7,10 @@ const useStyles = makeStyles({
     }
 });
 
-const CILoader = (props) => {
+const CILoader = () => {
     const cls = useStyles();
 
-    return <Backdrop className={cls.backdrop} open={props.open}>
+    return <Backdrop className={cls.backdrop} open>
         <LoadingSpinner />
     </Backdrop>
 }

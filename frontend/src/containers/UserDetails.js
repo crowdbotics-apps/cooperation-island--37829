@@ -115,10 +115,8 @@ const UserDetails = () => {
 
 
     const handleLogout = () => {
-        if (BGM) {
+        if (BGM)
             howler.welcome.fade(howler.welcome.volume(), 0, 1000);
-            howler.dashboard?.fade(1, 0, 1000);
-        }
         localStorage.clear();
 
         anime({

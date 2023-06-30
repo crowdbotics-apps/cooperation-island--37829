@@ -1,6 +1,5 @@
 import { makeStyles, Backdrop, LinearProgress } from "@material-ui/core";
 import LogoText from "./LogoText";
-import clsx from "clsx";
 
 const useStyles = makeStyles((theme) => ({
     backdrop: {
@@ -23,14 +22,14 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const LoadAssets = ({ onLoad, progress, show }) => {
+const LoadAssets = ({ onLoad, progress }) => {
     const cls = useStyles();
 
     return <div className={cls.grid}>
-        <Backdrop className={cls.backdrop} open={show}>
+        <Backdrop className={cls.backdrop} open>
             <LogoText />
         </Backdrop>
-        <LinearProgress classes={{ root: clsx(cls.progress, !show && cls.hidden), bar2Buffer: cls.bar }} variant="buffer" value={progress} valueBuffer={Math.round(progress + (Math.random() * 10))} />
+        <LinearProgress classes={{ root: cls.progress, bar2Buffer: cls.bar }} variant="buffer" value={progress} valueBuffer={Math.round(progress + (Math.random() * 10))} />
 
         <img className={cls.hidden} id="assets" onLoad={onLoad} src={require("../assets/animals/Animal_1.png")} />
         <img className={cls.hidden} id="assets" onLoad={onLoad} src={require("../assets/animals/Animal_2.png")} />
@@ -116,18 +115,28 @@ const LoadAssets = ({ onLoad, progress, show }) => {
         <img className={cls.hidden} id="assets" onLoad={onLoad} src={require("../assets/images/Switch.png")} />
         <img className={cls.hidden} id="assets" onLoad={onLoad} src={require("../assets/images/Typer.png")} />
 
+        <img className={cls.hidden} id="assets" onLoad={onLoad} src={require("../assets/modules/Bubbles.png")} />
+        <img className={cls.hidden} id="assets" onLoad={onLoad} src={require("../assets/modules/Dialog.png")} />
         <img className={cls.hidden} id="assets" onLoad={onLoad} src={require("../assets/modules/Module_1.png")} />
         <img className={cls.hidden} id="assets" onLoad={onLoad} src={require("../assets/modules/Module_1_BG.jpg")} />
         <img className={cls.hidden} id="assets" onLoad={onLoad} src={require("../assets/modules/Module_1_Text.png")} />
         <img className={cls.hidden} id="assets" onLoad={onLoad} src={require("../assets/modules/Module_2.png")} />
-        <img className={cls.hidden} id="assets" onLoad={onLoad} src={require("../assets/modules/Module_2_BG.png")} />
+        <img className={cls.hidden} id="assets" onLoad={onLoad} src={require("../assets/modules/Module_2_BG.jpg")} />
         <img className={cls.hidden} id="assets" onLoad={onLoad} src={require("../assets/modules/Module_2_Text.png")} />
         <img className={cls.hidden} id="assets" onLoad={onLoad} src={require("../assets/modules/Module_3.png")} />
+        <img className={cls.hidden} id="assets" onLoad={onLoad} src={require("../assets/modules/Module_3_Text.png")} />
+        <img className={cls.hidden} id="assets" onLoad={onLoad} src={require("../assets/modules/Palm.png")} />
+        <img className={cls.hidden} id="assets" onLoad={onLoad} src={require("../assets/modules/Shell-alt.png")} />
 
+        <audio className={cls.hidden} id="assets" onCanPlay={onLoad} src={require("../assets/sounds/Activity.mp3")} />
         <audio className={cls.hidden} id="assets" onCanPlay={onLoad} src={require("../assets/sounds/Avatar.mp3")} />
         <audio className={cls.hidden} id="assets" onCanPlay={onLoad} src={require("../assets/sounds/Click.mp3")} />
-        <audio className={cls.hidden} id="assets" onCanPlay={onLoad} src={require("../assets/sounds/Dashboard.mp3")} />
         <audio className={cls.hidden} id="assets" onCanPlay={onLoad} src={require("../assets/sounds/Module.mp3")} />
+        <audio className={cls.hidden} id="assets" onCanPlay={onLoad} src={require("../assets/sounds/Module_1.mp3")} />
+        <audio className={cls.hidden} id="assets" onCanPlay={onLoad} src={require("../assets/sounds/Module_2.mp3")} />
+        <audio className={cls.hidden} id="assets" onCanPlay={onLoad} src={require("../assets/sounds/No_Shell.mp3")} />
+        <audio className={cls.hidden} id="assets" onCanPlay={onLoad} src={require("../assets/sounds/Number.mp3")} />
+        <audio className={cls.hidden} id="assets" onCanPlay={onLoad} src={require("../assets/sounds/Shell.mp3")} />
         <audio className={cls.hidden} id="assets" onCanPlay={onLoad} src={require("../assets/sounds/Welcome.mp3")} />
     </div>
 }

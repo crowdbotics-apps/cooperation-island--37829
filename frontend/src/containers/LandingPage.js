@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { Fragment, useContext, useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { Backdrop, makeStyles } from "@material-ui/core";
 import { mapUserData } from "../funnels/v1";
@@ -76,10 +76,14 @@ const useStyles = makeStyles({
             marginTop: "1vh",
             marginBottom: "5vh"
         },
-        "& label:first-child": {
+        "& > label:first-child": {
             "& label": {
                 display: "inline",
-                fontWeight: "bold"
+                fontSize: "2.5vh",
+                fontWeight: "bold",
+                letterSpacing: "0.1vw !important",
+                paddingTop: "3vh",
+                marginBottom: "12vh"
             },
             fontSize: "2.5vh",
             letterSpacing: "0.1vw !important",
@@ -95,6 +99,9 @@ const useStyles = makeStyles({
         width: "37vw",
         marginTop: "8vh"
     },
+    label: {
+        marginTop: "16vh"
+    },
     backdrop: {
         zIndex: 5
     },
@@ -109,9 +116,11 @@ const useStyles = makeStyles({
         textAlign: "left",
         margin: "2vh 5vw 1vh 7vw"
     },
-    button: {
-        marginTop: "3vh",
-        marginLeft: "1vw"
+    buttonDiv: {
+        display: "flex",
+        justifyContent: "space-evenly",
+        width: "70%",
+        margin: "4.5vh auto 0"
     },
     logout: {
         position: "absolute",
@@ -138,6 +147,8 @@ const LandingPage = () => {
 
     const [showBackdrop, hideBackdrop] = useState(true);
 
+    const [showAccess, setAccess] = useState(false);
+
     useEffect(() => {
         window.RefreshTimer = setInterval(() => {
             if (localStorage["AccessToken"])
@@ -147,6 +158,10 @@ const LandingPage = () => {
                 clearInterval(window.RefreshTimer);
         }, 1000);
     }, []);
+
+    const handleInput = () => {
+        setAccess(true);
+    }
 
     const handleClick = () => {
         anime({
@@ -205,14 +220,12 @@ const LandingPage = () => {
     }
 
     const handleLogout = () => {
-        if (BGM) {
+        if (BGM)
             howler.welcome.fade(howler.welcome.volume(), 0, 1000);
-            howler.dashboard?.fade(1, 0, 1000);
-        }
         localStorage.clear();
 
         anime({
-            targets: "#animal, #board4, #guide, #logout, #music",
+            targets: "#animal, #animal2, #board4, #board5, #guide, #guide2, #logout, #music",
             opacity: [1, 0],
             easing: "easeOutQuint",
             delay: 1000,
@@ -314,11 +327,13 @@ const LandingPage = () => {
         <img className={cls.guide2} id="guide2" src={require("../assets/avatars/Avatar_9.png")} />
         <div className={cls.board} id="board4">
             <div className={cls.body}>
-                {user.email ? <CILabel>Please Accept or <CILink onClick={handleLink(true)}>Click Here</CILink> to resend the <b className="typer">User-Consent</b> document, sent on your registered email or If you already have an <b className="typer">Access-Code</b>, Please enter below.</CILabel> :
-                    <CILabel>Please <CILink onClick={handleLink(false)}>Click Here</CILink> to receive the <b className="typer">User-Consent</b> document or If you already have an <b className="typer">Access-Code</b>, Please enter below.</CILabel>}
-                <CILabel>Access Code</CILabel>
-                <CIInput onChange={handleChange} onEnter={handleSubmit} value={text} />
-                <CIButton onClick={handleSubmit}>Submit</CIButton>
+                {user.email ? <CILabel className={!showAccess && cls.label}>Please Accept or <CILink onClick={handleLink(true)}>Click Here</CILink> to resend the <b className="typer">User-Consent</b> document, sent on your registered email or If you already have an <b className="typer">Access-Code</b>, Please <CILink onClick={handleInput}>Click Here</CILink>.</CILabel> :
+                    <CILabel className={!showAccess && cls.label}>Please <CILink onClick={handleLink(false)}>Click Here</CILink> to receive the <b className="typer">User-Consent</b> document or If you already have an <b className="typer">Access-Code</b>, Please <CILink onClick={handleInput}>Click Here</CILink>.</CILabel>}
+                {showAccess && <Fragment>
+                    <CILabel>Access Code</CILabel>
+                    <CIInput onChange={handleChange} onEnter={handleSubmit} value={text} />
+                    <CIButton onClick={handleSubmit}>Submit</CIButton>
+                </Fragment>}
             </div>
         </div>
         <Backdrop className={cls.backdrop} id="backdrop" open={showBackdrop}>
@@ -332,7 +347,10 @@ const LandingPage = () => {
                     <p className="typer">Cooperation Island is a set of different activities made for children, just like you. On Cooperation Island, you will have the opportunity to explore different activities. For the most part, you will make decisions that can help you earn shells.</p>
                     <p className="typer">Unlike some activities you may play, your responses to these questions and your decisions help us with scientific research. That means that your responses to these activities will be used to help us better understand how children and adults make decisions and think about the world and will likely be a part of a scientific research project, so you should take your decisions seriously. You can be a part of this research project if you want to be. You do not have to be a part of it if you do not want to be. You should feel free to stop the activity at any point, and your name will not be put on any reports written about this project.</p>
                 </div>
-                <CIButton className={cls.button} onClick={handleClick}>Okay</CIButton>
+                <div className={cls.buttonDiv}>
+                    <CIButton alt onClick={handleClick}>Accept</CIButton>
+                    <CIButton onClick={handleLogout}>Logout</CIButton>
+                </div>
             </div>
         </Backdrop>
         <CILogout className={cls.logout} id="logout" onClick={handleLogout} />
