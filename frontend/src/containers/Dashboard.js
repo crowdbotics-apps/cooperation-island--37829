@@ -2,10 +2,12 @@ import { useContext, useEffect } from "react";
 import { makeStyles } from "@material-ui/core";
 import { useHistory } from "react-router-dom";
 import { userState } from "../libs/utils";
-import { showLoginBoard } from "../libs/animations";
+import { showAvatarPage, showLoginBoard } from "../libs/animations";
+import CIAvatar from "../shared/CIAvatar";
 import CILabel from "../shared/CILabel";
 import CILogout from "../shared/CILogout";
 import CIMusic from "../shared/CIMusic";
+import CIShell from "../shared/CIShell";
 import { AppContext } from "../App";
 import { Howl } from "howler";
 import anime from "animejs";
@@ -27,7 +29,7 @@ const useStyles = makeStyles({
     header: {
         position: "absolute",
         top: "-11.5vh",
-        left: "64.5vw"
+        left: "52.5vw"
     },
     label: {
         position: "absolute",
@@ -36,7 +38,13 @@ const useStyles = makeStyles({
         top: "4.5vh",
         width: "20vw"
     },
-    logout: {
+    shell: {
+        position: "absolute",
+        top: "0vh",
+        left: "22.6vw",
+        width: "4vw"
+    },
+    avatar: {
         position: "absolute",
         top: "0vh",
         left: "29vw",
@@ -45,7 +53,13 @@ const useStyles = makeStyles({
     music: {
         position: "absolute",
         top: "0vh",
-        left: "22.6vw",
+        left: "35.4vw",
+        width: "4vw"
+    },
+    logout: {
+        position: "absolute",
+        top: "0vh",
+        left: "42vw",
         width: "4vw"
     },
     module: {
@@ -94,18 +108,48 @@ const Dashboard = () => {
     useEffect(() => {
         if (!user.avatar || !user.details)
             history.push("/");
-
-        if (BGM)
-            howler.welcome.fade(1, 0.2, 1000);
-        setHowler({
-            dashboard: new Howl({
-                src: [require("../assets/sounds/Dashboard.mp3")],
-                autoplay: true,
-                volume: BGM ? 1 : 0,
-                loop: true
-            })
-        });
     }, []);
+
+    const handleAvatar = () => {
+        anime({
+            targets: "#background",
+            width: "100vw",
+            height: "100vh",
+            marginTop: "0vh",
+            marginLeft: "0vw",
+            opacity: 1,
+            easing: "easeInQuint",
+            duration: 2000
+        });
+        anime({
+            targets: "#logo",
+            left: "-50vw",
+            easing: "easeInQuint",
+            duration: 2000
+        });
+        anime({
+            targets: "#guide",
+            left: "-30vw",
+            easing: "easeInQuint",
+            duration: 2000
+        });
+        anime({
+            targets: "#header",
+            top: "-11.5vh",
+            easing: "easeInQuint",
+            duration: 2000
+        });
+        anime({
+            targets: "#module",
+            scale: 0,
+            easing: "easeInQuint",
+            duration: 2000,
+            complete: () => {
+                history.push("/avatar");
+                showAvatarPage();
+            }
+        });
+    }
 
     const handleClick = (event) => {
         new Howl({
@@ -151,16 +195,46 @@ const Dashboard = () => {
                     targets: "#module",
                     scale: 0,
                     easing: "easeInQuint",
-                    duration: 2000
+                    duration: 2000,
+                    complete: () => {
+                        switch (parseInt(event.target.getAttribute("module"))) {
+                            case 1:
+                                history.push("/fish-mind-reading", {
+                                    module: 1
+                                });
+                                howler.welcome.fade(howler.welcome.volume(), 0, 1000);
+                                setHowler({
+                                    module_1: new Howl({
+                                        src: [require("../assets/sounds/Module_1.mp3")],
+                                        autoplay: true,
+                                        volume: BGM ? 1 : 0,
+                                        loop: true
+                                    })
+                                });
+                                break;
+                            case 2:
+                                howler.welcome.fade(howler.welcome.volume(), 0, 1000);
+                                setHowler({
+                                    module_2: new Howl({
+                                        src: [require("../assets/sounds/Module_2.mp3")],
+                                        autoplay: true,
+                                        volume: BGM ? 1 : 0,
+                                        loop: true
+                                    })
+                                });
+                                history.push("/tree-shaking", {
+                                    module: 2
+                                });
+                                break;
+                        }
+                    }
                 });
             });
     }
 
     const handleLogout = () => {
-        if (BGM) {
+        if (BGM)
             howler.welcome.fade(howler.welcome.volume(), 0, 1000);
-            howler.dashboard?.fade(1, 0, 1000);
-        }
         localStorage.clear();
 
         anime({
@@ -194,15 +268,17 @@ const Dashboard = () => {
         <div className={cls.header} id="header">
             <img className={cls.board} src={require("../assets/images/Name_Plate.png")} />
             <CILabel className={cls.label}>{user.id}</CILabel>
-            <CILogout className={cls.logout} id="logout" onClick={handleLogout} />
+            <CIShell className={cls.shell} id="shell" />
+            <CIAvatar className={cls.avatar} id="avatar" onClick={handleAvatar} />
             <CIMusic className={cls.music} id="music" />
+            <CILogout className={cls.logout} id="logout" onClick={handleLogout} />
         </div>
-        <img className={clsx(cls.module, "pointer")} id="module" onClick={handleClick} src={require("../assets/modules/Module_1.png")} />
-        <img className={clsx(cls.module, cls.module2, "pointer")} id="module" onClick={handleClick} src={require("../assets/modules/Module_2.png")} />
-        <img className={clsx(cls.module, cls.module3)} id="module" src={require(`../assets/modules/Module_${anime.random(1, 2)}.png`)} />
-        <img className={clsx(cls.module, cls.module4)} id="module" src={require("../assets/modules/Module_2.png")} />
-        <img className={clsx(cls.module, cls.module5)} id="module" src={require("../assets/modules/Module_1.png")} />
-        <img className={clsx(cls.module, cls.module6)} id="module" src={require("../assets/modules/Module_2.png")} />
+        <img className={clsx(cls.module, "pointer")} id="module" module={1} onClick={handleClick} src={require("../assets/modules/Module_1.png")} />
+        <img className={clsx(cls.module, cls.module2, "pointer")} id="module" module={2} onClick={handleClick} src={require("../assets/modules/Module_2.png")} />
+        <img className={clsx(cls.module, cls.module3)} id="module" src={require("../assets/modules/Module_3.png")} />
+        <img className={clsx(cls.module, cls.module4)} id="module" src={require("../assets/modules/Module_1.png")} />
+        <img className={clsx(cls.module, cls.module5)} id="module" src={require("../assets/modules/Module_2.png")} />
+        <img className={clsx(cls.module, cls.module6)} id="module" src={require("../assets/modules/Module_3.png")} />
     </div>
 }
 

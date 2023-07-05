@@ -17,7 +17,8 @@ export const userState = {
     active: false,
     age: 0,
     avatar: 0,
-    details: false
+    details: false,
+    email: false
 };
 
 export const formatAge = (value, initial) => {
@@ -34,7 +35,7 @@ export const formatCode = (value, initial) => {
         return value.toUpperCase();
 }
 
-export const formatNationality = (value, initial) => {
+export const formatText = (value, initial) => {
     if (/[^a-zA-Z]/.test(value))
         return initial;
     else

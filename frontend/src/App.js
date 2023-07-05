@@ -12,6 +12,8 @@ import AvatarPage from "./containers/AvatarPage";
 import Dashboard from "./containers/Dashboard";
 import ResetPassword from "./components/ResetPassword";
 import ReadingPane from "./components/ReadingPane";
+import Module_1 from "./modules/Module_1";
+import Module_2 from "./modules/Module_2";
 import "react-toastify/dist/ReactToastify.min.css";
 
 const AppContext = createContext();
@@ -43,15 +45,28 @@ const App = () => {
       ...howler,
       ...data
     });
-  }  
+  }
+
+  const handleModule = ({ location: { state } }) => {
+    switch (state?.module) {
+      case 1:
+        return <Module_1 />;
+      case 2:
+        return <Module_2 />;
+      default:
+        return <Redirect to="/" />;
+    }
+  }
 
   const getRoutes = () => {
     if (user.active) {
       if (user.access)
         return <Switch>
-          <Route path="/home" component={Dashboard} />
-          <Route path="/avatar" component={AvatarPage} />
           <Route path="/details" component={UserDetails} />
+          <Route path="/avatar" component={AvatarPage} />
+          <Route path="/home" component={Dashboard} />
+          <Route path="/fish-mind-reading" render={handleModule} />
+          <Route path="/tree-shaking" render={handleModule} />
           <Redirect to="/" />
         </Switch>
       else
@@ -75,7 +90,7 @@ const App = () => {
       {getRoutes()}
       <Redirect to="/" />
     </Switch>
-    <CILoader open={loader} />
+    {loader && <CILoader />}
     <ToastContainer
       position="bottom-right"
       autoClose={2000}

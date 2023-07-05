@@ -45,6 +45,10 @@ const HomePage = () => {
     const isLoaded = loadedItems === allItems && allItems !== 0;
 
     useEffect(() => {
+        window.addEventListener("beforeunload", () => {
+            window.history.replaceState({}, document.title);
+        });
+
         if (isLoaded && fetchStatus) {
             setStatus(false);
 
@@ -212,7 +216,7 @@ const HomePage = () => {
             <img className={cls.BG} id="background" src={require("../assets/images/Application_BG.jpg")} />
             <img className={cls.logo} id="logo" src={require("../assets/images/Logo_Text.png")} />
         </div>
-        {<LoadAssets onLoad={handleLoaded} progress={Math.round((loadedItems / allItems) * 100)} show={!isLoaded && fetchStatus} />}
+        {(!isLoaded && fetchStatus) && <LoadAssets onLoad={handleLoaded} progress={Math.round((loadedItems / allItems) * 100)} />}
     </Fragment>
 }
 

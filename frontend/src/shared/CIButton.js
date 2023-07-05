@@ -30,6 +30,10 @@ const CIButton = (props) => {
 
     const buttonId = "button" + anime.random(1, 100);
 
+    const params = { ...props };
+
+    delete params.alt;
+
     const handleClick = () => {
         new Howl({
             src: require("../assets/sounds/Click.mp3"),
@@ -43,7 +47,7 @@ const CIButton = (props) => {
         props.onClick && props.onClick();
     }
 
-    return <button {...props} className={clsx(cls.root, props.className, "pointer")} id={buttonId} onClick={handleClick}>
+    return <button {...params} className={clsx(cls.root, props.className, "pointer")} id={buttonId} onClick={handleClick}>
         <div className={clsx(cls.label, "pointer")}>{props.children}</div>
     </button>
 }

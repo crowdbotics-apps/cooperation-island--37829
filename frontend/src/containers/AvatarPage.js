@@ -104,7 +104,7 @@ const Avatar = () => {
     const prevActive = usePrevious(active);
 
     useEffect(() => {
-        if (user.avatar || !user.details)
+        if (!user.details)
             history.push("/");
     }, []);
 
@@ -160,10 +160,8 @@ const Avatar = () => {
     }
 
     const handleLogout = () => {
-        if (BGM) {
+        if (BGM)
             howler.welcome.fade(howler.welcome.volume(), 0, 1000);
-            howler.dashboard?.fade(1, 0, 1000);
-        }
         localStorage.clear();
 
         anime
@@ -203,7 +201,7 @@ const Avatar = () => {
             autoplay: true,
             onplay: () => {
                 if (howler.welcome.volume())
-                    howler.welcome.fade(1, 0.1, 1000);
+                    howler.welcome.fade(howler.welcome.volume(), 0.1, 1000);
             },
             onend: () => {
                 if (howler.welcome.volume())
