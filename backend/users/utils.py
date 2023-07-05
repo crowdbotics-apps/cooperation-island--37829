@@ -3,8 +3,11 @@ from django.http import HttpResponse
 from .models import FishGameTrial
 
 
-def export_trials_csv(request, *args, **kwargs):
-    queryset = kwargs['queryset']
+def export_trials_csv(request, queryset=None, modeladmin=None):
+
+    if queryset is None:
+        queryset = FishGameTrial.objects.all()
+
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="fishgametrials.csv"'
 

@@ -1,7 +1,6 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 
-
 from home.api.v1.viewsets import (
     SignupViewSet,
     LoginViewSet,
@@ -15,15 +14,13 @@ from home.api.v1.viewsets import (
     PrivacyPolicyViewSet,
     TermAndConditionViewSet,
     FishGameTrialAPIView,
+    ActivityFeedbackViewSet,
 )
-
-
 
 
 router = DefaultRouter()
 router.register("signup", SignupViewSet, basename="signup")
 router.register("login", LoginViewSet, basename="login")   
-
 
 urlpatterns = [
     path("", include(router.urls)),
@@ -39,5 +36,5 @@ urlpatterns = [
     path('privacy/', PrivacyPolicyViewSet.as_view({'get':'list'}), name='privacy-policy'),
     path('terms-conditions/', TermAndConditionViewSet.as_view({'get':'list'}), name='term-and-condition'),
     path('score/fish-mind-reading/', FishGameTrialAPIView.as_view(), name='fish-trial-list'),
-
+    path('feedback/<str:activity_type>/', ActivityFeedbackViewSet.as_view(), name='activity-feedback'),
 ]

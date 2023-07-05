@@ -155,7 +155,6 @@ class PasswordResetSession(models.Model):
         send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [self.user.email])
 
 
-
 class PrivacyPolicy(models.Model):
     body = models.TextField()
     author = models.ForeignKey(User, on_delete=models.PROTECT)
@@ -187,3 +186,69 @@ class FishGameTrial(models.Model):
 
     def __str__(self):
         return f"Participant: {self.participant.id} - Trial: {self.trial_number}"
+    
+
+class ActivityFeedback(models.Model):
+    activity_type_choices = [
+        ('fish-mind-reading', 'Fish Mind Reading'),
+        ('tree-shaking', 'Tree Shaking'),
+    ]
+    
+    activity_type = models.CharField(max_length=20, choices=activity_type_choices, unique=True)
+
+    def __str__(self):
+        return f"{self.activity_type}"
+   
+
+class Question(models.Model):
+    question_type_choices = [
+        ('text_input', 'Text Input'),
+        ('multiple_choice', 'Multiple Choice Question'),
+        ('dropdown', 'Dropdown Selection'),
+    ]
+
+    activity_feedback = models.ForeignKey(ActivityFeedback, on_delete=models.CASCADE, related_name='questions')
+    question_text = models.CharField(max_length=255)
+    question_type = models.CharField(max_length=20, choices=question_type_choices)
+
+
+    def __str__(self):
+        return f"{self.question_text}"
+
+    @property
+    def answer_options(self):
+        return self.answeroption_set.all()
+
+
+class AnswerOption(models.Model):
+    option_text = models.CharField(max_length=255)
+    question = models.ForeignKey(
+                                    Question, 
+                                    related_name='answer_options', 
+                                    on_delete=models.CASCADE,
+                                 )
+
+
+class QuestionOrder(models.Model):
+    activity_feedback = models.ForeignKey(ActivityFeedback, on_delete=models.CASCADE)
+    question = models.ForeignKey(Question, on_delete=models.CASCADE)
+    order = models.PositiveIntegerField()
+
+    class Meta:
+        ordering = ['order']
+
+    def __str__(self):
+        return f"Activity: {self.activity_feedback}, Question: {self.question}, Order: {self.order}"
+    
+
+class ParticipantResponse(models.Model):
+    participant = models.ForeignKey(User, on_delete=models.PROTECT)
+    activity_feedback = models.ForeignKey(ActivityFeedback, on_delete=models.PROTECT)
+    question = models.ForeignKey(Question, on_delete=models.PROTECT)
+    text_answer = models.TextField(blank=True, null=True)
+    answer_options = models.ManyToManyField(AnswerOption, blank=True)
+
+    def __str__(self):
+        return f"Participant: {self.participant.username}, Question: {self.question.question_text}"
+
+

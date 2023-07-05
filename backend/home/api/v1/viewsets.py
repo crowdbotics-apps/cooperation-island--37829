@@ -4,6 +4,7 @@ from django.utils.http import urlsafe_base64_decode
 from django.utils.encoding import force_text
 from django.shortcuts import render
 from django.db import IntegrityError
+from django.core.exceptions import ObjectDoesNotExist
 from rest_framework.viewsets import ModelViewSet, ViewSet, ReadOnlyModelViewSet
 from rest_framework.response import Response
 from rest_framework import status, generics
@@ -21,6 +22,10 @@ from users.models import (  Profile,
                             PrivacyPolicy, 
                             TermAndCondition, 
                             FishGameTrial,
+                            Question,
+                            ActivityFeedback,
+                            AnswerOption,
+                            ParticipantResponse,
                         )
 from home.api.v1.serializers import (
     SignupSerializer,
@@ -32,6 +37,8 @@ from home.api.v1.serializers import (
     PrivacyPolicySerializer,
     TermAndConditionSerializer,
     FishGameTrialSerializer,
+    QuestionSerializer,
+    QuestionAnswerSerializer,
 )
 
 
@@ -252,9 +259,6 @@ class UserVerificationView(generics.GenericAPIView):
 class EmailConsentView(APIView):
     permission_classes = [IsAuthenticated]
 
-class EmailConsentView(APIView):
-    permission_classes = [IsAuthenticated]
-
     def post(self, request):
         user = request.user
         email_verification = EmailVerification.objects.filter(user=user).first()
@@ -321,6 +325,73 @@ class TermAndConditionViewSet(ReadOnlyModelViewSet):
 class FishGameTrialAPIView(generics.ListCreateAPIView):
     queryset = FishGameTrial.objects.all()
     serializer_class = FishGameTrialSerializer
+    permission_classes = [IsAuthenticated]
 
     def perform_create(self, serializer):
         serializer.save(participant=self.request.user)
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        
+        if serializer.is_valid():
+            return Response(status=status.HTTP_200_OK)
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+class ActivityFeedbackViewSet(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get_activity_feedback(self, activity_type):
+        try:
+            return ActivityFeedback.objects.get(activity_type=activity_type)
+        except ActivityFeedback.DoesNotExist:
+            raise ObjectDoesNotExist('Activity feedback not found.')
+        
+    def get_question(self, question_id):
+        try:
+            return Question.objects.get(pk=question_id)
+        except Question.DoesNotExist:
+            raise ObjectDoesNotExist('Question not found.')
+
+    def get(self, request, activity_type=None):
+        activity_feedback = self.get_activity_feedback(activity_type)
+        questions = activity_feedback.questions.order_by('questionorder__order')
+        serializer = QuestionSerializer(questions, many=True)
+        return Response(serializer.data)
+
+    def post(self, request, activity_type=None):
+        activity_feedback = self.get_activity_feedback(activity_type)
+        serializer = QuestionAnswerSerializer(data=request.data, context={'question': activity_feedback})
+        if serializer.is_valid():
+            question_id = serializer.validated_data['id']
+            answer = serializer.validated_data['answer']
+
+            question = self.get_question(question_id)
+
+            if question.question_type == 'text_input':
+                text_answer = answer[0] if answer else None
+                participant_response = ParticipantResponse(
+                    participant=request.user,
+                    activity_feedback=activity_feedback,
+                    question=question,
+                    text_answer=text_answer,
+                )
+                participant_response.save()
+            else:
+                participant_response = ParticipantResponse(
+                    participant=request.user,
+                    activity_feedback=activity_feedback,
+                    question=question,
+                )
+                participant_response.save()
+
+                answer_options = AnswerOption.objects.filter(id__in=answer)
+                participant_response.answer_options.set(answer_options)
+
+
+            return Response({'detail': 'Response submitted successfully.'}, status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

@@ -5,6 +5,7 @@ from django.shortcuts import get_object_or_404
 from django.http import HttpRequest
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth import authenticate
+from django.core.exceptions import ValidationError
 from rest_framework import serializers
 from rest_framework.authtoken.models import Token
 from allauth.account import app_settings as allauth_settings
@@ -22,6 +23,9 @@ from users.models import (  ConsentAccessCode,
                             PrivacyPolicy, 
                             TermAndCondition, 
                             FishGameTrial,
+                            ActivityFeedback, 
+                            Question, 
+                            AnswerOption,
                         )
 
 
@@ -158,3 +162,92 @@ class FishGameTrialSerializer(serializers.ModelSerializer):
     class Meta:
         model = FishGameTrial
         fields = ['id','participant', 'trial_number', 'match', 'trial_response_time']
+
+
+class AnswerOptionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AnswerOption
+        fields = ['id', 'option_text']
+
+
+class QuestionSerializer(serializers.ModelSerializer):
+    options = serializers.SerializerMethodField()
+    question_type = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Question
+        fields = ['id', 'question_text','question_type', 'options']
+
+    def get_options(self, question):
+        options = []
+        if question.question_type == 'dropdown' or question.question_type == 'multiple_choice':
+            for option in question.answer_options.all():
+                options.append({
+                    'id': option.id,
+                    'text': option.option_text
+                })
+        return options
+    
+    def get_question_type(self, question):
+        question_type = question.question_type
+        if question_type == 'text_input':
+            return '1'
+        elif question_type == 'dropdown':
+            return '2'
+        elif question_type == 'multiple_choice':
+            return '3'
+        return question_type
+    
+    def validate(self, data):
+        question_type = data.get('question_type')
+        answer_options = self.context.get('answer_options')
+
+        if question_type == 'dropdown' or question_type == 'multiple_choice':
+            if len(answer_options) != 4:
+                raise serializers.ValidationError("Four answer options are required for dropdown and multiple-choice questions.")
+        
+        return data
+
+
+class QuestionAnswerSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    answer = serializers.ListField(child=serializers.CharField())
+
+    def validate(self, data):
+        question_id = data.get('id')
+        answer = data.get('answer')
+
+        try:
+            question = Question.objects.get(pk=question_id)
+        except Question.DoesNotExist:
+            raise serializers.ValidationError('Question not found.')
+        
+        if question.question_type in ['dropdown', 'multiple_choice']:
+            valid_answer_option_ids = question.answer_options.values_list('id', flat=True)
+            invalid_answer_options = set(answer) - set(valid_answer_option_ids)
+            if invalid_answer_options:
+                raise ValidationError(f"Invalid answer options: {list(invalid_answer_options)}")
+
+        if question.question_type == 'text_input':
+            if len(answer) != 1:
+                raise serializers.ValidationError('Invalid answer. Only one answer is allowed for text type question.')
+        elif question.question_type == 'dropdown':
+            if len(answer) != 1:
+                raise serializers.ValidationError('Invalid answer. Please select one option for dropdown type question.')
+        elif question.question_type == 'multiple_choice':
+            valid_answer_option_ids = question.answer_options.values_list('id', flat=True)
+            if not set(answer).issubset(set(str(opt_id) for opt_id in valid_answer_option_ids)):
+                raise serializers.ValidationError('Invalid answer. Some answer options are not valid for multiple choice question.')
+        else:
+            raise serializers.ValidationError('Invalid question type.')
+
+        return data
+
+
+class ActivityFeedbackSerializer(serializers.ModelSerializer):
+    questions = QuestionSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = ActivityFeedback
+        fields = ['activity_type', 'questions']
+
