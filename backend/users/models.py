@@ -178,12 +178,6 @@ class FishGameTrial(models.Model):
     trial_response_time = models.DecimalField(max_digits=5, decimal_places=2)
     created_at = models.DateTimeField(auto_now_add=True)
 
-    def save(self, *args, **kwargs):
-        # Convert milliseconds to seconds
-        self.trial_response_time = self.trial_response_time / 1000
-
-        super().save(*args, **kwargs)
-
     def __str__(self):
         return f"Participant: {self.participant.id} - Trial: {self.trial_number}"
     
@@ -250,5 +244,3 @@ class ParticipantResponse(models.Model):
 
     def __str__(self):
         return f"Participant: {self.participant.username}, Question: {self.question.question_text}"
-
-

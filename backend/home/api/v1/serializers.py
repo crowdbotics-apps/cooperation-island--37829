@@ -1,29 +1,14 @@
 from datetime import date
-from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.shortcuts import get_object_or_404
 from django.http import HttpRequest
 from django.utils.translation import ugettext_lazy as _
-from django.contrib.auth import authenticate
-from django.core.exceptions import ValidationError
 from rest_framework import serializers
-from rest_framework.authtoken.models import Token
-from allauth.account import app_settings as allauth_settings
-from allauth.account.forms import ResetPasswordForm
-from allauth.utils import email_address_exists, generate_unique_username
 from allauth.account.adapter import get_adapter
-from allauth.account.utils import setup_user_email
-from allauth.account.models import EmailConfirmation, EmailConfirmationHMAC
-from rest_auth.serializers import LoginSerializer as RestAuthLoginSerializer
-from rest_auth.serializers import PasswordResetConfirmSerializer as RestAuthPasswordResetConfirmSerializer
-from rest_auth.registration.serializers import VerifyEmailSerializer as RestAuthVerifyEmailSerializer
-from rest_auth.serializers import PasswordResetSerializer as RestAuthPasswordResetSerializer
 from users.models import (  ConsentAccessCode, 
                             Profile, 
                             PrivacyPolicy, 
                             TermAndCondition, 
                             FishGameTrial,
-                            ActivityFeedback, 
                             Question, 
                             AnswerOption,
                         )
@@ -221,12 +206,6 @@ class QuestionAnswerSerializer(serializers.Serializer):
             question = Question.objects.get(pk=question_id)
         except Question.DoesNotExist:
             raise serializers.ValidationError('Question not found.')
-        
-        if question.question_type in ['dropdown', 'multiple_choice']:
-            valid_answer_option_ids = question.answer_options.values_list('id', flat=True)
-            invalid_answer_options = set(answer) - set(valid_answer_option_ids)
-            if invalid_answer_options:
-                raise ValidationError(f"Invalid answer options: {list(invalid_answer_options)}")
 
         if question.question_type == 'text_input':
             if len(answer) != 1:
@@ -234,6 +213,10 @@ class QuestionAnswerSerializer(serializers.Serializer):
         elif question.question_type == 'dropdown':
             if len(answer) != 1:
                 raise serializers.ValidationError('Invalid answer. Please select one option for dropdown type question.')
+            valid_answer_option_ids = question.answer_options.values_list('id', flat=True)
+            if not set(answer).issubset(set(str(opt_id) for opt_id in valid_answer_option_ids)):
+                raise serializers.ValidationError('Invalid answer. Answer options is not valid for dropdown question.')
+            
         elif question.question_type == 'multiple_choice':
             valid_answer_option_ids = question.answer_options.values_list('id', flat=True)
             if not set(answer).issubset(set(str(opt_id) for opt_id in valid_answer_option_ids)):
@@ -244,10 +227,8 @@ class QuestionAnswerSerializer(serializers.Serializer):
         return data
 
 
-class ActivityFeedbackSerializer(serializers.ModelSerializer):
-    questions = QuestionSerializer(many=True, read_only=True)
+    
 
-    class Meta:
-        model = ActivityFeedback
-        fields = ['activity_type', 'questions']
+
+
 

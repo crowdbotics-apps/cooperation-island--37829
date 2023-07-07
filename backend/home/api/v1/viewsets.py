@@ -14,7 +14,6 @@ from rest_framework.authtoken.serializers import AuthTokenSerializer
 from rest_framework.authtoken.models import Token
 from rest_framework import generics, status
 from rest_framework.response import Response
-from rest_framework.exceptions import AuthenticationFailed
 from home.utils import encrypt_payload
 from users.models import (  Profile, 
                             EmailVerification, 
@@ -26,6 +25,7 @@ from users.models import (  Profile,
                             ActivityFeedback,
                             AnswerOption,
                             ParticipantResponse,
+
                         )
 from home.api.v1.serializers import (
     SignupSerializer,
@@ -395,3 +395,4 @@ class ActivityFeedbackViewSet(APIView):
             return Response({'detail': 'Response submitted successfully.'}, status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+

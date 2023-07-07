@@ -103,18 +103,13 @@ AnswerOptionInlineFormSet = forms.inlineformset_factory(
     AnswerOption,
     form=AnswerOptionInlineForm,
     formset=BaseAnswerOptionInlineFormSet,
-    extra=4,
-    min_num=4,
-    max_num=4,
-    validate_min=True,
-    validate_max=True
 )
 
 
 class AnswerOptionInline(admin.TabularInline):
     model = AnswerOption
     formset = AnswerOptionInlineFormSet
-    extra = 4
+    extra = 2
 
 
 class QuestionInline(admin.StackedInline):
