@@ -1,8 +1,12 @@
 import { useContext, useEffect } from "react";
 import { makeStyles } from "@material-ui/core";
 import { useHistory } from "react-router-dom";
+import { rankedQualities } from "../libs/utils";
 import { showHomePage } from "../libs/animations";
 import BoardImg from "../assets/images/Board-alt.png";
+import BlockImg from "../assets/modules/Block.png";
+import SectionsImg from "../assets/modules/Sections.png";
+import ValuesImg from "../assets/modules/Values.png";
 import CIButton from "../shared/CIButton";
 import CIClose from "../shared/CIClose";
 import CILabel from "../shared/CILabel";
@@ -10,9 +14,10 @@ import CIMusic from "../shared/CIMusic";
 import CIShell from "../shared/CIShell";
 import { AppContext } from "../App";
 import anime from "animejs";
+import clsx from "clsx";
 import $ from "jquery";
 
-const useStyles = makeStyles({
+const useStyles = makeStyles((theme) => ({
     board: {
         position: "absolute",
         filter: "drop-shadow(0.33vh 0.66vh 1.2vh black)",
@@ -26,22 +31,24 @@ const useStyles = makeStyles({
         backgroundRepeat: "no-repeat",
         backgroundSize: "55vw 90vh"
     },
+    sections: {
+        position: "absolute",
+        filter: "drop-shadow(0.33vh 0.66vh 1.2vh black)",
+        top: "110vh",
+        left: "45vw",
+        height: "70vh",
+        width: "53vw",
+        background: `url(${SectionsImg})`,
+        backgroundRepeat: "no-repeat",
+        backgroundSize: "53vw 70vh"
+    },
     logo: {
         position: "absolute",
         filter: "drop-shadow(0.1vh 0.1vh 0.4vh black)",
         top: "-40vh",
-        left: "1.5vw",
+        left: "2vw",
         height: "22.95vh",
         width: "21vw"
-    },
-    palm: {
-        position: "absolute",
-        filter: "drop-shadow(0.33vh 0.66vh 1.2vh black)",
-        transform: "scale(0)",
-        top: "40vh",
-        left: "14vw",
-        height: "120.52vh",
-        width: "68vw"
     },
     instructor: {
         position: "absolute",
@@ -52,20 +59,61 @@ const useStyles = makeStyles({
         height: "70vh",
         width: "24vw"
     },
+    block: {
+        position: "absolute",
+        filter: "drop-shadow(0.33vh 0.66vh 1.2vh black)",
+        top: "110vh",
+        left: "22vw",
+        height: "68vh",
+        width: "20vw",
+        background: `url(${BlockImg})`,
+        backgroundRepeat: "no-repeat",
+        backgroundSize: "20vw 68vh"
+    },
+    container: {
+        "&::-webkit-scrollbar": {
+            width: "0.4vw"
+        },
+        "&::-webkit-scrollbar-thumb": {
+            background: theme.palette.primary.main,
+            borderRadius: "1vw"
+        },
+        "&::-webkit-scrollbar-track": {
+            background: "transparent"
+        },
+        maxHeight: "55vh",
+        width: "17vw",
+        overflow: "hidden scroll",
+        marginTop: "5.5vh",
+        marginLeft: "1vw"
+    },
+    value: {
+        "&:first-child": {
+            marginTop: "2vh"
+        },
+        "&:last-child": {
+            marginBottom: "2vh"
+        },
+        "& label": {
+            color: theme.palette.primary.contrast,
+            paddingTop: "1.75vh"
+        },
+        textAlign: "center",
+        marginTop: "3vh",
+        marginLeft: "1vw",
+        marginRight: "1vw",
+        height: "8vh",
+        width: "15vw",
+        background: `url(${ValuesImg})`,
+        backgroundRepeat: "no-repeat",
+        backgroundSize: "15vw 8vh"
+    },
     guide: {
         position: "absolute",
         filter: "drop-shadow(0.33vh 0.66vh 1.2vh black)",
         transform: "scaleX(-1)",
         top: "33.5vh",
         left: "-30vw",
-        height: "70vh",
-        width: "24vw"
-    },
-    guide2: {
-        position: "absolute",
-        filter: "drop-shadow(0.33vh 0.66vh 1.2vh black)",
-        top: "33.5vh",
-        left: "108vw",
         height: "70vh",
         width: "24vw"
     },
@@ -101,6 +149,12 @@ const useStyles = makeStyles({
             marginTop: "4vh"
         },
         "& label": {
+            "&:nth-child(2)": {
+                marginTop: "15vh"
+            },
+            "&:nth-child(3)": {
+                marginTop: "23vh"
+            },
             color: "black",
             marginTop: "12vh"
         },
@@ -112,9 +166,9 @@ const useStyles = makeStyles({
         marginTop: "12vh",
         padding: "0vh 8vw"
     }
-});
+}));
 
-const Module_2 = () => {
+const Module_3 = () => {
     const cls = useStyles();
 
     const history = useHistory();
@@ -130,7 +184,7 @@ const Module_2 = () => {
                 easing: "linear",
                 duration: 2000,
                 complete: () => {
-                    $("#background").attr("src", require("../assets/modules/Module_2_BG.jpg"));
+                    $("#background").attr("src", require("../assets/modules/Module_3_BG.jpg"));
                 }
             })
             .add({
@@ -141,13 +195,13 @@ const Module_2 = () => {
             })
             .add({
                 targets: "#logo2",
-                top: "6vh",
+                top: "4vh",
                 easing: "easeOutQuint",
                 duration: 2000
             }, "-=1000")
             .add({
                 targets: "#instructor",
-                left: "0vw",
+                left: "-0.5vw",
                 easing: "easeOutQuint",
                 duration: 2000
             }, "-=2000")
@@ -176,29 +230,19 @@ const Module_2 = () => {
             }, "-=2000")
             .add({
                 targets: "#guide",
-                left: "3vw",
+                left: "1vw",
                 easing: "easeOutQuint",
                 duration: 2000
             })
             .add({
-                targets: "#background",
-                width: "180vw",
-                height: "180vh",
-                marginTop: "-66vh",
-                marginLeft: "-76vw",
+                targets: "#block",
+                top: "23vh",
                 easing: "easeOutQuint",
                 duration: 2000
             }, "-=2000")
             .add({
-                targets: "#palm",
-                scale: [0, 1],
-                top: "-18vh",
-                easing: "easeOutQuint",
-                duration: 2000
-            }, "-=2000")
-            .add({
-                targets: "#guide2",
-                left: "74vw",
+                targets: "#sections",
+                top: "22vh",
                 easing: "easeOutQuint",
                 duration: 2000
             }, "-=2000")
@@ -214,13 +258,9 @@ const Module_2 = () => {
         anime
             .timeline()
             .add({
-                targets: "#background",
+                targets: "#background, #bg-animations",
                 opacity: 0,
-                width: "100vw",
-                height: "100vh",
-                marginTop: "0vh",
-                marginLeft: "0vw",
-                easing: "easeInQuint",
+                easing: "linear",
                 duration: 2000,
                 complete: () => {
                     $("#background").attr("src", require("../assets/images/Application_BG.jpg"));
@@ -245,15 +285,8 @@ const Module_2 = () => {
                 duration: 2000
             }, "-=4000")
             .add({
-                targets: "#guide2",
-                left: "130vw",
-                easing: "easeInQuint",
-                duration: 2000
-            }, "-=4000")
-            .add({
-                targets: "#palm",
-                scale: [1, 0],
-                top: "40vh",
+                targets: "#block, #sections",
+                top: "110vh",
                 easing: "easeInQuint",
                 duration: 2000
             }, "-=4000")
@@ -264,7 +297,7 @@ const Module_2 = () => {
                 duration: 2000
             }, "-=4000")
             .finished.then(() => {
-                howler.module_2.fade(howler.module_2.volume(), 0, 1000);
+                howler.module_3.fade(howler.module_3.volume(), 0, 1000);
                 if (BGM)
                     howler.welcome.fade(0, 1, 1000);
 
@@ -284,33 +317,42 @@ const Module_2 = () => {
     }
 
     return <div>
-        <img className={cls.logo} id="logo2" src={require("../assets/modules/Module_2_Text.png")} />
-        <img className={cls.palm} id="palm" src={require("../assets/modules/Palm.png")} />
-        <img className={cls.instructor} id="instructor" src={require("../assets/avatars/xtras/Avatar_11.png")} />
+        <img className={cls.logo} id="logo2" src={require("../assets/modules/Module_3_Text.png")} />
+        <img className={cls.instructor} id="instructor" src={require("../assets/avatars/xtras/Avatar_13.png")} />
         <img className={cls.guide} id="guide" src={require(`../assets/avatars/Avatar_${user.avatar}.png`)} />
-        <img className={cls.guide2} id="guide2" src={require("../assets/avatars/xtras/Avatar_12.png")} />
         <CIClose className={cls.close} id="close" onClick={handleClose} />
         <CIMusic className={cls.music} id="music" />
         <CIShell className={cls.shell} id="shell" />
         <div className={cls.board} id="board">
             <CILabel className={cls.header}>
-                Welcome to the Tree Shaking activity!
+                Welcome to the Tell Us About You activity!
             </CILabel>
             <div className={cls.body}>
                 <CILabel>
-                    In this activity, you’ll shake this palm tree on the island to get the shells.
+                    In this activity you will tell us about things that are important to you, about yourself.
                 </CILabel>
                 <CILabel>
-                    Then, you can keep all the shells to yourself or share some with your partner.
+                    You can drag each value into one of the three sections! You can also rank them within each box! The values that are closest to your avatar are the most important, and the ones furthest away are the least important.
                 </CILabel>
-                <img src={require("../assets/modules/Shell-alt.png")} />
                 <CILabel>
                     Are you ready?
                 </CILabel>
                 <CIButton onClick={handleClick}>Let's GO</CIButton>
             </div>
         </div>
+        <div className={cls.block} id="block">
+            <div className={cls.container}>
+                {rankedQualities.map(quality => {
+                    return <div className={clsx(cls.value, "pointer")}>
+                        <CILabel className="pointer">
+                            {quality}
+                        </CILabel>
+                    </div>
+                })}
+            </div>
+        </div>
+        <div className={cls.sections} id="sections" />
     </div>
 }
 
-export default Module_2;
+export default Module_3;

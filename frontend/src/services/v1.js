@@ -65,3 +65,27 @@ export const terms = () => {
 export const privacy = () => {
     return API.get(base + "/privacy/");
 }
+
+export const feedback = (module) => {
+    return API.get(base + `/feedback/${module}/`, {
+        env: {
+            noLoader: true
+        }
+    });
+}
+
+export const saveFeedback = (module, data) => {
+    return API.post(base + `/feedback/${module}/`, data, {
+        env: {
+            noLoader: true
+        }
+    });
+}
+
+export const score = (module, data) => {
+    return API.post(base + `/score/${module}/`, data, {
+        env: {
+            noLoader: true
+        }
+    });
+}

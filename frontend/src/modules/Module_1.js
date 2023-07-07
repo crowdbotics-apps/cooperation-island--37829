@@ -1,10 +1,12 @@
 import { Fragment, useContext, useEffect, useState } from "react";
 import { makeStyles } from "@material-ui/core";
 import { useHistory } from "react-router-dom";
+import { score } from "../services/v1";
 import { showHomePage } from "../libs/animations";
 import BoardImg from "../assets/images/Board-alt.png";
 import DialogImg from "../assets/modules/Dialog.png";
 import Bubbles from "../components/Bubbles";
+import Feedback from "../components/Feedback";
 import Fishes from "../components/Fishes";
 import Shell from "../components/Shell";
 import CIButton from "../shared/CIButton";
@@ -13,6 +15,7 @@ import CILabel from "../shared/CILabel";
 import CIMusic from "../shared/CIMusic";
 import CIShell from "../shared/CIShell";
 import { AppContext } from "../App";
+import { useTimer } from "use-timer";
 import { Howl } from "howler";
 import anime from "animejs";
 import clsx from "clsx";
@@ -93,11 +96,11 @@ const useStyles = makeStyles((theme) => ({
     guide: {
         position: "absolute",
         filter: "drop-shadow(0.33vh 0.66vh 1.2vh black)",
+        transform: "scaleX(-1)",
         top: "33.5vh",
         left: "-30vw",
         height: "70vh",
-        width: "24vw",
-        transform: "scaleX(-1)"
+        width: "24vw"
     },
     fish: {
         position: "absolute",
@@ -295,6 +298,8 @@ const Module_1 = () => {
 
     const history = useHistory();
 
+    const { time, start, reset } = useTimer();
+
     const [showBGAnimations, setAnimation] = useState(false);
 
     const [fishArray] = useState(Array(25).fill().map((_, i) => i + 1).sort(() => Math.random() - 0.5));
@@ -304,6 +309,8 @@ const Module_1 = () => {
     const [show, setShow] = useState(false);
 
     const [response, setResponse] = useState(true);
+
+    const [feedback, setFeedback] = useState(false);
 
     const [number, setNumber] = useState(0);
 
@@ -347,7 +354,7 @@ const Module_1 = () => {
                 rotateY: ["-90deg", "0deg"],
                 easing: "easeOutQuint",
                 duration: 2000
-            }, "-=2000")
+            }, "-=2000");
     }, []);
 
     const handleClick = () => {
@@ -459,7 +466,52 @@ const Module_1 = () => {
             });
     }
 
+    const handleExit = () => {
+        anime
+            .timeline()
+            .add({
+                targets: "#background, #bg-animations",
+                opacity: 0,
+                easing: "linear",
+                duration: 2000,
+                complete: () => {
+                    $("#background").attr("src", require("../assets/images/Application_BG.jpg"));
+                }
+            })
+            .add({
+                targets: "#background",
+                opacity: 1,
+                easing: "linear",
+                duration: 2000
+            })
+            .add({
+                targets: "#logo2",
+                left: "-30vw",
+                easing: "easeInQuint",
+                duration: 2000
+            }, "-=4000")
+            .finished.then(() => {
+                howler.module_1.fade(howler.module_1.volume(), 0, 1000);
+                if (BGM)
+                    howler.welcome.fade(0, 1, 1000);
+
+                history.push("/home");
+                anime({
+                    targets: "#logo",
+                    top: "-12vh",
+                    left: "-12vw",
+                    scale: 0.45,
+                    translateX: ["-30vw", "0vw"],
+                    translateY: ["-30vh", "0vh"],
+                    easing: "easeOutQuint",
+                    duration: 2000
+                });
+                showHomePage();
+            });
+    }
+
     const handleShow = () => {
+        start();
         new Howl({
             src: require("../assets/sounds/Number.mp3"),
             autoplay: true
@@ -469,6 +521,13 @@ const Module_1 = () => {
     }
 
     const handleRestart = (flag) => () => {
+        score("fish-mind-reading", {
+            trial_number: trial,
+            match: flag,
+            trial_response_time: time
+        });
+        reset();
+
         setResponse(false);
 
         new Howl({
@@ -520,19 +579,48 @@ const Module_1 = () => {
             },
         });
 
-        if (trial === 103) {
-            new Howl({
-                src: require("../assets/sounds/Activity.mp3"),
-                autoplay: true,
-                onplay: () => {
-                    if (howler.module_1.volume())
-                        howler.module_1.fade(howler.module_1.volume(), 0.1, 1000);
-                },
-                onend: () => {
-                    if (howler.module_1.volume())
-                        howler.module_1.fade(0.1, 1, 1000);
-                }
-            });
+        if (trial === 5) {
+            setTimeout(() => {
+                setFeedback(true);
+
+                new Howl({
+                    src: require("../assets/sounds/Activity.mp3"),
+                    autoplay: true,
+                    onplay: () => {
+                        if (howler.module_1.volume())
+                            howler.module_1.fade(howler.module_1.volume(), 0.1, 1000);
+                    },
+                    onend: () => {
+                        if (howler.module_1.volume())
+                            howler.module_1.fade(0.1, 1, 1000);
+                    }
+                });
+
+                anime({
+                    targets: "#guide",
+                    left: "-30vw",
+                    easing: "easeInQuint",
+                    duration: 2000
+                });
+                anime({
+                    targets: "#dialog",
+                    scale: [1, 0],
+                    easing: "easeInQuint",
+                    duration: 2000
+                });
+                anime({
+                    targets: "#fish2",
+                    marginLeft: "30vw",
+                    easing: "easeInQuint",
+                    duration: 2000
+                });
+                anime({
+                    targets: "#close, #music, #shell",
+                    top: "-12vh",
+                    easing: "easeInQuint",
+                    duration: 2000
+                });
+            }, 1000);
         }
         else {
             anime({
@@ -614,6 +702,7 @@ const Module_1 = () => {
                 <CIButton onClick={handleClick}>Let's GO</CIButton>
             </div>
         </div>
+        {feedback && <Feedback module="fish-mind-reading" onClose={handleExit} />}
     </div>
 }
 

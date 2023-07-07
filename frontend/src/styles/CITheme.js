@@ -6,6 +6,7 @@ const CITheme = createTheme({
             BG: "#207067",
             main: "#7C382D",
             light: "#CEB891",
+            contrast: "#FBF6D8",
             text: "#7C382D99"
         }
     }

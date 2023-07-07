@@ -17,3 +17,14 @@ export const mapUserDetails = (data) => ({
     nationality: data.nationality,
     zipcode: data.zipcode
 });
+
+export const mapFeedback = (data) => {
+    return data
+        .filter(x => parseInt(x.question_type) === 1 || x.options.length === 4)
+        .map(x => ({
+            id: x.id,
+            question: x.question_text,
+            question_type: parseInt(x.question_type),
+            options: x.options
+        }));
+}

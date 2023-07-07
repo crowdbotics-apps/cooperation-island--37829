@@ -1,7 +1,9 @@
 import { useContext, useEffect } from "react";
 import { makeStyles } from "@material-ui/core";
 import { useHistory } from "react-router-dom";
+import { mapFeedback } from "../funnels/v1";
 import { userState } from "../libs/utils";
+import { feedback } from "../services/v1";
 import { showAvatarPage, showLoginBoard } from "../libs/animations";
 import CIAvatar from "../shared/CIAvatar";
 import CILabel from "../shared/CILabel";
@@ -29,7 +31,7 @@ const useStyles = makeStyles({
     header: {
         position: "absolute",
         top: "-11.5vh",
-        left: "52.5vw"
+        left: "51.5vw"
     },
     label: {
         position: "absolute",
@@ -103,7 +105,7 @@ const Dashboard = () => {
 
     const history = useHistory();
 
-    const { BGM, howler, user, setHowler, setUser } = useContext(AppContext);
+    const { BGM, howler, user, setFeedback, setHowler, setUser } = useContext(AppContext);
 
     useEffect(() => {
         if (!user.avatar || !user.details)
@@ -199,9 +201,6 @@ const Dashboard = () => {
                     complete: () => {
                         switch (parseInt(event.target.getAttribute("module"))) {
                             case 1:
-                                history.push("/fish-mind-reading", {
-                                    module: 1
-                                });
                                 howler.welcome.fade(howler.welcome.volume(), 0, 1000);
                                 setHowler({
                                     module_1: new Howl({
@@ -211,6 +210,16 @@ const Dashboard = () => {
                                         loop: true
                                     })
                                 });
+
+                                feedback("fish-mind-reading")
+                                    .then(({ data }) => {
+                                        setFeedback(mapFeedback(data));
+                                    });
+
+                                history.push("/fish-mind-reading", {
+                                    module: 1
+                                });
+
                                 break;
                             case 2:
                                 howler.welcome.fade(howler.welcome.volume(), 0, 1000);
@@ -222,9 +231,32 @@ const Dashboard = () => {
                                         loop: true
                                     })
                                 });
+
+                                feedback("tree-shaking")
+                                    .then(({ data }) => {
+                                        setFeedback(mapFeedback(data));
+                                    });
+
                                 history.push("/tree-shaking", {
                                     module: 2
                                 });
+
+                                break;
+                            case 3:
+                                howler.welcome.fade(howler.welcome.volume(), 0, 1000);
+                                setHowler({
+                                    module_3: new Howl({
+                                        src: [require("../assets/sounds/Module_3.mp3")],
+                                        autoplay: true,
+                                        volume: BGM ? 1 : 0,
+                                        loop: true
+                                    })
+                                });
+
+                                history.push("/tell-us-about-you", {
+                                    module: 3
+                                });
+
                                 break;
                         }
                     }
@@ -275,7 +307,7 @@ const Dashboard = () => {
         </div>
         <img className={clsx(cls.module, "pointer")} id="module" module={1} onClick={handleClick} src={require("../assets/modules/Module_1.png")} />
         <img className={clsx(cls.module, cls.module2, "pointer")} id="module" module={2} onClick={handleClick} src={require("../assets/modules/Module_2.png")} />
-        <img className={clsx(cls.module, cls.module3)} id="module" src={require("../assets/modules/Module_3.png")} />
+        <img className={clsx(cls.module, cls.module3)} id="module" module={3} src={require("../assets/modules/Module_3.png")} />
         <img className={clsx(cls.module, cls.module4)} id="module" src={require("../assets/modules/Module_1.png")} />
         <img className={clsx(cls.module, cls.module5)} id="module" src={require("../assets/modules/Module_2.png")} />
         <img className={clsx(cls.module, cls.module6)} id="module" src={require("../assets/modules/Module_3.png")} />

@@ -14,6 +14,7 @@ import ResetPassword from "./components/ResetPassword";
 import ReadingPane from "./components/ReadingPane";
 import Module_1 from "./modules/Module_1";
 import Module_2 from "./modules/Module_2";
+import Module_3 from "./modules/Module_3";
 import "react-toastify/dist/ReactToastify.min.css";
 
 const AppContext = createContext();
@@ -24,6 +25,8 @@ const App = () => {
   const [user, setUser] = useState(localData ? mapUserData(localData) : userState);
 
   const [BGM, setBGM] = useState(false);
+
+  const [feedback, setFeedback] = useState([]);
 
   const [howler, setHowler] = useState({});
 
@@ -53,6 +56,8 @@ const App = () => {
         return <Module_1 />;
       case 2:
         return <Module_2 />;
+      case 3:
+        return <Module_3 />;
       default:
         return <Redirect to="/" />;
     }
@@ -67,6 +72,7 @@ const App = () => {
           <Route path="/home" component={Dashboard} />
           <Route path="/fish-mind-reading" render={handleModule} />
           <Route path="/tree-shaking" render={handleModule} />
+          <Route path="/tell-us-about-you" render={handleModule} />
           <Redirect to="/" />
         </Switch>
       else
@@ -84,7 +90,7 @@ const App = () => {
     }
   }
 
-  return <AppContext.Provider value={{ BGM, howler, user, setBGM, setHowler: handleHowler, setUser: handleUser }}>
+  return <AppContext.Provider value={{ BGM, feedback, howler, user, setBGM, setFeedback, setHowler: handleHowler, setUser: handleUser }}>
     <Route path="/" component={HomePage} />
     <Switch>
       {getRoutes()}
