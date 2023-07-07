@@ -21,6 +21,17 @@ export const userState = {
     email: false
 };
 
+export const rankedQualities = [
+    "Being Honest",
+    "Being Funny",
+    "Being Stickler",
+    "Being Fair",
+    "Being Athletic",
+    "Being Generous",
+    "Being Intelligent",
+    "Being Artistic"
+];
+
 export const formatAge = (value, initial) => {
     if (value === "" || value && /[0-9]/.test(value))
         return value;
