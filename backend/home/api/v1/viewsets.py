@@ -25,7 +25,7 @@ from users.models import (  Profile,
                             ActivityFeedback,
                             AnswerOption,
                             ParticipantResponse,
-
+                            RankedQualities,
                         )
 from home.api.v1.serializers import (
     SignupSerializer,
@@ -39,6 +39,8 @@ from home.api.v1.serializers import (
     FishGameTrialSerializer,
     QuestionSerializer,
     QuestionAnswerSerializer,
+    RankedQualitiesSerializer,
+    TreeShakingGameTrialSerializer,
 )
 
 
@@ -395,4 +397,47 @@ class ActivityFeedbackViewSet(APIView):
             return Response({'detail': 'Response submitted successfully.'}, status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class RankedQualitiesAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        ranked_qualities = request.data
+        user = request.user
+
+        try:
+            for ranked_quality in ranked_qualities:
+                quality = ranked_quality['id']
+                category = ranked_quality['category']
+                rank = ranked_quality['rank']
+
+                if quality not in dict(RankedQualities.quality_choices):
+                    return Response(f"Invalid quality choice: {quality}", status=status.HTTP_400_BAD_REQUEST)
+
+                RankedQualities.objects.create(participant=user, quality=quality, category=category, rank=rank)
+        except Exception as e:
+            return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
+
+        return Response("Ranked qualities saved successfully.", status=status.HTTP_200_OK)
+    
+
+class TreeShakingGameTrialView(APIView):
+    serializer_class = TreeShakingGameTrialSerializer
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        participant = request.user
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            serializer.save(participant=participant)
+            return Response(status=status.HTTP_200_OK) 
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+
+
+
+
 

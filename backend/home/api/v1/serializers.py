@@ -11,6 +11,8 @@ from users.models import (  ConsentAccessCode,
                             FishGameTrial,
                             Question, 
                             AnswerOption,
+                            RankedQualities,
+                            TreeShakingGameTrial,
                         )
 
 
@@ -226,9 +228,17 @@ class QuestionAnswerSerializer(serializers.Serializer):
 
         return data
 
-
     
+class RankedQualitiesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = RankedQualities
+        fields = ['id', 'category', 'rank']
 
+
+class TreeShakingGameTrialSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TreeShakingGameTrial
+        fields = ('trial_number', 'shell', 'shared_shell', 'trial_response_time')
 
 
 

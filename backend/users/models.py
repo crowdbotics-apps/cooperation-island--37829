@@ -244,3 +244,42 @@ class ParticipantResponse(models.Model):
 
     def __str__(self):
         return f"Participant: {self.participant.username}, Question: {self.question.question_text}"
+
+
+
+class RankedQualities(models.Model):
+    participant = models.ForeignKey(User, on_delete=models.PROTECT)
+    quality_choices = [
+        (1, 'Being Honest'),
+        (2, 'Being Funny'),
+        (3, 'Being Stickler'),
+        (4, 'Being Fair'),
+        (5, 'Being Athletic'),
+        (6, 'Being Generous'),
+        (7, 'Being Intelligent'),
+        (8, 'Being Artistic'),
+    ]
+    category_choices = [
+        (1, 'Very Important'),
+        (2, 'A Little Important'),
+        (3, 'Not That Important'),
+    ]
+    quality = models.PositiveSmallIntegerField(choices=quality_choices)
+    category = models.PositiveSmallIntegerField(choices=category_choices)
+    rank = models.PositiveSmallIntegerField()
+    def __str__(self):
+        return f"User: {self.participant.username}, Quality: {self.quality}, Rank: {self.rank}"
+
+
+class TreeShakingGameTrial(models.Model):
+    participant = models.ForeignKey(User, on_delete=models.PROTECT, related_name='tree_participant')
+    trial_number = models.PositiveIntegerField()
+    shell = models.PositiveIntegerField()
+    shared_shell= models.PositiveIntegerField()
+    trial_response_time = models.DecimalField(max_digits=5, decimal_places=2)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Participant: {self.participant.id} - Trial: {self.trial_number}"
+    
+

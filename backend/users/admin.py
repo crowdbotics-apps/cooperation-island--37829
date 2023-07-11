@@ -19,6 +19,8 @@ from .models import (ConsentAccessCode,
                      AnswerOption,
                      QuestionOrder,
                      ParticipantResponse,
+                     RankedQualities,
+                     TreeShakingGameTrial,
                     )
 
 from .utils import export_trials_csv
@@ -156,3 +158,7 @@ class QuestionOrderAdmin(admin.ModelAdmin):
 
 
 admin.site.register(ParticipantResponse)
+
+admin.site.register(RankedQualities)
+
+admin.site.register(TreeShakingGameTrial)

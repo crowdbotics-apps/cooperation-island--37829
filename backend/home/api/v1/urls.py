@@ -15,6 +15,8 @@ from home.api.v1.viewsets import (
     TermAndConditionViewSet,
     FishGameTrialAPIView,
     ActivityFeedbackViewSet,
+    RankedQualitiesAPIView,
+    TreeShakingGameTrialView,
 )
 
 
@@ -37,4 +39,6 @@ urlpatterns = [
     path('terms-conditions/', TermAndConditionViewSet.as_view({'get':'list'}), name='term-and-condition'),
     path('score/fish-mind-reading/', FishGameTrialAPIView.as_view(), name='fish-trial-list'),
     path('feedback/<str:activity_type>/', ActivityFeedbackViewSet.as_view(), name='activity-feedback'),
+    path('qualities/tell-us-about-you/', RankedQualitiesAPIView.as_view(), name='qualities'),
+    path('score/tree-shaking/', TreeShakingGameTrialView.as_view(), name='fish-trial-list'),
 ]
