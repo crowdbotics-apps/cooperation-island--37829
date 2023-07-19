@@ -310,8 +310,8 @@ const Dashboard = () => {
             <CILogout className={cls.logout} id="logout" onClick={handleLogout} />
         </div>
         <img className={clsx(cls.module, "pointer")} id="module" module={1} onClick={handleClick} src={require("../assets/modules/Module_1.png")} />
-        <img className={clsx(cls.module, cls.module2, "pointer")} id="module" module={2} onClick={handleClick} src={require("../assets/modules/Module_2.png")} />
-        <img className={clsx(cls.module, cls.module3, "pointer")} id="module" module={3} onClick={handleClick} src={require("../assets/modules/Module_3.png")} />
+        <img className={clsx(cls.module, cls.module2, "pointer")} id="module" module={2} src={require("../assets/modules/Module_2.png")} />
+        <img className={clsx(cls.module, cls.module3, "pointer")} id="module" module={3} src={require("../assets/modules/Module_3.png")} />
         <img className={clsx(cls.module, cls.module4)} id="module" src={require("../assets/modules/Module_1.png")} />
         <img className={clsx(cls.module, cls.module5)} id="module" src={require("../assets/modules/Module_2.png")} />
         <img className={clsx(cls.module, cls.module6)} id="module" src={require("../assets/modules/Module_3.png")} />
