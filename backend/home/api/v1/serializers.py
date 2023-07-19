@@ -183,6 +183,8 @@ class QuestionSerializer(serializers.ModelSerializer):
             return '2'
         elif question_type == 'multiple_choice':
             return '3'
+        elif question_type == 'rating':
+            return '4'
         return question_type
     
     def validate(self, data):
@@ -190,8 +192,8 @@ class QuestionSerializer(serializers.ModelSerializer):
         answer_options = self.context.get('answer_options')
 
         if question_type == 'dropdown' or question_type == 'multiple_choice':
-            if len(answer_options) != 4:
-                raise serializers.ValidationError("Four answer options are required for dropdown and multiple-choice questions.")
+            if len(answer_options) != 4 or len(answer_options) != 2:
+                raise serializers.ValidationError("Two or Four answer options are required for dropdown and multiple-choice questions.")
         
         return data
 
@@ -217,17 +219,21 @@ class QuestionAnswerSerializer(serializers.Serializer):
                 raise serializers.ValidationError('Invalid answer. Please select one option for dropdown type question.')
             valid_answer_option_ids = question.answer_options.values_list('id', flat=True)
             if not set(answer).issubset(set(str(opt_id) for opt_id in valid_answer_option_ids)):
-                raise serializers.ValidationError('Invalid answer. Answer options is not valid for dropdown question.')
-            
+                raise serializers.ValidationError('Invalid answer. Answer options are not valid for dropdown question.')
         elif question.question_type == 'multiple_choice':
             valid_answer_option_ids = question.answer_options.values_list('id', flat=True)
             if not set(answer).issubset(set(str(opt_id) for opt_id in valid_answer_option_ids)):
                 raise serializers.ValidationError('Invalid answer. Some answer options are not valid for multiple choice question.')
+        elif question.question_type == 'rating':
+            if len(answer) != 1:
+                raise serializers.ValidationError('Invalid answer. Only one answer is allowed for rating type question.')
+            if int(answer[0]) not in range(1, 11):
+                raise serializers.ValidationError(f'Invalid answer {answer[0]}. Only answers in the range 1-10 are acceptable.')
         else:
             raise serializers.ValidationError('Invalid question type.')
 
         return data
-
+    
     
 class RankedQualitiesSerializer(serializers.ModelSerializer):
     class Meta:
@@ -238,7 +244,7 @@ class RankedQualitiesSerializer(serializers.ModelSerializer):
 class TreeShakingGameTrialSerializer(serializers.ModelSerializer):
     class Meta:
         model = TreeShakingGameTrial
-        fields = ('trial_number', 'shell', 'shared_shell', 'trial_response_time')
+        fields = ['trial_number', 'shell', 'shared_shell', 'response', 'trial_response_time']
 
 
 

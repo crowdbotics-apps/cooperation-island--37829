@@ -21,9 +21,16 @@ from .models import (ConsentAccessCode,
                      ParticipantResponse,
                      RankedQualities,
                      TreeShakingGameTrial,
+                     IndividualRankingQualitiesScore,
                     )
 
-from .utils import export_trials_csv
+from .utils import (
+                    export_fishgame_trials_csv, 
+                    export_rankedqualities_csv, 
+                    export_treeshaking_trials_csv,
+                    export_profile_csv,
+                    export_scores_csv,
+                )
 
 User = get_user_model()
 
@@ -34,8 +41,8 @@ class UserAdmin(auth_admin.UserAdmin):
     form = UserChangeForm
     add_form = UserCreationForm
     # fieldsets = (("User", {"fields": ("username",)}),) + auth_admin.UserAdmin.fieldsets
-    list_display = ["username", "email", "is_superuser", 'age','is_active', 'consent_status']
-    search_fields = ["username"]
+    list_display = ['username', 'email', 'age', 'consent_status', 'date_joined']
+    search_fields = ('email','username')
     list_filter = [
         ('consent_status', admin.BooleanFieldListFilter),
         ('date_joined'),
@@ -44,8 +51,6 @@ class UserAdmin(auth_admin.UserAdmin):
 
 
 admin.site.register(ConsentAccessCode)
-
-admin.site.register(Profile)
 
 admin.site.register(EmailVerification)
 
@@ -58,11 +63,13 @@ admin.site.register(TermAndCondition)
 
 class FishGameTrialAdmin(admin.ModelAdmin):
     list_display = ['participant', 'trial_number', 'match', 'trial_response_time', 'created_at']
-
+    list_filter = [
+        ('created_at'),
+    ]
     actions = ['export_selected_trials_csv']
 
     def export_selected_trials_csv(self, request, queryset):
-        return export_trials_csv(request, queryset=queryset, modeladmin=self)
+        return export_fishgame_trials_csv(request, queryset=queryset, modeladmin=self)
 
     export_selected_trials_csv.short_description = 'Export selected trials as CSV'
 
@@ -96,8 +103,8 @@ class BaseAnswerOptionInlineFormSet(BaseInlineFormSet):
             if form.cleaned_data and not form.cleaned_data.get('DELETE', False):
                 count += 1
         print(self.question_type)
-        if self.question_type in ['multiple_choice', 'dropdown'] and count < 4:
-            raise ValidationError("At least 4 answer options are required.")
+        if self.question_type in ['multiple_choice', 'dropdown'] and count < 2:
+            raise ValidationError("At least 2 answer options are required.")
 
 
 AnswerOptionInlineFormSet = forms.inlineformset_factory(
@@ -137,15 +144,6 @@ class QuestionAdmin(admin.ModelAdmin):
     list_display = ['question_text', 'question_type']
     inlines = [AnswerOptionInline]
 
-    def change_view(self, request, object_id, form_url='', extra_context=None):
-        question = self.get_object(request, object_id)
-        if question.question_type in ['dropdown', 'multiple_choice']:
-            self.message_user(request, "Please provide four answer options.", messages.INFO)
-        if question.question_type =='text_input':
-            self.message_user(request, "Please leave answer options empty.", messages.INFO)
-
-        return super().change_view(request, object_id, form_url, extra_context=extra_context)
-
 
 @admin.register(AnswerOption)
 class AnswerOptionAdmin(admin.ModelAdmin):
@@ -159,6 +157,98 @@ class QuestionOrderAdmin(admin.ModelAdmin):
 
 admin.site.register(ParticipantResponse)
 
-admin.site.register(RankedQualities)
 
-admin.site.register(TreeShakingGameTrial)
+class RankedQualitiesAdmin(admin.ModelAdmin):
+    list_display = ['participant', 'quality', 'category', 'rank']
+    actions = ['export_selected_rankedqualities_csv']
+    list_filter = [
+        ('created_at'),
+    ]
+
+    def export_selected_rankedqualities_csv(self, request, queryset):
+        return export_rankedqualities_csv(request, queryset=queryset, modeladmin=self)
+
+    export_selected_rankedqualities_csv.short_description = 'Export selected ranked qualities as CSV'
+
+    def changelist_view(self, request, extra_context=None):
+        if extra_context is None:
+            extra_context = {}
+
+        if self.model == RankedQualities:
+            extra_context['export_csv_url'] = reverse('users:export_rankedqualities_csv')
+
+        return super().changelist_view(request, extra_context=extra_context)
+
+admin.site.register(RankedQualities, RankedQualitiesAdmin)
+
+
+class IndividualRankingQualitiesScoreAdmin(admin.ModelAdmin):
+    list_display = ['participant', 'question', 'score', 'created_at']
+    actions = ['export_selected_scores_csv']
+    list_filter = [
+        ('created_at'),
+    ]
+
+    def export_selected_scores_csv(self, request, queryset):
+        return export_scores_csv(request, queryset=queryset, modeladmin=self)
+
+    export_selected_scores_csv.short_description = 'Export selected scores as CSV'
+
+    def changelist_view(self, request, extra_context=None):
+        if extra_context is None:
+            extra_context = {}
+
+        if self.model == IndividualRankingQualitiesScore:
+            extra_context['export_csv_url'] = reverse('users:export_scores_csv')
+
+        return super().changelist_view(request, extra_context=extra_context)
+
+admin.site.register(IndividualRankingQualitiesScore, IndividualRankingQualitiesScoreAdmin)
+
+
+class TreeShakingGameTrialAdmin(admin.ModelAdmin):
+    list_display = ['participant', 'trial_number', 'shell', 'shared_shell', 'response', 'trial_response_time', 'created_at']
+    actions = ['export_selected_trials_csv']
+    list_filter = [
+        ('created_at'),
+    ]
+
+    def export_selected_trials_csv(self, request, queryset):
+        return export_treeshaking_trials_csv(request, queryset=queryset, modeladmin=self)
+
+    export_selected_trials_csv.short_description = 'Export selected trials as CSV'
+
+    def changelist_view(self, request, extra_context=None):
+        if extra_context is None:
+            extra_context = {}
+
+        if self.model == TreeShakingGameTrial:
+            extra_context['export_csv_url'] = reverse('users:export-treeshaking-trial-csv')
+
+        return super().changelist_view(request, extra_context=extra_context)
+
+admin.site.register(TreeShakingGameTrial, TreeShakingGameTrialAdmin)
+
+
+class ProfileAdmin(admin.ModelAdmin):
+    list_display = ['participant', 'birth_month', 'birth_year', 'nationality', 'gender', 'zipcode']
+    actions = ['export_selected_profiles_csv']
+    list_filter = [
+        ('created_at'),
+    ]
+
+    def export_selected_profiles_csv(self, request, queryset):
+        return export_profile_csv(request, queryset=queryset, modeladmin=self)
+
+    export_selected_profiles_csv.short_description = 'Export selected profiles as CSV'
+
+    def changelist_view(self, request, extra_context=None):
+        if extra_context is None:
+            extra_context = {}
+
+        if self.model == Profile:
+            extra_context['export_csv_url'] = reverse('users:export_profiles_csv')
+
+        return super().changelist_view(request, extra_context=extra_context)
+
+admin.site.register(Profile, ProfileAdmin)

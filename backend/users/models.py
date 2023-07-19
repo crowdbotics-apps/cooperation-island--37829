@@ -72,6 +72,7 @@ class Profile(models.Model):
     nationality = models.CharField(max_length=100)
     gender = models.CharField(max_length=50)
     zipcode = models.CharField(max_length=10)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def save(self, *args, **kwargs):
         self.participant.detail_status = True
@@ -89,7 +90,6 @@ class EmailVerification(models.Model):
     created_at = models.DateTimeField(default=timezone.now)
     expiry_date = models.DateTimeField()
 
-
     def generate_token(self):
         self.verification_token = get_random_string(length=32)
         self.created_at = timezone.now()
@@ -105,11 +105,11 @@ class EmailVerification(models.Model):
     def send_verification_email(self):
         current_site = get_current_site(request=None)
         domain = current_site.domain
+        # domain='localhost:8000', # set for local
         mail_subject = 'Verify your email'
         message = render_to_string('verification_email.html', {
             'user': self.user,
-            'domain': 'localhost:8000', # set for local
-            # 'domain': domain,
+            'domain': domain,
             'uidb64': urlsafe_base64_encode(force_bytes(self.user.pk)),
             'token': self.verification_token,
             'expiry_date': self.expiry_date
@@ -148,8 +148,8 @@ class PasswordResetSession(models.Model):
     def send_reset_email_notification(self):
         current_site = get_current_site(request=None)
         domain = current_site.domain
-        # reset_url = f"https://{domain}/reset-password/{self.session_id}"
-        reset_url = f"http://localhost:8000/reset-password/{self.session_id}"
+        reset_url = f"https://{domain}/reset-password/{self.session_id}"
+        # reset_url = f"http://localhost:8000/reset-password/{self.session_id}"
         subject = 'Password Reset'
         message = f'Your password reset link is valid for only 1 hour. Click the following link to reset your password: {reset_url}'
         send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [self.user.email])
@@ -175,8 +175,13 @@ class FishGameTrial(models.Model):
     participant = models.ForeignKey(User, on_delete=models.PROTECT, related_name='participant')
     trial_number = models.IntegerField()
     match = models.BooleanField()
-    trial_response_time = models.DecimalField(max_digits=5, decimal_places=2)
+    trial_response_time = models.DecimalField(max_digits=6, decimal_places=2)
     created_at = models.DateTimeField(auto_now_add=True)
+
+    def save(self, *args, **kwargs):
+        # Convert milliseconds to seconds
+        self.trial_response_time = self.trial_response_time / 1000
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"Participant: {self.participant.id} - Trial: {self.trial_number}"
@@ -186,9 +191,12 @@ class ActivityFeedback(models.Model):
     activity_type_choices = [
         ('fish-mind-reading', 'Fish Mind Reading'),
         ('tree-shaking', 'Tree Shaking'),
+        ('tell-us-about-you', 'Tell Us About You')
     ]
     
     activity_type = models.CharField(max_length=20, choices=activity_type_choices, unique=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f"{self.activity_type}"
@@ -199,12 +207,14 @@ class Question(models.Model):
         ('text_input', 'Text Input'),
         ('multiple_choice', 'Multiple Choice Question'),
         ('dropdown', 'Dropdown Selection'),
+        ('rating', 'Rating'),
     ]
 
     activity_feedback = models.ForeignKey(ActivityFeedback, on_delete=models.CASCADE, related_name='questions')
     question_text = models.CharField(max_length=255)
     question_type = models.CharField(max_length=20, choices=question_type_choices)
-
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f"{self.question_text}"
@@ -221,12 +231,19 @@ class AnswerOption(models.Model):
                                     related_name='answer_options', 
                                     on_delete=models.CASCADE,
                                  )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
+    def __str__(self):
+        return f"{self.option_text}"
+    
 
 class QuestionOrder(models.Model):
     activity_feedback = models.ForeignKey(ActivityFeedback, on_delete=models.CASCADE)
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     order = models.PositiveIntegerField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         ordering = ['order']
@@ -241,10 +258,10 @@ class ParticipantResponse(models.Model):
     question = models.ForeignKey(Question, on_delete=models.PROTECT)
     text_answer = models.TextField(blank=True, null=True)
     answer_options = models.ManyToManyField(AnswerOption, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"Participant: {self.participant.username}, Question: {self.question.question_text}"
-
 
 
 class RankedQualities(models.Model):
@@ -267,6 +284,8 @@ class RankedQualities(models.Model):
     quality = models.PositiveSmallIntegerField(choices=quality_choices)
     category = models.PositiveSmallIntegerField(choices=category_choices)
     rank = models.PositiveSmallIntegerField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
     def __str__(self):
         return f"User: {self.participant.username}, Quality: {self.quality}, Rank: {self.rank}"
 
@@ -276,10 +295,27 @@ class TreeShakingGameTrial(models.Model):
     trial_number = models.PositiveIntegerField()
     shell = models.PositiveIntegerField()
     shared_shell= models.PositiveIntegerField()
-    trial_response_time = models.DecimalField(max_digits=5, decimal_places=2)
+    trial_response_time = models.DecimalField(max_digits=6, decimal_places=2)
+    response = models.BooleanField()
     created_at = models.DateTimeField(auto_now_add=True)
+
+    def save(self, *args, **kwargs):
+        # Convert milliseconds to seconds
+        self.trial_response_time = self.trial_response_time / 1000
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"Participant: {self.participant.id} - Trial: {self.trial_number}"
     
+    
+class IndividualRankingQualitiesScore(models.Model):
+    participant = models.ForeignKey(User, on_delete=models.PROTECT)
+    question = models.ForeignKey(Question, on_delete=models.PROTECT)
+    score = models.PositiveIntegerField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.participant.username} - {self.question.question_text}"
+
+
 

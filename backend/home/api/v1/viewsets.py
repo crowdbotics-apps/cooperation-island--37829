@@ -26,6 +26,7 @@ from users.models import (  Profile,
                             AnswerOption,
                             ParticipantResponse,
                             RankedQualities,
+                            IndividualRankingQualitiesScore,
                         )
 from home.api.v1.serializers import (
     SignupSerializer,
@@ -360,41 +361,74 @@ class ActivityFeedbackViewSet(APIView):
 
     def get(self, request, activity_type=None):
         activity_feedback = self.get_activity_feedback(activity_type)
-        questions = activity_feedback.questions.order_by('questionorder__order')
-        serializer = QuestionSerializer(questions, many=True)
+        
+        if activity_type == 'tell-us-about-you':
+            questions = activity_feedback.questions.filter(question_type='rating').order_by('questionorder__order')
+        else:
+            questions = activity_feedback.questions.order_by('questionorder__order')
+        
+        filtered_questions = []
+        for question in questions:
+            if activity_type == 'tell-us-about-you':
+                if question.question_type == 'rating':
+                    filtered_questions.append(question)
+            else:
+                if question.question_type == 'text_input':
+                    filtered_questions.append(question)
+                elif question.question_type in ['dropdown', 'multiple_choice']:
+                    answer_options_count = question.answer_options.count()
+                    if answer_options_count == 2 or answer_options_count == 4:
+                        filtered_questions.append(question)
+
+        serializer = QuestionSerializer(filtered_questions, many=True) 
+        
         return Response(serializer.data)
 
     def post(self, request, activity_type=None):
         activity_feedback = self.get_activity_feedback(activity_type)
-        serializer = QuestionAnswerSerializer(data=request.data, context={'question': activity_feedback})
+        serializer = QuestionAnswerSerializer(data=request.data, context={'participant': request.user})
+        
         if serializer.is_valid():
             question_id = serializer.validated_data['id']
             answer = serializer.validated_data['answer']
 
             question = self.get_question(question_id)
-
-            if question.question_type == 'text_input':
-                text_answer = answer[0] if answer else None
-                participant_response = ParticipantResponse(
-                    participant=request.user,
-                    activity_feedback=activity_feedback,
-                    question=question,
-                    text_answer=text_answer,
-                )
-                participant_response.save()
+            
+            if activity_type == 'tell-us-about-you':
+                if question.question_type == 'rating':
+                    score = int(answer[0])
+                    participant_score = IndividualRankingQualitiesScore(
+                        participant=request.user,
+                        question=question,
+                        score=score,
+                    )
+                    participant_score.save()
+                    return Response({'detail': 'Response submitted successfully.'}, status=status.HTTP_200_OK)
+                else:
+                    return Response({'error': 'Invalid question type for this activity type.'}, status=status.HTTP_400_BAD_REQUEST)
             else:
-                participant_response = ParticipantResponse(
-                    participant=request.user,
-                    activity_feedback=activity_feedback,
-                    question=question,
-                )
-                participant_response.save()
+                if question.question_type == 'text_input':
+                    text_answer = answer[0] if answer else None
+                    participant_response = ParticipantResponse(
+                        participant=request.user,
+                        activity_feedback=activity_feedback,
+                        question=question,
+                        text_answer=text_answer,
+                    )
+                    participant_response.save()
+                else:
+                    participant_response = ParticipantResponse(
+                        participant=request.user,
+                        activity_feedback=activity_feedback,
+                        question=question,
+                    )
+                    participant_response.save()
 
-                answer_options = AnswerOption.objects.filter(id__in=answer)
-                participant_response.answer_options.set(answer_options)
+                    answer_options = AnswerOption.objects.filter(id__in=answer)
+                    participant_response.answer_options.set(answer_options)
 
 
-            return Response({'detail': 'Response submitted successfully.'}, status=status.HTTP_200_OK)
+                return Response({'detail': 'Response submitted successfully.'}, status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
