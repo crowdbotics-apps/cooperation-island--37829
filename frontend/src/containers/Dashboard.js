@@ -77,8 +77,7 @@ const useStyles = makeStyles({
         left: "55vw"
     },
     module3: {
-        left: "78vw",
-        filter: "drop-shadow(0.33vh 0.66vh 0.8vh black) grayscale(1)"
+        left: "78vw"
     },
     module4: {
         top: "84vh",
@@ -253,6 +252,11 @@ const Dashboard = () => {
                                     })
                                 });
 
+                                feedback("tell-us-about-you")
+                                    .then(({ data }) => {
+                                        setFeedback(mapFeedback(data));
+                                    });
+
                                 history.push("/tell-us-about-you", {
                                     module: 3
                                 });
@@ -307,7 +311,7 @@ const Dashboard = () => {
         </div>
         <img className={clsx(cls.module, "pointer")} id="module" module={1} onClick={handleClick} src={require("../assets/modules/Module_1.png")} />
         <img className={clsx(cls.module, cls.module2, "pointer")} id="module" module={2} onClick={handleClick} src={require("../assets/modules/Module_2.png")} />
-        <img className={clsx(cls.module, cls.module3)} id="module" module={3} src={require("../assets/modules/Module_3.png")} />
+        <img className={clsx(cls.module, cls.module3, "pointer")} id="module" module={3} onClick={handleClick} src={require("../assets/modules/Module_3.png")} />
         <img className={clsx(cls.module, cls.module4)} id="module" src={require("../assets/modules/Module_1.png")} />
         <img className={clsx(cls.module, cls.module5)} id="module" src={require("../assets/modules/Module_2.png")} />
         <img className={clsx(cls.module, cls.module6)} id="module" src={require("../assets/modules/Module_3.png")} />

@@ -19,6 +19,12 @@ const bubblesArray = Array(anime.random(300, 500)).fill();
 const Bubbles = () => {
     const cls = useStyles();
 
+    useEffect(() => {
+        setTimeout(showAnimation(1), 0);
+        setTimeout(showAnimation(2), 4000);
+        setTimeout(showAnimation(3), 8000);
+    }, []);
+
     const showAnimation = (id) => () => {
         anime({
             targets: `#bubbles${id} .${cls.bubble}`,
@@ -44,12 +50,6 @@ const Bubbles = () => {
             loop: true
         });
     }
-
-    useEffect(() => {
-        setTimeout(showAnimation(1), 0);
-        setTimeout(showAnimation(2), 4000);
-        setTimeout(showAnimation(3), 8000);
-    }, []);
 
     return <div>
         {bubblesArray.map((_, i) => <div id={`bubbles${anime.random(1, 3)}`} key={i}>

@@ -1,8 +1,10 @@
 import { createContext, useEffect, useState } from "react";
 import { Redirect, Route, Switch } from "react-router-dom";
+import { makeStyles } from "@material-ui/core";
 import { ToastContainer } from "react-toastify";
 import { parseToken, userState } from "./libs/utils";
 import { mapUserData } from "./funnels/v1";
+import { Tooltip } from "react-tooltip";
 import CILoader from "./shared/CILoader";
 import HomePage from "./containers/HomePage";
 import LoginBoard from "./containers/LoginBoard";
@@ -19,7 +21,19 @@ import "react-toastify/dist/ReactToastify.min.css";
 
 const AppContext = createContext();
 
+const useStyles = makeStyles((theme) => ({
+  tooltip: {
+    background: theme.palette.primary.tooltip,
+    color: theme.palette.primary.main,
+    filter: "drop-shadow(0.33vh 0.66vh 1.2vh black)",
+    fontFamily: "Summer Show",
+    opacity: 1
+  }
+}));
+
 const App = () => {
+  const cls = useStyles();
+
   const localData = parseToken(localStorage["UserState"]);
 
   const [user, setUser] = useState(localData ? mapUserData(localData) : userState);
@@ -105,6 +119,7 @@ const App = () => {
       pauseOnFocusLoss={false}
       draggable={false}
     />
+    <Tooltip className={cls.tooltip} id="tooltip" />
   </AppContext.Provider>
 }
 

@@ -15,7 +15,7 @@ import CILabel from "../shared/CILabel";
 import CIMusic from "../shared/CIMusic";
 import CIShell from "../shared/CIShell";
 import { AppContext } from "../App";
-import { useTimer } from "use-timer";
+import { useTimer } from "react-use-precision-timer";
 import { Howl } from "howler";
 import anime from "animejs";
 import clsx from "clsx";
@@ -298,7 +298,7 @@ const Module_1 = () => {
 
     const history = useHistory();
 
-    const { time, start, reset } = useTimer();
+    const timer = useTimer();
 
     const [showBGAnimations, setAnimation] = useState(false);
 
@@ -511,7 +511,7 @@ const Module_1 = () => {
     }
 
     const handleShow = () => {
-        start();
+        timer.start();
         new Howl({
             src: require("../assets/sounds/Number.mp3"),
             autoplay: true
@@ -524,9 +524,9 @@ const Module_1 = () => {
         score("fish-mind-reading", {
             trial_number: trial,
             match: flag,
-            trial_response_time: time
+            trial_response_time: timer.getElapsedRunningTime()
         });
-        reset();
+        timer.stop();
 
         setResponse(false);
 
