@@ -20,7 +20,7 @@ export const mapUserDetails = (data) => ({
 
 export const mapFeedback = (data) => {
     return data
-        .filter(x => parseInt(x.question_type) === 1 || x.options.length === 4)
+        .filter(x => parseInt(x.question_type) === 1 || parseInt(x.question_type) === 4 || x.options.length === 2 || x.options.length === 4)
         .map(x => ({
             id: x.id,
             question: x.question_text,

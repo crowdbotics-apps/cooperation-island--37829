@@ -89,3 +89,7 @@ export const score = (module, data) => {
         }
     });
 }
+
+export const qualities = (data) => {
+    return API.post(base + "/qualities/tell-us-about-you/", data);
+}

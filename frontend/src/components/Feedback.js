@@ -6,16 +6,18 @@ import CIButton from "../shared/CIButton";
 import CIInput from "../shared/CIInput";
 import CILabel from "../shared/CILabel";
 import Option from "./Option";
+import Star from "./Star";
 import { AppContext } from "../App";
 import { toast } from "react-toastify";
 import anime from "animejs";
+import clsx from "clsx";
 
 const useStyles = makeStyles((theme) => ({
     animal: {
         position: "absolute",
         zIndex: 2,
         top: "8vh",
-        left: "58vw",
+        left: "61vw",
         height: "16.27vh",
         width: "10vw",
         transform: "scale(0)"
@@ -56,7 +58,8 @@ const useStyles = makeStyles((theme) => ({
         height: "50vh",
         display: "flex",
         alignItems: "center",
-        justifyContent: "center"
+        justifyContent: "center",
+        marginBottom: "2.7vh"
     },
     question: {
         color: "black",
@@ -64,6 +67,9 @@ const useStyles = makeStyles((theme) => ({
         padding: "0 10vw",
         marginTop: "6vh",
         marginBottom: "14vh"
+    },
+    questionAlt: {
+        marginBottom: "20vh"
     },
     options: {
         "& div": {
@@ -76,15 +82,37 @@ const useStyles = makeStyles((theme) => ({
         justifyContent: "space-evenly",
         marginBottom: "4vh"
     },
+    optionAlt: {
+        marginBottom: "11.25vh"
+    },
     button: {
         marginTop: "2vh"
     },
     input: {
         margin: "18vh auto 10.75vh",
+    },
+    star: {
+        margin: "0vh 0.5vw"
+    },
+    starContainer: {
+        "& label": {
+            "&:last-child": {
+                textAlign: "right",
+                marginLeft: "40.1vw"
+            },
+            position: "absolute",
+            color: "black",
+            filter: "drop-shadow(0.05vh 0.05vh 0.1vh black)",
+            textAlign: "left",
+            margin: "2vh 9.5vw 0vh"
+        },
+        margin: "-1vh 0vw 11.8vh 0.5vw"
     }
 }));
 
 const Feedback = ({ module, onClose }) => {
+    const isRated = module === "tell-us-about-you";
+
     const cls = useStyles();
 
     const { feedback } = useContext(AppContext);
@@ -94,6 +122,8 @@ const Feedback = ({ module, onClose }) => {
     const [selected, setSelected] = useState([]);
 
     const [answer, setAnswer] = useState("");
+
+    const [score, setScore] = useState(0);
 
     const [show, hide] = useState(true);
 
@@ -129,10 +159,12 @@ const Feedback = ({ module, onClose }) => {
             toast.error("You must select one option.");
         else if (feedback[active].question_type === 3 && !selected.length)
             toast.error("You must select one or multiple option.");
+        else if (feedback[active].question_type === 4 && !score)
+            toast.error("You must select a level.");
         else {
             saveFeedback(module, {
                 id: feedback[active].id,
-                answer: feedback[active].question_type === 1 ? [answer] : selected
+                answer: feedback[active].question_type === 1 ? [answer] : (feedback[active].question_type === 4 ? [score] : selected)
             });
 
             if (active === feedback.length - 1)
@@ -147,8 +179,9 @@ const Feedback = ({ module, onClose }) => {
                         duration: 250,
                         complete: () => {
                             setActive(active + 1);
-                            setSelected([]);
                             setAnswer("");
+                            setScore(0);
+                            setSelected([]);
                         }
                     })
                     .add({
@@ -188,8 +221,12 @@ const Feedback = ({ module, onClose }) => {
             setSelected(selected.includes(id) ? selected.filter(x => x !== id) : [...selected, id]);
     }
 
+    const handleScore = (id) => () => {
+        setScore(id);
+    }
+
     return <div>
-        <img className={cls.animal} id="animal" src={require("../assets/animals/Animal_3.png")} />
+        <img className={cls.animal} id="animal" src={require(`../assets/animals/Animal_${isRated ? 4 : 3}.png`)} />
         <div className={cls.board} id="board6">
             <div className={cls.pagination}>
                 {Array(feedback.length).fill().map((_, i) => {
@@ -199,9 +236,17 @@ const Feedback = ({ module, onClose }) => {
                 })}
             </div>
             {feedback.length ? (show ? <div id="feedback">
-                <CILabel className={cls.question}>{feedback[active].question}</CILabel>
-                {feedback[active].question_type === 1 ? <CIInput className={cls.input} onChange={handleInput} placeholder="Answer" value={answer} /> : <Fragment>
-                    <div className={cls.options}>
+                <CILabel className={clsx(cls.question, feedback[active].options.length === 2 && cls.questionAlt)}>{feedback[active].question}</CILabel>
+                {feedback[active].question_type === 1 ? <CIInput className={cls.input} onChange={handleInput} placeholder="Answer" value={answer} /> : (feedback[active].question_type === 4 ? <div className={cls.starContainer}>
+                    <Star active={score >= 1} className={cls.star} id="1" onClick={handleScore(1)} />
+                    <Star active={score >= 2} className={cls.star} id="2" onClick={handleScore(2)} />
+                    <Star active={score >= 3} className={cls.star} id="3" onClick={handleScore(3)} />
+                    <Star active={score >= 4} className={cls.star} id="4" onClick={handleScore(4)} />
+                    <Star active={score >= 5} className={cls.star} id="5" onClick={handleScore(5)} />
+                    <CILabel>Not Important</CILabel>
+                    <CILabel>Very Important</CILabel>
+                </div> : <Fragment>
+                    <div className={clsx(cls.options, feedback[active].options.length === 2 && cls.optionAlt)}>
                         <Option
                             active={selected.includes(feedback[active].options[0].id)}
                             id={feedback[active].options[0].id}
@@ -217,7 +262,7 @@ const Feedback = ({ module, onClose }) => {
                             text={feedback[active].options[1].text}
                         />
                     </div>
-                    <div className={cls.options}>
+                        {feedback[active].options.length === 4 && <div className={cls.options}>
                         <Option
                             active={selected.includes(feedback[active].options[2].id)}
                             id={feedback[active].options[2].id}
@@ -232,8 +277,8 @@ const Feedback = ({ module, onClose }) => {
                             onClick={handleSelect(feedback[active].options[3].id)}
                             text={feedback[active].options[3].text}
                         />
-                    </div>
-                </Fragment>}
+                    </div>}
+                </Fragment>)}
             </div> : <div className={cls.feedback} />) : <div className={cls.noFeedback}>
                 <CILabel>No Feedback required.</CILabel>
             </div>}

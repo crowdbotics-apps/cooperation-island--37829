@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react";
-import { differenceInYears, endOfMonth, endOfYear, startOfMonth, subYears } from "date-fns";
+import { endOfYear, subYears } from "date-fns";
 import { DatePicker } from "@material-ui/pickers";
 import { makeStyles } from "@material-ui/core";
 import { useHistory } from "react-router-dom";
@@ -148,15 +148,10 @@ const UserDetails = () => {
     }
 
     const handleBirthday = (value) => {
-        if (differenceInYears(startOfMonth(new Date), value) === user.age || differenceInYears(endOfMonth(new Date), value) === user.age)
             setDetails({
                 ...details,
                 birthDay: value
             });
-        else {
-            setDetails({ ...details });
-            toast.error("The Month or Year is incorrect, based on your age.");
-        }
     }
 
     const handleFocus = (event) => {

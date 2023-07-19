@@ -1,20 +1,27 @@
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import { makeStyles } from "@material-ui/core";
 import { useHistory } from "react-router-dom";
 import { rankedQualities } from "../libs/utils";
+import { qualities } from "../services/v1";
 import { showHomePage } from "../libs/animations";
 import BoardImg from "../assets/images/Board-alt.png";
 import BlockImg from "../assets/modules/Block.png";
 import SectionsImg from "../assets/modules/Sections.png";
+import Section1Img from "../assets/modules/Section_1.png";
+import Section2Img from "../assets/modules/Section_2.png";
+import Section3Img from "../assets/modules/Section_3.png";
 import ValuesImg from "../assets/modules/Values.png";
+import Feedback from "../components/Feedback";
+import Qualities from "../components/Qualities";
+import Sections from "../components/Sections";
 import CIButton from "../shared/CIButton";
 import CIClose from "../shared/CIClose";
 import CILabel from "../shared/CILabel";
 import CIMusic from "../shared/CIMusic";
 import CIShell from "../shared/CIShell";
 import { AppContext } from "../App";
+import { Howl } from "howler";
 import anime from "animejs";
-import clsx from "clsx";
 import $ from "jquery";
 
 const useStyles = makeStyles((theme) => ({
@@ -81,27 +88,41 @@ const useStyles = makeStyles((theme) => ({
         "&::-webkit-scrollbar-track": {
             background: "transparent"
         },
-        maxHeight: "55vh",
+        height: "55vh",
         width: "17vw",
         overflow: "hidden scroll",
         marginTop: "5.5vh",
         marginLeft: "1vw"
     },
+    section: {
+        position: "absolute",
+        height: "55vh",
+        width: "15vw",
+        marginTop: "6.5vh"
+    },
+    clsSection: {
+        "&::-webkit-scrollbar": {
+            width: "0.4vw"
+        },
+        "&::-webkit-scrollbar-thumb": {
+            background: theme.palette.primary.main,
+            borderRadius: "1vw"
+        },
+        "&::-webkit-scrollbar-track": {
+            background: "transparent"
+        },
+        overflow: "hidden scroll",
+        height: "39vh",
+        width: "14.6vw",
+        marginTop: "5vh",
+        marginLeft: "-0.75vw"
+    },
     value: {
-        "&:first-child": {
-            marginTop: "2vh"
-        },
-        "&:last-child": {
-            marginBottom: "2vh"
-        },
         "& label": {
             color: theme.palette.primary.contrast,
             paddingTop: "1.75vh"
         },
         textAlign: "center",
-        marginTop: "3vh",
-        marginLeft: "1vw",
-        marginRight: "1vw",
         height: "8vh",
         width: "15vw",
         background: `url(${ValuesImg})`,
@@ -173,6 +194,14 @@ const Module_3 = () => {
 
     const history = useHistory();
 
+    const [state, setState] = useState({
+        section1: [],
+        section2: [],
+        section3: []
+    });
+
+    const [feedback, setFeedback] = useState(false);
+
     const { BGM, howler, user } = useContext(AppContext);
 
     useEffect(() => {
@@ -212,6 +241,75 @@ const Module_3 = () => {
                 duration: 2000
             }, "-=2000");
     }, []);
+
+    useEffect(() => {
+        if (!rankedQualities
+            .filter(x => ![...state.section1, ...state.section2, ...state.section3].includes(x.id))
+            .length) {
+            setTimeout(() => {
+                qualities([
+                    ...state.section1
+                        .map((x, i) => ({
+                            id: x,
+                            category: 1,
+                            rank: i + 1
+                        })),
+                    ...state.section2
+                        .map((x, i) => ({
+                            id: x,
+                            category: 2,
+                            rank: i + 1
+                        })),
+                    ...state.section3
+                        .map((x, i) => ({
+                            id: x,
+                            category: 3,
+                            rank: i + 1
+                        }))
+                ]);
+                setFeedback(true);
+
+                new Howl({
+                    src: require("../assets/sounds/Activity.mp3"),
+                    autoplay: true,
+                    onplay: () => {
+                        if (howler.module_3.volume())
+                            howler.module_3.fade(howler.module_3.volume(), 0.1, 1000);
+                    },
+                    onend: () => {
+                        if (howler.module_3.volume())
+                            howler.module_3.fade(0.1, 1, 1000);
+                    }
+                });
+
+                anime({
+                    targets: "#guide",
+                    left: "-30vw",
+                    easing: "easeInQuint",
+                    duration: 2000
+                });
+                anime({
+                    targets: "#block, #sections",
+                    top: "110vh",
+                    easing: "easeInQuint",
+                    duration: 2000
+                });
+                anime({
+                    targets: "#close, #music, #shell",
+                    top: "-12vh",
+                    easing: "easeInQuint",
+                    duration: 2000
+                });
+            }, 500);
+        }
+    }, [state]);
+
+    const addItems = (section) => (id) => {
+        setState({
+            ...state,
+            [section]: [...state[section], id]
+        });
+    }
 
     const handleClick = () => {
         anime
@@ -258,7 +356,7 @@ const Module_3 = () => {
         anime
             .timeline()
             .add({
-                targets: "#background, #bg-animations",
+                targets: "#background",
                 opacity: 0,
                 easing: "linear",
                 duration: 2000,
@@ -316,6 +414,50 @@ const Module_3 = () => {
             });
     }
 
+    const handleExit = () => {
+        anime
+            .timeline()
+            .add({
+                targets: "#background",
+                opacity: 0,
+                easing: "linear",
+                duration: 2000,
+                complete: () => {
+                    $("#background").attr("src", require("../assets/images/Application_BG.jpg"));
+                }
+            })
+            .add({
+                targets: "#background",
+                opacity: 1,
+                easing: "linear",
+                duration: 2000
+            })
+            .add({
+                targets: "#logo2",
+                left: "-30vw",
+                easing: "easeInQuint",
+                duration: 2000
+            }, "-=4000")
+            .finished.then(() => {
+                howler.module_3.fade(howler.module_3.volume(), 0, 1000);
+                if (BGM)
+                    howler.welcome.fade(0, 1, 1000);
+
+                history.push("/home");
+                anime({
+                    targets: "#logo",
+                    top: "-12vh",
+                    left: "-12vw",
+                    scale: 0.45,
+                    translateX: ["-30vw", "0vw"],
+                    translateY: ["-30vh", "0vh"],
+                    easing: "easeOutQuint",
+                    duration: 2000
+                });
+                showHomePage();
+            });
+    }
+
     return <div>
         <img className={cls.logo} id="logo2" src={require("../assets/modules/Module_3_Text.png")} />
         <img className={cls.instructor} id="instructor" src={require("../assets/avatars/xtras/Avatar_13.png")} />
@@ -342,16 +484,55 @@ const Module_3 = () => {
         </div>
         <div className={cls.block} id="block">
             <div className={cls.container}>
-                {rankedQualities.map(quality => {
-                    return <div className={clsx(cls.value, "pointer")}>
-                        <CILabel className="pointer">
-                            {quality}
-                        </CILabel>
-                    </div>
-                })}
+                {rankedQualities
+                    .filter(x => ![...state.section1, ...state.section2, ...state.section3].includes(x.id))
+                    .map((quality, i, list) => {
+                        return <Qualities
+                            className={cls.value}
+                            key={quality.id}
+                            first={i === 0}
+                            last={i === list.length - 1}
+                            {...quality}
+                        />
+                    })}
             </div>
         </div>
-        <div className={cls.sections} id="sections" />
+        <div className={cls.sections} id="sections">
+            <Sections
+                addItems={addItems("section1")}
+                className={cls.section}
+                data={state.section1}
+                clsQuality={cls.value}
+                clsSection={cls.clsSection}
+                SectionImg={Section1Img}
+                style={{
+                    marginLeft: "2.25vw"
+                }}
+            />
+            <Sections
+                addItems={addItems("section2")}
+                className={cls.section}
+                data={state.section2}
+                clsQuality={cls.value}
+                clsSection={cls.clsSection}
+                SectionImg={Section2Img}
+                style={{
+                    marginLeft: "18.9vw"
+                }}
+            />
+            <Sections
+                addItems={addItems("section3")}
+                className={cls.section}
+                data={state.section3}
+                clsQuality={cls.value}
+                clsSection={cls.clsSection}
+                SectionImg={Section3Img}
+                style={{
+                    marginLeft: "35.5vw"
+                }}
+            />
+        </div>
+        {feedback && <Feedback module="tell-us-about-you" onClose={handleExit} />}
     </div>
 }
 
