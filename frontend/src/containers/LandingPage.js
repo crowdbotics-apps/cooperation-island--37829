@@ -316,7 +316,7 @@ const LandingPage = () => {
             handleAccess(text)
                 .then(handleSave)
                 .catch(() => {
-                    toast.error("The Access Code is invalid.")
+                    toast.error("The Access Code is invalid.");
                 });
         }
     }

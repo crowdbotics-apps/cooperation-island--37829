@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { makeStyles } from "@material-ui/core";
 import { useHistory } from "react-router-dom";
 import { score } from "../services/v1";
@@ -47,23 +47,23 @@ const useStyles = makeStyles({
         filter: "drop-shadow(0.33vh 0.66vh 1.2vh black)",
         transform: "scale(0)",
         top: "40vh",
-        left: "14vw",
+        left: "17vw",
         height: "120.52vh",
         width: "68vw"
     },
     palmWrapper: {
         position: "absolute",
         overflow: "hidden",
-        transform: "scale(0)",
-        top: "40vh",
+        top: "-9vh",
         left: "17vw",
         height: "120.52vh",
         width: "68vw"
     },
     palm: {
         filter: "drop-shadow(0.33vh 0.66vh 1.2vh black)",
+        transform: "translateX(-816vw)",
         height: "120.52vh",
-        width: "1428vw"
+        width: "1564vw"
     },
     instructor: {
         position: "absolute",
@@ -198,6 +198,8 @@ const Module_2 = () => {
 
     const history = useHistory();
 
+    const closeRef = useRef();
+
     const timer = useTimer();
 
     const [showBGAnimations, setBGAnimation] = useState(false);
@@ -287,13 +289,6 @@ const Module_2 = () => {
             .add({
                 targets: "#palmAlt",
                 scale: [0, 1],
-                top: "-18vh",
-                easing: "easeOutQuint",
-                duration: 2000
-            }, "-=2000")
-            .add({
-                targets: "#palmWrapper",
-                scale: [0, 1],
                 top: "-9vh",
                 easing: "easeOutQuint",
                 duration: 2000
@@ -309,19 +304,17 @@ const Module_2 = () => {
                 top: "4vh",
                 easing: "easeOutQuint",
                 duration: 2000,
-                complete: handleRestart
+                complete: () => {
+                    $("#palmAlt, #palmWrapper").toggle();
+                    setTimeout(handleRestart, 400);
+                }
             }, "-=2000")
     }
 
     const handleClose = () => {
+        closeRef.current = true;
+
         if (isAnimating) {
-            anime({
-                targets: "#speech, #shell2, #shell2Alt, #label, #labelAlt",
-                opacity: 0,
-                duration: 1
-            });
-        }
-        else {
             anime({
                 targets: "#speech",
                 scale: [1, 0],
@@ -333,6 +326,13 @@ const Module_2 = () => {
                 rotateY: ["0deg", "-90deg"],
                 easing: "easeInQuint",
                 duration: 2000
+            });
+        }
+        else {
+            anime({
+                targets: "#speech, #shell2, #shell2Alt, #label, #labelAlt",
+                opacity: 0,
+                duration: 1
             });
         }
 
@@ -459,7 +459,7 @@ const Module_2 = () => {
     const handleResponse = (flag) => () => {
         score("tree-shaking", {
             trial_number: trial,
-            shells: shells.self + shells.partner,
+            shell: shells.self + shells.partner,
             shared_shell: shells.partner,
             response: flag,
             trial_response_time: timer.getElapsedRunningTime()
@@ -601,7 +601,7 @@ const Module_2 = () => {
                     duration: 2000
                 });
                 anime({
-                    targets: "#palmWrapper, #palmAlt",
+                    targets: "#palmWrapper",
                     scale: [1, 0],
                     top: "40vh",
                     easing: "easeInQuint",
@@ -625,35 +625,50 @@ const Module_2 = () => {
             partner: anime.random(1, 20)
         });
         setTrial(trial + 1);
-        setAnimation(true);
+        setAnimation(false);
 
         anime({
-            targets: "#palm",
-            translateX: ["68vw", "-1360vw"],
-            loop: 0,
-            direction: "alternate",
-            easing: "steps(21)",
-            duration: 700,
+            targets: "#test",
+            translateX: [
+                {
+                    value: ["-748vw", "-1496vw"],
+                    duration: 220,
+                    easing: "steps(11)",
+                },
+                {
+                    value: ["-1496vw", "0vw"],
+                    duration: 110,
+                    easing: "steps(22)",
+                },
+                {
+                    value: ["0vw", "-748vw"],
+                    duration: 220,
+                    easing: "steps(11)",
+                }
+            ],
+            loop: 4,
             complete: () => {
-                setAnimation(false);
+                setAnimation(true);
 
-                anime({
-                    targets: "#speech",
-                    scale: [0, 1],
-                    easing: "easeOutQuint",
-                    delay: 500,
-                    duration: 2000
-                });
-                anime({
-                    targets: "#shell2, #shell2Alt, #label, #labelAlt",
-                    rotateY: ["-90deg", "0deg"],
-                    easing: "easeOutQuint",
-                    delay: 750,
-                    duration: 2000,
-                    complete: () => {
-                        timer.start();
-                    }
-                });
+                if (!closeRef.current) {
+                    anime({
+                        targets: "#speech",
+                        scale: [0, 1],
+                        easing: "easeOutQuint",
+                        delay: 500,
+                        duration: 2000
+                    });
+                    anime({
+                        targets: "#shell2, #shell2Alt, #label, #labelAlt",
+                        rotateY: ["-90deg", "0deg"],
+                        easing: "easeOutQuint",
+                        delay: 750,
+                        duration: 2000,
+                        complete: () => {
+                            timer.start();
+                        }
+                    });
+                }
             }
         });
     }
@@ -670,9 +685,9 @@ const Module_2 = () => {
         <CIClose className={cls.close} id="close" onClick={handleClose} />
         <CIMusic className={cls.music} id="music" />
         <CIShell className={cls.shell} id="shell" />
-        {/* <div className={cls.palmWrapper} id="palmWrapper">
+        <div className={cls.palmWrapper} style={{ display: "none" }} id="palmWrapper">
             <img className={cls.palm} id="palm" src={require("../assets/modules/Palm.png")} />
-        </div> */}
+        </div>
         <div className={cls.speech} id="speech">
             <CILabel>
                 {`You have gathered ${shells.self + shells.partner} shells from this search.`}

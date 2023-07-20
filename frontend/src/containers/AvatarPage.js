@@ -279,7 +279,7 @@ const Avatar = () => {
                     });
             })
             .catch(() => {
-                toast.error("The Access Code is invalid.")
+                toast.error("Something went wrong.");
             });
     }
 
