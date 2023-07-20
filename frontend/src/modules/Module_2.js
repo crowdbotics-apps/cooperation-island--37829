@@ -646,7 +646,7 @@ const Module_2 = () => {
                     easing: "steps(11)",
                 }
             ],
-            loop: 4,
+            loop: 0,
             complete: () => {
                 setAnimation(true);
 

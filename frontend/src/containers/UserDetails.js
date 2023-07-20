@@ -161,7 +161,7 @@ const UserDetails = () => {
     const handleNext = () => {
         if (details.nationality.length === 0)
             toast.error("The Nationality cannot be empty.");
-        if (details.gender.length === 0)
+        else if (details.gender.length === 0)
             toast.error("The Gender cannot be empty.");
         else if (!validateZipCode(details.zipcode))
             toast.error("The Zipcode is invalid.");
