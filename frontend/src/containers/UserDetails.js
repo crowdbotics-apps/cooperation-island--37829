@@ -148,10 +148,10 @@ const UserDetails = () => {
     }
 
     const handleBirthday = (value) => {
-            setDetails({
-                ...details,
-                birthDay: value
-            });
+        setDetails({
+            ...details,
+            birthDay: value
+        });
     }
 
     const handleFocus = (event) => {
@@ -159,15 +159,25 @@ const UserDetails = () => {
     }
 
     const handleNext = () => {
-        if (details.nationality.length === 0)
+        let isValid = true;
+
+        if (details.nationality.length === 0) {
             toast.error("The Nationality cannot be empty.");
-        else if (details.gender.length === 0)
+            isValid = false;
+        }
+        if (details.gender.length === 0) {
             toast.error("The Gender cannot be empty.");
-        else if (!validateZipCode(details.zipcode))
+            isValid = false;
+        }
+        if (!validateZipCode(details.zipcode)) {
             toast.error("The Zipcode is invalid.");
-        else if (!details.birthDay)
+            isValid = false;
+        }
+        if (!details.birthDay) {
             toast.error("The Birth Date cannot be empty.");
-        else {
+            isValid = false;
+        }
+        if (isValid) {
             handleDetailsAPI(mapUserDetails(details))
                 .then(({ data }) => {
                     const userData = parseToken(data.user);

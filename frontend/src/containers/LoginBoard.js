@@ -514,27 +514,45 @@ const LoginBoard = () => {
     }
 
     const validateLogin = () => {
-        if (login.username.length < 6)
+        let isValid = true;
+
+        if (login.username.length < 6) {
             toast.error("Username must be more than 5 characters.");
-        else if (login.password.trim().length < 8)
+            isValid = false;
+        }
+        if (login.password.trim().length < 8) {
             toast.error("Password must be at least 8 characters.");
-        else
-            return true;
+            isValid = false;
+        }
+
+        return isValid;
     }
 
     const validateSignup = () => {
-        if (signup.username.length < 6)
+        let isValid = true;
+
+        if (signup.username.length < 6) {
             toast.error("Username must be more than 5 characters.");
-        else if (signup.password.trim().length < 8)
+            isValid = false;
+        }
+        if (signup.password.trim().length < 8) {
             toast.error("Password must be at least 8 characters.");
-        else if (!validateEmail(signup.email))
+            isValid = false;
+        }
+        if (!validateEmail(signup.email)) {
             toast.error("The Email is invalid.");
-        else if (!parseInt(signup.age))
+            isValid = false;
+        }
+        if (!parseInt(signup.age)) {
             toast.error("The Age cannot be empty or 0.");
-        else if (parseInt(signup.age) > 18)
+            isValid = false;
+        }
+        if (parseInt(signup.age) > 18) {
             toast.error("Children above 18 are not allowed.");
-        else
-            return true;
+            isValid = false;
+        }
+
+        return isValid;
     }
 
     const validateUsername = () => {
