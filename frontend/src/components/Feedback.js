@@ -153,8 +153,6 @@ const Feedback = ({ module, onClose }) => {
     const handleClick = () => {
         if (!feedback.length)
             handleClose();
-        else if (feedback[active].question_type === 1 && !answer.length)
-            toast.error("The Answer cannot be empty.");
         else if (feedback[active].question_type === 2 && !selected.length)
             toast.error("You must select one option.");
         else if (feedback[active].question_type === 3 && !selected.length)

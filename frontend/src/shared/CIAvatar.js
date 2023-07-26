@@ -5,7 +5,8 @@ import clsx from "clsx";
 
 const useStyles = makeStyles({
     svg: {
-        height: "10vh"
+        height: "10vh",
+        outline: "none"
     }
 });
 
@@ -25,7 +26,8 @@ const CIAvatar = (props) => {
         props.onClick && props.onClick();
     }
 
-    return <svg className={clsx(cls.svg, props.className, "pointer")} id={props.id} onClick={handleClick} viewBox="0 0 100 111">
+    return <svg className={clsx(cls.svg, props.className, "pointer")} id={props.id} onClick={handleClick} viewBox="0 0 100 111" data-tooltip-id="tooltip"
+        data-tooltip-content="Change Avatar">
         <path className="pointer" opacity="0.3" d="M99.9987 58.4278C100.194 86.8865 77.9737 110.114 50.3609 110.307C22.7445 110.5 0.198186 87.5869 0.00134468 59.1265C-0.199044 30.6678 22.0228 7.44044 49.6356 7.24715C77.2502 7.05208 99.7966 29.9673 99.9987 58.4278Z" fill="black" />
         <path className="pointer" d="M99.9987 51.1801C100.194 79.6388 77.9737 102.864 50.3609 103.059C22.7445 103.253 0.198186 80.341 0.00134468 51.8806C-0.199044 23.4219 22.0228 0.192758 49.6356 0.00123622C77.2502 -0.193832 99.7966 22.7214 99.9987 51.1801Z" fill="#552800" />
         <path className="pointer" d="M9.66964 26.1049C8.11973 30.8061 22.5867 22.693 48.5982 23.5495C74.6132 24.4025 83.7123 22.8633 85.1451 19.6925C86.5798 16.5218 72.1323 4.76092 57.8125 2.33675C43.4945 -0.0856463 16.646 4.9081 9.66964 26.1049Z" fill="#A85C09" />

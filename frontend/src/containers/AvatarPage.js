@@ -7,6 +7,7 @@ import { avatar as handleAvatar } from "../services/v1";
 import { showHomePage, showLoginBoard } from "../libs/animations";
 import AvatarFrame from "../components/AvatarFrame";
 import CIButton from "../shared/CIButton";
+import CILabel from "../shared/CILabel";
 import CILogout from "../shared/CILogout";
 import CIMusic from "../shared/CIMusic";
 import { AppContext } from "../App";
@@ -40,6 +41,15 @@ const useStyles = makeStyles((theme) => ({
     },
     right: {
         left: "68vw"
+    },
+    title: {
+        position: "absolute",
+        top: "-10vh",
+        textAlign: "center",
+        fontSize: "8vh",
+        fontWeight: "bold",
+        letterSpacing: "0.1vw",
+        width: "100vw"
     },
     root: {
         "&::-webkit-scrollbar": {
@@ -234,6 +244,12 @@ const Avatar = () => {
                         duration: 2000
                     })
                     .add({
+                        targets: "#title",
+                        top: "-10vh",
+                        easing: "easeInQuint",
+                        duration: 2000
+                    }, "-=4000")
+                    .add({
                         targets: "#logout, #music",
                         left: "100vw",
                         easing: "easeInQuint",
@@ -284,6 +300,7 @@ const Avatar = () => {
     }
 
     return <div className={cls.root} id="avatar-page">
+        <CILabel className={cls.title} id="title">Choose your Avatar!</CILabel>
         <div className={cls.list}>
             <AvatarFrame active={active === 1} avatar={1} className={cls.frame} onClick={handleClick(1)} variant={1} />
             <AvatarFrame active={active === 2} avatar={2} className={cls.frame} onClick={handleClick(2)} variant={2} />

@@ -76,19 +76,29 @@ const useStyles = makeStyles({
             marginTop: "1vh",
             marginBottom: "5vh"
         },
-        "& > label:first-child": {
-            "& label": {
-                display: "inline",
-                fontSize: "2.5vh",
+        "& label": {
+            "&:first-child:has(+ label)": {
+                fontSize: "3.3vh",
                 fontWeight: "bold",
-                letterSpacing: "0.1vw !important",
-                paddingTop: "3vh",
                 marginBottom: "12vh"
             },
+            "&#first": {
+                fontSize: "3.3vh",
+                marginTop: "12vh"
+            },
+            "&#last": {
+                "& label": {
+                    fontSize: "2vh",
+                    letterSpacing: "0.05vw !important"
+                },
+                fontSize: "2vh",
+                letterSpacing: "0.05vw !important",
+                marginTop: "14vh"
+            },
+            display: "inline",
             fontSize: "2.5vh",
             letterSpacing: "0.1vw !important",
-            paddingTop: "3vh",
-            marginBottom: "12vh"
+            marginTop: "1vh"
         },
         display: "flex",
         flexDirection: "column",
@@ -98,9 +108,6 @@ const useStyles = makeStyles({
         height: "50vh",
         width: "37vw",
         marginTop: "8vh"
-    },
-    label: {
-        marginTop: "16vh"
     },
     backdrop: {
         zIndex: 5
@@ -113,14 +120,15 @@ const useStyles = makeStyles({
         marginBottom: "8vh"
     },
     content: {
+        fontFamily: "Summer Show",
         textAlign: "left",
-        margin: "2vh 5vw 1vh 7vw"
+        margin: "10vh 5vw 1vh 7vw"
     },
     buttonDiv: {
         display: "flex",
         justifyContent: "space-evenly",
         width: "70%",
-        margin: "4.5vh auto 0"
+        margin: "8vh auto 0"
     },
     logout: {
         position: "absolute",
@@ -141,7 +149,7 @@ const LandingPage = () => {
 
     const history = useHistory();
 
-    const { BGM, howler, user, setUser } = useContext(AppContext);
+    const { BGM, howler, setUser } = useContext(AppContext);
 
     const [text, setText] = useState("");
 
@@ -327,12 +335,16 @@ const LandingPage = () => {
         <img className={cls.guide2} id="guide2" src={require("../assets/avatars/Avatar_9.png")} />
         <div className={cls.board} id="board4">
             <div className={cls.body}>
-                {user.email ? <CILabel className={!showAccess && cls.label}>Please Accept or <CILink onClick={handleLink(true)}>Click Here</CILink> to resend the <b className="typer">User-Consent</b> document, sent on your registered email or If you already have an <b className="typer">Access-Code</b>, Please <CILink onClick={handleInput}>Click Here</CILink>.</CILabel> :
-                    <CILabel className={!showAccess && cls.label}>Please <CILink onClick={handleLink(false)}>Click Here</CILink> to receive the <b className="typer">User-Consent</b> document or If you already have an <b className="typer">Access-Code</b>, Please <CILink onClick={handleInput}>Click Here</CILink>.</CILabel>}
-                {showAccess && <Fragment>
-                    <CILabel>Access Code</CILabel>
+                {showAccess ? <Fragment>
+                    <CILabel id="first">Access Code</CILabel>
                     <CIInput onChange={handleChange} onEnter={handleSubmit} value={text} />
                     <CIButton onClick={handleSubmit}>Submit</CIButton>
+                </Fragment> : <Fragment>
+                    <CILabel>Time to get Consent!</CILabel>
+                    <CILabel>Now, we need your parent to agree.</CILabel>
+                    <CILabel>To send your parent an email, please <CILink onClick={handleLink(false)}>click here</CILink>.</CILabel>
+                    <CILabel>Then ask your parent to respond to the email so you can get started as soon as possible.</CILabel>
+                    <CILabel id="last">If you have an access code, please <CILink onClick={handleInput}>click here</CILink>.</CILabel>
                 </Fragment>}
             </div>
         </div>
@@ -340,10 +352,9 @@ const LandingPage = () => {
             <img className={cls.animal2} id="animal2" src={require("../assets/animals/Animal_2.png")} />
             <div className={cls.board2} id="board5">
                 <CILabel className={cls.title}>
-                    Disclaimer
+                    Welcome to Cooperation Island!
                 </CILabel>
                 <div className={cls.content}>
-                    <h4 className="typer">Welcome to Cooperation Island!</h4>
                     <p className="typer">Cooperation Island is a set of different activities made for children, just like you. On Cooperation Island, you will have the opportunity to explore different activities. For the most part, you will make decisions that can help you earn shells.</p>
                     <p className="typer">Unlike some activities you may play, your responses to these questions and your decisions help us with scientific research. That means that your responses to these activities will be used to help us better understand how children and adults make decisions and think about the world and will likely be a part of a scientific research project, so you should take your decisions seriously. You can be a part of this research project if you want to be. You do not have to be a part of it if you do not want to be. You should feel free to stop the activity at any point, and your name will not be put on any reports written about this project.</p>
                 </div>

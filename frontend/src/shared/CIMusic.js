@@ -7,7 +7,8 @@ import clsx from "clsx";
 
 const useStyles = makeStyles({
     svg: {
-        height: "10vh"
+        height: "10vh",
+        outline: "none"
     }
 });
 
@@ -57,7 +58,8 @@ const CIMusic = (props) => {
         setBGM(!BGM);
     }
 
-    return <svg className={clsx(cls.svg, props.className, "pointer")} id={props.id} onClick={handleClick} viewBox="0 0 100 111">
+    return <svg className={clsx(cls.svg, props.className, "pointer")} id={props.id} onClick={handleClick} viewBox="0 0 100 111" data-tooltip-id="tooltip"
+        data-tooltip-content="Toggle Sound">
         <path className="pointer" opacity="0.3" d="M99.9987 58.4267C100.196 86.8849 77.9741 110.11 50.3618 110.305C22.7441 110.498 0.198183 87.5854 0.00134455 59.1254C-0.19904 30.6672 22.0242 7.44029 49.6383 7.247C77.2506 7.05371 99.7965 29.9667 99.9987 58.4267Z" fill="black" />
         <path className="pointer" d="M99.9987 51.1792C100.196 79.6374 77.9741 102.864 50.3618 103.058C22.7441 103.253 0.198183 80.3396 0.00134455 51.8779C-0.19904 23.4214 22.0242 0.192754 49.6383 0.0012362C77.2506 -0.193829 99.7965 22.721 99.9987 51.1792Z" fill="#552800" />
         <path className="pointer" d="M9.66945 26.1045C8.12134 30.8055 22.5881 22.6926 48.6009 23.5491C74.6137 24.4021 83.7143 22.8629 85.1489 19.6922C86.5818 16.5215 72.1363 4.76084 57.8168 2.33671C43.4955 -0.083867 16.6475 4.90802 9.66945 26.1045Z" fill="#A85C09" />

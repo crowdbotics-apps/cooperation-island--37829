@@ -116,7 +116,7 @@ export const showDetailsPage = () => {
         .timeline()
         .add({
             targets: "#board",
-            left: "60vw",
+            left: "34vw",
             easing: "easeOutQuint",
             duration: 2000
         })
@@ -146,6 +146,12 @@ export const showAvatarPage = () => {
             easing: "linear",
             duration: 2000
         })
+        .add({
+            targets: "#title",
+            top: "2vh",
+            easing: "easeOutQuint",
+            duration: 2000
+        }, "-=2000")
         .add({
             targets: "#logout, #music",
             left: "94vw",

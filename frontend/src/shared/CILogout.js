@@ -5,7 +5,8 @@ import clsx from "clsx";
 
 const useStyles = makeStyles({
     svg: {
-        height: "10vh"
+        height: "10vh",
+        outline: "none"
     }
 });
 
@@ -31,7 +32,8 @@ const CILogout = (props) => {
         props.onClick && props.onClick();
     }
 
-    return <svg className={clsx(cls.svg, props.className, "pointer")} id={props.id} onClick={handleClick} viewBox="0 0 101 111">
+    return <svg className={clsx(cls.svg, props.className, "pointer")} id={props.id} onClick={handleClick} viewBox="0 0 101 111" data-tooltip-id="tooltip"
+        data-tooltip-content="Logout">
         <path className="pointer" opacity="0.3" d="M100.995 58.4267C101.192 86.8849 78.9702 110.112 51.3579 110.305C23.742 110.498 1.19428 87.5854 0.997438 59.1254C0.797053 30.6672 23.0203 7.43854 50.6344 7.24702C78.2467 7.05196 100.793 29.9668 100.995 58.4267Z" fill="black" />
         <path className="pointer" d="M100.995 51.1792C101.192 79.6374 78.9702 102.864 51.3579 103.058C23.742 103.253 1.19428 80.3396 0.997438 51.8796C0.797053 23.4214 23.0203 0.192754 50.6344 0.0012362C78.2467 -0.193829 100.793 22.721 100.995 51.1792Z" fill="#552800" />
         <path className="pointer" d="M10.6638 26.1045C9.11388 30.8056 23.5824 22.6926 49.5934 23.5492C75.608 24.4021 84.7086 22.8647 86.1397 19.6922C87.5743 16.5215 73.1271 4.76086 58.8076 2.33673C44.4898 -0.0838463 17.6418 4.90982 10.6638 26.1045Z" fill="#A85C09" />
