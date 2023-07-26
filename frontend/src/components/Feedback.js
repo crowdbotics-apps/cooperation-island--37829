@@ -6,7 +6,7 @@ import CIButton from "../shared/CIButton";
 import CIInput from "../shared/CIInput";
 import CILabel from "../shared/CILabel";
 import Option from "./Option";
-import Star from "./Star";
+import Rating from "./Rating";
 import { AppContext } from "../App";
 import { toast } from "react-toastify";
 import anime from "animejs";
@@ -91,10 +91,10 @@ const useStyles = makeStyles((theme) => ({
     input: {
         margin: "18vh auto 10.75vh",
     },
-    star: {
+    rating: {
         margin: "0vh 0.5vw"
     },
-    starContainer: {
+    ratingContainer: {
         "& label": {
             "&:last-child": {
                 textAlign: "right",
@@ -235,12 +235,12 @@ const Feedback = ({ module, onClose }) => {
             </div>
             {feedback.length ? (show ? <div id="feedback">
                 <CILabel className={clsx(cls.question, feedback[active].options.length === 2 && cls.questionAlt)}>{feedback[active].question}</CILabel>
-                {feedback[active].question_type === 1 ? <CIInput className={cls.input} onChange={handleInput} placeholder="Answer" value={answer} /> : (feedback[active].question_type === 4 ? <div className={cls.starContainer}>
-                    <Star active={score >= 1} className={cls.star} id="1" onClick={handleScore(1)} />
-                    <Star active={score >= 2} className={cls.star} id="2" onClick={handleScore(2)} />
-                    <Star active={score >= 3} className={cls.star} id="3" onClick={handleScore(3)} />
-                    <Star active={score >= 4} className={cls.star} id="4" onClick={handleScore(4)} />
-                    <Star active={score >= 5} className={cls.star} id="5" onClick={handleScore(5)} />
+                {feedback[active].question_type === 1 ? <CIInput className={cls.input} onChange={handleInput} placeholder="Answer" value={answer} /> : (feedback[active].question_type === 4 ? <div className={cls.ratingContainer}>
+                    <Rating active={score >= 1} className={cls.rating} id="1" onClick={handleScore(1)} />
+                    <Rating active={score >= 2} className={cls.rating} id="2" onClick={handleScore(2)} />
+                    <Rating active={score >= 3} className={cls.rating} id="3" onClick={handleScore(3)} />
+                    <Rating active={score >= 4} className={cls.rating} id="4" onClick={handleScore(4)} />
+                    <Rating active={score >= 5} className={cls.rating} id="5" onClick={handleScore(5)} />
                     <CILabel>Not Important</CILabel>
                     <CILabel>Very Important</CILabel>
                 </div> : <Fragment>
