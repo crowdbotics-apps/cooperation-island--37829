@@ -1,13 +1,39 @@
+@font-face {
+  font-family: "Summer Show";
+  src: url("../assets/fonts/Summer-Show.ttf") format("truetype");
+}
+
 * {
-  cursor: url("../../public/images/Cursor.png"), auto;
+  cursor: url("../assets/images/Cursor.png"), auto;
 }
 
 body {
-  margin: 0px;
+  margin: 0;
   overflow: hidden;
 }
 
-@font-face {
+iframe{
+  border: hidden;
+}
+
+button, .pointer {
+  cursor: url("../assets/images/Pointer.png"), auto !important;
+}
+
+.typer {
+  cursor: url("../assets/images/Typer.png"), auto;
+}
+
+.Toastify__toast {
+  background-color: #FBF6D8;
+  filter: drop-shadow(-0.5vh 0.66vh 1vh black);
+}
+
+.Toastify__toast-body {
+  color: #7C382D;
   font-family: "Summer Show";
-  src: url("../../public/fonts/Summer-Show.ttf") format("truetype");
+}
+
+.MuiPickersMonth-monthSelected, .MuiPickersYear-yearSelected {
+  color: #207067 !important;
 }

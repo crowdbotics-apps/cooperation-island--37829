@@ -36,3 +36,8 @@ pipenv = "*"
 cb-terms-and-conditions = {editable = true, path = "./modules/terms_and_conditions"}
 cb-firebase-push-notifications = {editable = true, path = "./modules/firebase_push_notifications"}
 cb-django-signature = {editable = true, path = "./modules/django_signature"}
+pyjwt = "*"
+django-cors-headers = "==3.11.0"
+celery = "==5.3.0"
+django-crontab = "*"
+redis = "==4.5.5"

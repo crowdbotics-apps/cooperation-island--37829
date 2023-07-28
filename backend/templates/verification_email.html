@@ -1,0 +1,46 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Parental Consent</title>
+</head>
+<body>
+    <h2>Welcome to Cooperation Island! </h2>
+    
+    <p>Dear {{ user.username }},</p>
+    
+    <p>Your child signed up to participate in a research study on Cooperation Island. Cooperation Island is a web-based application that allows children to participate in scientific research from the comfort of their own home. Cooperation Island is designed for children starting at age 5. Children up to age 17 are eligible to participate. Please read the following information to provide permission for your child to participate. 
+    </p>
+    
+    <p><strong>Purpose:</strong> The purpose of Cooperation Island is to provide children with a fun and engaging way to engage in scientific research. Children’s response on Cooperation Island can also help us to better understand children’s development with a focus on understanding how children learn to cooperate with others.</p>
+    
+    <p><strong>Description:</strong> If you give permission for your child to participate in Cooperation Island, your child will (1) get the opportunity to choose an avatar to represent them, (2) answer a few basic demographic questions (such as gender, and birth month and year), and (3) participate in a variety of interactive modules where they make decisions about others. For full information about all modules available on Cooperation Island, we recommend you view our website at CooperationIsland.org. The modules run between 3 to 10 minutes each and they can participate in as many modules as they wish. We also may occasionally add additional modules at which point we may email you to encourage your child to participate. 
+    </p>
+
+    <p><strong>Risks, costs, and benefits:</strong> There are no anticipated risks but there may be unknown risks. There are no costs associated with your participation in this study. Although this study will not directly benefit you personally, we hope that our results will add to our knowledge of social behavior and cognition. 
+    </p>
+
+    <p><strong>Payments:</strong> Throughout the activity, your children will get the opportunity to earn “shells” which can be traded in at the “Shell Shop”. By doing so, children can then earn additional island gear for their avatar, such as a new hat or beach ball. This activity does not cost any money and will not provide any opportunity to make money. </p>
+
+    <p><strong>Confidentiality:</strong> The only identifiable data collected on this platform includes usernames and passwords, which will be kept separate and untethered from the participants’ activity on Cooperation Island. These data will be stored securely on an encrypted server. If any breach of these data occurs, you will be notified promptly. All data collected on the platform via participation on different modules is de-identified and is not connected to participants’ usernames. All of such data will be stored securely on the server and kept on secured servers associated with Boston College. We will not use your data for any commercial purposes. We are only collecting the data you are willing to share with us. We are not collecting any passive data (such as GPS location or what you do on other apps). You can always delete your account if you no longer want to participate. Because the data is fully de-identified, there is no way to delete previously collected data if you do decide to forgo future participation on the site.</p>
+    
+    <p>Contacts and Questions: The research conducting this study is Katherine McAuliffe. You may contact her at <a href = "mailto: katherine.mcauliffe.2@bc.edu">katherine.mcauliffe.2@bc.edu</a> and at <strong>(617)-552-4319</strong>. If you believe your child may have suffered a research related injury, contact Katherine McAuliffe who will give you further instructions. If you have any question about your child’s rights as a research participant, you may contact: Director, Office for Research Protections, Boston College at (617) 552-4778 or <a href = "mailto: irb@bc.edu">irb@bc.edu</a>. This research is funded by Dr. McAuliffe’s research funds. 
+    </p>
+
+    <p>By verifying this account below, you are confirming that you have read the contents of this email and give consent for your child to participate in Cooperation Island. Once you have verified the account, your child will need to set-up a username and password. If you have multiple children who are interested, you will need to consent for each of them and they can create their own unique account.<strong> Please inform your child that they can now participate in Cooperation Island.</strong>
+    </p>
+    
+    <p>If you want to participate, click on the link below</p>
+    
+    <a href="https://{{ domain }}/api/v1/verify/{{ uidb64 }}/{{ token }}/">Verify Account</a>
+
+    <p>Above link is valid for 3 days only.</p>
+    
+    <p>If you didn't sign up for an account on our website, you can safely ignore this email.</p>
+    
+    <p>Best regards,</p>
+    <p>Cooperation Island Team</p>
+</body>
+</html>
+

@@ -1,54 +1,51 @@
+import { useEffect, useState } from "react";
 import { makeStyles } from "@material-ui/core";
 import { useHistory } from "react-router-dom";
 import { showLoginBoard } from "../libs/animations";
+import { getUsername, savePassword } from "../services/v1";
+import BoardImg from "../assets/images/Board-alt.png";
 import CILabel from "../shared/CILabel";
 import CIInput from "../shared/CIInput";
 import CIButton from "../shared/CIButton";
+import { toast } from "react-toastify";
 import anime from "animejs";
 
 const useStyles = makeStyles({
     guide: {
         position: "absolute",
-        top: "33.5%",
-        left: "-30%",
+        top: "33.5vh",
+        left: "-30vw",
         height: "88vh",
-        width: "20vw"
+        width: "30vw",
+        transform: "scaleX(-1)"
     },
     board: {
         position: "absolute",
-        top: "-1%",
-        left: "110%",
-        height: "100vh",
-        width: "30vw",
-        rotate: "90deg",
-        background: "url('/images/Board.png')",
+        top: "15vh",
+        left: "110vw",
+        height: "68vh",
+        width: "48vw",
+        background: `url(${BoardImg})`,
         backgroundRepeat: "no-repeat",
-        backgroundSize: "100% 100%"
+        backgroundSize: "48vw 68vh"
     },
     body: {
-        "& button": {
-            width: "36%"
-        },
         "& input": {
             marginTop: "1vh",
-            marginBottom: "1vh",
-            marginLeft: "5.25vw"
+            marginBottom: "3vh",
         },
-        "& label": {
-            "&:first-child": {
-                fontSize: "4.5vh",
-                fontWeight: "bold",
-                letterSpacing: "0.1vw",
-                marginBottom: "4vh"
-            },
-            width: "100%"
+        "& label:first-child": {
+            fontSize: "4.5vh",
+            fontWeight: "bold",
+            letterSpacing: "0.1vw",
+            marginBottom: "6vh"
         },
-        rotate: "-90deg",
-        height: "61vh",
-        width: "100%",
-        marginTop: "30%",
-        marginLeft: "9%",
-        textAlign: "center"
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        height: "68vh",
+        width: "48vw",
+        marginTop: "8vh"
     }
 });
 
@@ -57,36 +54,69 @@ const ResetPassword = () => {
 
     const history = useHistory();
 
-    const handleSave = () => {
-        anime
-            .timeline()
-            .add({
-                targets: "#guide",
-                left: "-30%",
-                easing: "easeInQuint",
-                duration: 2000
+    const [username, setUsername] = useState("");
+
+    const [password, setPassword] = useState("");
+
+    const sessionId = window.location.pathname.split("/").pop();
+
+    useEffect(() => {
+        getUsername(sessionId)
+            .then(({ data }) => {
+                setUsername(data.username);
             })
-            .add({
-                targets: "#board2",
-                left: "110%",
-                easing: "easeInQuint",
-                duration: 2000
-            }, "-=2000")
-            .finished.then(() => {
+            .catch(() => {
+                toast.error("The Session ID is invalid or expired.");
                 history.push("/login");
-                showLoginBoard();
             });
+    }, []);
+
+    const handlePassword = (event) => {
+        setPassword(event.target.value);
+    }
+
+    const handleSave = () => {
+        if (password.trim().length < 8)
+            toast.error("Password must be at least 8 characters.");
+        else {
+            savePassword(sessionId, password)
+                .then(() => {
+                    toast.success("Your Password has been updated.");
+                    anime
+                        .timeline()
+                        .add({
+                            targets: "#guide",
+                            left: "-30vw",
+                            easing: "easeInQuint",
+                            duration: 2000
+                        })
+                        .add({
+                            targets: "#board2",
+                            left: "110vw",
+                            easing: "easeInQuint",
+                            duration: 2000
+                        }, "-=2000")
+                        .finished.then(() => {
+
+                            history.push("/login");
+                            showLoginBoard();
+                        });
+                })
+                .catch(() => {
+                    toast.error("Something went wrong.");
+                });
+        }
     }
 
     return <div>
-        <img className={cls.guide} id="guide" src="/avatars/Avatar_3.png" />
+        <img className={cls.guide} id="guide" src={require("../assets/avatars/Avatar_3.png")} />
         <div className={cls.board} id="board2">
             <div className={cls.body}>
                 <CILabel>Reset Password</CILabel>
-                <CILabel>Email</CILabel>
-                <CIInput disabled />
+                <CILabel>Username</CILabel>
+                <CIInput disabled value={username} />
                 <CILabel>Password</CILabel>
-                <CIInput type="password" />
+                <CIInput onChange={handlePassword} onEnter={handleSave} type="password" value={password} />
                 <CIButton onClick={handleSave}>Save</CIButton>
             </div>
         </div>

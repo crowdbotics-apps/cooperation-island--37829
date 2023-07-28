@@ -1,11 +1,11 @@
 import { makeStyles } from "@material-ui/core";
+import { Howl } from "howler";
 import anime from "animejs";
 import clsx from "clsx";
 
 const useStyles = makeStyles((theme) => ({
     root: {
         color: theme.palette.primary.main,
-        cursor: "pointer",
         display: "block",
         fontFamily: "Summer Show",
         fontSize: "3.3vh",
@@ -21,6 +21,10 @@ const CILink = (props) => {
     const labelId = "label" + anime.random(1, 100);
 
     const handleClick = () => {
+        new Howl({
+            src: require("../assets/sounds/Click.mp3"),
+            autoplay: true
+        });
         anime({
             targets: "#" + labelId,
             letterSpacing: [1, 0],
@@ -29,7 +33,7 @@ const CILink = (props) => {
         props.onClick && props.onClick();
     }
 
-    return <label {...props} className={clsx(cls.root, props.className)} id={labelId} onClick={handleClick} />
+    return <label {...props} className={clsx(cls.root, props.className, "pointer")} id={labelId} onClick={handleClick} />
 }
 
 export default CILink;

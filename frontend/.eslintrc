@@ -15,6 +15,7 @@
   "rules": {
     "quotes": "warn",
     "no-console": "warn",
+    "no-extra-boolean-cast": "off",
     "no-unreachable": "warn",
     "no-unused-vars": "warn",
     "react-hooks/exhaustive-deps": "off"
