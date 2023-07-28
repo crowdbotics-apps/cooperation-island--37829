@@ -61,9 +61,9 @@ const useStyles = makeStyles({
     },
     palm: {
         filter: "drop-shadow(0.33vh 0.66vh 1.2vh black)",
-        transform: "translateX(-816vw)",
+        transform: "translateX(0vw)",
         height: "120.52vh",
-        width: "1564vw"
+        width: "2720vw"
     },
     instructor: {
         position: "absolute",
@@ -628,26 +628,13 @@ const Module_2 = () => {
         setAnimation(false);
 
         anime({
-            targets: "#test",
-            translateX: [
-                {
-                    value: ["-748vw", "-1496vw"],
-                    duration: 220,
-                    easing: "steps(11)",
-                },
-                {
-                    value: ["-1496vw", "0vw"],
-                    duration: 110,
-                    easing: "steps(22)",
-                },
-                {
-                    value: ["0vw", "-748vw"],
-                    duration: 220,
-                    easing: "steps(11)",
-                }
-            ],
-            loop: 0,
+            targets: "#palm",
+            translateX: ["68vw", "-2652vw"],
+            easing: "steps(40)",
+            duration: 1600,
+            loop: 2,
             complete: () => {
+                $("#palm").css("transform", "translateX(0vw)");
                 setAnimation(true);
 
                 if (!closeRef.current) {

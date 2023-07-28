@@ -66,7 +66,7 @@ const ReadingPane = () => {
 
     const [body, setBody] = useState("");
 
-    const pageType = window.location.pathname === "/privacy" ? 0 : 1;
+    const pageType = window.location.pathname.includes("/privacy") ? 0 : 1;
 
     useEffect(() => {
         Promise.all([pageType ? terms() : privacy()])

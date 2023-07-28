@@ -29,38 +29,53 @@ export const rankedQualities = [
     },
     {
         id: 2,
-        desc: "Making people laugh",
-        text: "Being Funny"
+        desc: "Following the rules without fail",
+        text: "Following the rules"
     },
     {
         id: 3,
-        desc: "Following the rules without fail",
-        text: "Being Stickler"
-    },
-    {
-        id: 4,
         desc: "Treat people and things equally",
         text: "Being Fair"
     },
     {
-        id: 5,
-        desc: "Being good at sports",
-        text: "Being Athletic"
-    },
-    {
-        id: 6,
+        id: 4,
         desc: "Being patreon and kind towards others",
         text: "Being Generous"
     },
     {
+        id: 5,
+        desc: "Being reliable and keep their trust",
+        text: "Being Trustworthy"
+    },
+    {
+        id: 6,
+        desc: "Support other people in bad times",
+        text: "Standing up for others"
+    },
+    {
         id: 7,
+        desc: "Being able to let go and pardon people",
+        text: "Being Forgiving"
+    },
+    {
+        id: 8,
         desc: "Being good at understanding and learning things",
         text: "Being Intelligent"
     },
     {
-        id: 8,
+        id: 9,
         desc: "Being good at painting and drawing",
         text: "Being Artistic"
+    },
+    {
+        id: 10,
+        desc: "Being good at sports",
+        text: "Being Athletic"
+    },
+    {
+        id: 11,
+        desc: "Making people laugh",
+        text: "Being Funny"
     }
 ];
 

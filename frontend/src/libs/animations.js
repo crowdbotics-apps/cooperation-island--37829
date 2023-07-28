@@ -87,13 +87,13 @@ export const showLandingPage = () => {
         .timeline()
         .add({
             targets: "#board5",
-            top: "10vh",
+            top: "14vh",
             easing: "easeOutQuint",
             duration: 2000
         })
         .add({
             targets: "#animal2",
-            top: "1vh",
+            top: "5vh",
             easing: "easeOutQuint",
             duration: 2000
         }, "-=2000")

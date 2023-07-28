@@ -200,7 +200,7 @@ const LoginBoard = () => {
 
     const [username, setUsername] = useState("");
 
-    const [active, setActive] = useState(window.location.pathname === "/login");
+    const [active, setActive] = useState(window.location.pathname.includes("/login"));
 
     const { setBGM, setHowler, setUser } = useContext(AppContext);
 

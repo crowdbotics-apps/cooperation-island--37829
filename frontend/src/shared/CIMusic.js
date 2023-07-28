@@ -37,21 +37,21 @@ const CIMusic = (props) => {
             duration: 1000
         });
         if (BGM) {
-            if (window.location.pathname === "/fish-mind-reading")
+            if (window.location.pathname.includes("/fish-mind-reading"))
                 howler.module_1.fade(howler.module_1.volume(), 0, 1000);
-            else if (window.location.pathname === "/tree-shaking")
+            else if (window.location.pathname.includes("/tree-shaking"))
                 howler.module_2.fade(howler.module_2.volume(), 0, 1000);
-            else if (window.location.pathname === "/tell-us-about-you")
+            else if (window.location.pathname.includes("/tell-us-about-you"))
                 howler.module_3.fade(howler.module_3.volume(), 0, 1000);
             else
                 howler.welcome.fade(howler.welcome.volume(), 0, 1000);
         }
         else
-            if (window.location.pathname === "/fish-mind-reading")
+            if (window.location.pathname.includes("/fish-mind-reading"))
                 howler.module_1.fade(0, 1, 1000);
-            else if (window.location.pathname === "/tree-shaking")
+            else if (window.location.pathname.includes("/tree-shaking"))
                 howler.module_2.fade(0, 1, 1000);
-            else if (window.location.pathname === "/tell-us-about-you")
+            else if (window.location.pathname.includes("/tell-us-about-you"))
                 howler.module_3.fade(0, 1, 1000);
             else
                 howler.welcome.fade(0, 1, 1000);

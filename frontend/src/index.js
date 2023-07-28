@@ -6,18 +6,21 @@ import { BrowserRouter } from "react-router-dom";
 import { DndProvider } from "react-dnd";
 import DateFnsUtils from "@date-io/date-fns";
 import CITheme from "./styles/CITheme";
+import IFrame from "./IFrame";
 import App from "./App";
 import "./styles/index.scss";
 
 ReactDOM.render(
-    <BrowserRouter>
-        <MuiPickersUtilsProvider utils={DateFnsUtils}>
-            <DndProvider backend={HTML5Backend}>
-                <ThemeProvider theme={CITheme}>
-                    <App />
-                </ThemeProvider>
-            </DndProvider>
-        </MuiPickersUtilsProvider>
-    </BrowserRouter>,
+    window.location.href.includes("/app") ?
+        <BrowserRouter basename="app">
+            <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                <DndProvider backend={HTML5Backend}>
+                    <ThemeProvider theme={CITheme}>
+                        <App />
+                    </ThemeProvider>
+                </DndProvider>
+            </MuiPickersUtilsProvider>
+        </BrowserRouter>
+        : <IFrame />,
     document.getElementById("root")
 );

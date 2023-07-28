@@ -1,6 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 import { makeStyles } from "@material-ui/core";
 import { useHistory } from "react-router-dom";
+import update from "immutability-helper";
 import { rankedQualities } from "../libs/utils";
 import { qualities } from "../services/v1";
 import { showHomePage } from "../libs/animations";
@@ -118,11 +119,6 @@ const useStyles = makeStyles((theme) => ({
         marginLeft: "-0.75vw"
     },
     value: {
-        "& label": {
-            color: theme.palette.primary.contrast,
-            paddingTop: "1.75vh"
-        },
-        textAlign: "center",
         height: "8vh",
         width: "15vw",
         background: `url(${ValuesImg})`,
@@ -201,6 +197,8 @@ const Module_3 = () => {
     });
 
     const [feedback, setFeedback] = useState(false);
+
+    const [draggingId, setDragging] = useState(0);
 
     const { BGM, howler, user } = useContext(AppContext);
 
@@ -307,8 +305,22 @@ const Module_3 = () => {
     const addItems = (section) => (id) => {
         setState({
             ...state,
+            section1: state.section1.filter(x => x !== id),
+            section2: state.section2.filter(x => x !== id),
+            section3: state.section3.filter(x => x !== id),
             [section]: [...state[section], id]
         });
+    }
+
+    const moveItems = (section) => (x1, x2) => {
+        setState((prev) => update(prev, {
+            [section]: {
+                $splice: [
+                    [x1, 1],
+                    [x2, 0, prev[section][x1]],
+                ]
+            }
+        }));
     }
 
     const handleClick = () => {
@@ -500,6 +512,7 @@ const Module_3 = () => {
         <div className={cls.sections} id="sections">
             <Sections
                 addItems={addItems("section1")}
+                moveItems={moveItems("section1")}
                 className={cls.section}
                 data={state.section1}
                 clsQuality={cls.value}
@@ -508,9 +521,11 @@ const Module_3 = () => {
                 style={{
                     marginLeft: "2.25vw"
                 }}
+                {...{ draggingId, setDragging }}
             />
             <Sections
                 addItems={addItems("section2")}
+                moveItems={moveItems("section2")}
                 className={cls.section}
                 data={state.section2}
                 clsQuality={cls.value}
@@ -519,9 +534,11 @@ const Module_3 = () => {
                 style={{
                     marginLeft: "18.9vw"
                 }}
+                {...{ draggingId, setDragging }}
             />
             <Sections
                 addItems={addItems("section3")}
+                moveItems={moveItems("section3")}
                 className={cls.section}
                 data={state.section3}
                 clsQuality={cls.value}
@@ -530,6 +547,7 @@ const Module_3 = () => {
                 style={{
                     marginLeft: "35.5vw"
                 }}
+                {...{ draggingId, setDragging }}
             />
         </div>
         {feedback && <Feedback module="tell-us-about-you" onClose={handleExit} />}

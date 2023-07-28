@@ -1,5 +1,5 @@
 import { createContext, useEffect, useState } from "react";
-import { Redirect, Route, Switch } from "react-router-dom";
+import { Redirect, Route, Switch, useHistory } from "react-router-dom";
 import { makeStyles } from "@material-ui/core";
 import { ToastContainer } from "react-toastify";
 import { parseToken, userState } from "./libs/utils";
@@ -34,6 +34,8 @@ const useStyles = makeStyles((theme) => ({
 const App = () => {
   const cls = useStyles();
 
+  const history = useHistory();
+
   const localData = parseToken(localStorage["UserState"]);
 
   const [user, setUser] = useState(localData ? mapUserData(localData) : userState);
@@ -46,8 +48,18 @@ const App = () => {
 
   const [loader, setLoader] = useState(false);
 
+  const [tooltip, showTooltip] = useState(true);
+
   useEffect(() => {
     window.setLoader = setLoader;
+
+    const handleListen = history.listen((location) => {
+      window.top.history.replaceState({}, document.title, location.pathname);
+    });
+
+    return () => {
+      handleListen();
+    }
   }, []);
 
   const handleUser = (data) => {
@@ -104,7 +116,7 @@ const App = () => {
     }
   }
 
-  return <AppContext.Provider value={{ BGM, feedback, howler, user, setBGM, setFeedback, setHowler: handleHowler, setUser: handleUser }}>
+  return <AppContext.Provider value={{ BGM, feedback, howler, user, setBGM, setFeedback, showTooltip, setHowler: handleHowler, setUser: handleUser }}>
     <Route path="/" component={HomePage} />
     <Switch>
       {getRoutes()}
@@ -119,7 +131,7 @@ const App = () => {
       pauseOnFocusLoss={false}
       draggable={false}
     />
-    <Tooltip className={cls.tooltip} id="tooltip" />
+    {tooltip && <Tooltip className={cls.tooltip} id="tooltip" />}
   </AppContext.Provider>
 }
 
