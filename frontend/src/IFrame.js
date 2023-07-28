@@ -23,7 +23,7 @@ const IFrame = () => {
                 height: aspectRatio ? window.innerHeight : window.innerWidth / 2.13,
                 width: aspectRatio ? window.innerHeight * 2.13 : window.innerWidth
             }}
-            src={process.env.PUBLIC_URL + location.pathname}
+            src={process.env.REACT_APP_WEB_URL + location.pathname}
         />
     </div>
 }
