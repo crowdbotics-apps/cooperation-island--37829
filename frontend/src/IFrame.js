@@ -5,7 +5,7 @@ const aspectRatio = parseFloat(window.innerWidth / window.innerHeight).toFixed(2
 const IFrame = () => {
     useEffect(() => {
         window.addEventListener("resize", () => {
-            window.location.reload();
+            // window.location.reload();
         });
     }, []);
 
