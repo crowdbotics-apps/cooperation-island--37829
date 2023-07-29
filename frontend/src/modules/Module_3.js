@@ -121,6 +121,7 @@ const useStyles = makeStyles((theme) => ({
     value: {
         height: "8vh",
         width: "15vw",
+        filter: "drop-shadow(0.33vh 0.44vh 0.66vh black)",
         background: `url(${ValuesImg})`,
         backgroundRepeat: "no-repeat",
         backgroundSize: "15vw 8vh"

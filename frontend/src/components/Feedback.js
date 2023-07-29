@@ -41,6 +41,7 @@ const useStyles = makeStyles((theme) => ({
             width: "0.6vw",
             marginRight: "0.65vw"
         },
+        height: "2vh",
         marginLeft: "2vw",
         marginTop: "12vh"
     },

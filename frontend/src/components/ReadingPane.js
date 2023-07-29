@@ -48,6 +48,7 @@ const useStyles = makeStyles((theme) => ({
         "&::-webkit-scrollbar-track": {
             background: "transparent"
         },
+        fontSize: "2.6vh",
         textAlign: "left",
         margin: "2vh 5vw 1vh 7vw",
         height: "62.3vh",

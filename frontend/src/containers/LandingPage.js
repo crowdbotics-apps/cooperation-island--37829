@@ -121,6 +121,7 @@ const useStyles = makeStyles({
     },
     content: {
         fontFamily: "Summer Show",
+        fontSize: "2.6vh",
         textAlign: "left",
         margin: "10vh 5vw 1vh 7vw"
     },

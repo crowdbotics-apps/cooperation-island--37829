@@ -69,7 +69,33 @@ const useStyles = makeStyles((theme) => ({
             cursor: "inherit",
             fontFamily: "Summer Show",
             fontSize: "4vh"
-        }
+        },
+        "& div.MuiPickersBasePicker-pickerView": {
+            maxWidth: "none",
+            minWidth: "auto",
+            minHeight: "auto"
+        },
+        "& div.MuiPickersMonthSelection-container": {
+            "& div": {
+                height: "12.5vh",
+                width: "10vw"
+            },
+            width: "24.22vw"
+        },
+        "& div.MuiPickersYearSelection-container": {
+            "& div": {
+                height: "6.66vh",
+                width: "23.75vw"
+            },
+            height: "50vh"
+        },
+        "& div.MuiPickersYear-yearSelected": {
+            margin: "0"
+        },
+        height: "50.8vh",
+        width: "24.22vw",
+        minWidth: "auto",
+        maxWidth: "none"
     },
     guide: {
         position: "absolute",

@@ -1,11 +1,13 @@
 import { useEffect } from "react";
+import { isMobile } from "mobile-device-detect";
 
 const aspectRatio = parseFloat(window.innerWidth / window.innerHeight).toFixed(2) > 2.13;
 
 const IFrame = () => {
     useEffect(() => {
         window.addEventListener("resize", () => {
-            // window.location.reload();
+            if (!isMobile)
+                window.location.reload();
         });
     }, []);
 
@@ -23,7 +25,7 @@ const IFrame = () => {
                 height: aspectRatio ? window.innerHeight : window.innerWidth / 2.13,
                 width: aspectRatio ? window.innerHeight * 2.13 : window.innerWidth
             }}
-            src={process.env.REACT_APP_WEB_URL + location.pathname}
+            src={"/app" + location.pathname}
         />
     </div>
 }
