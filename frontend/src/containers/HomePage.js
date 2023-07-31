@@ -34,7 +34,7 @@ const HomePage = () => {
 
     const history = useHistory();
 
-    const { user, setHowler } = useContext(AppContext);
+    const { avatarRef, user, setHowler } = useContext(AppContext);
 
     const [loadedItems, setLoaded] = useState(0);
 
@@ -129,7 +129,7 @@ const HomePage = () => {
                                 easing: "easeInElastic",
                                 duration: 2000
                             });
-                            showAvatarPage();
+                            showAvatarPage(avatarRef.current.setUser);
                         }
                         else if (window.location.pathname.includes("/home")) {
                             anime({

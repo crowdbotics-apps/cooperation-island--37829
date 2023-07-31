@@ -101,6 +101,7 @@ const LoadAssets = ({ onLoad, progress }) => {
 
         <img className={cls.hidden} id="assets" onLoad={onLoad} src={require("../assets/images/Application_BG.jpg")} />
         <img className={cls.hidden} id="assets" onLoad={onLoad} src={require("../assets/images/Avatar_BG.png")} />
+        <img className={cls.hidden} id="assets" onLoad={onLoad} src={require("../assets/images/Avatar_Text.png")} />
         <img className={cls.hidden} id="assets" onLoad={onLoad} src={require("../assets/images/Board.png")} />
         <img className={cls.hidden} id="assets" onLoad={onLoad} src={require("../assets/images/Board-alt.png")} />
         <img className={cls.hidden} id="assets" onLoad={onLoad} src={require("../assets/images/Board-lg.png")} />

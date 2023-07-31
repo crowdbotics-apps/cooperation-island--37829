@@ -15,11 +15,13 @@ import CILogout from "../shared/CILogout";
 import CIMusic from "../shared/CIMusic";
 import { AppContext } from "../App";
 import { toast } from "react-toastify";
+import { Howl } from "howler";
 import anime from "animejs";
 
 const useStyles = makeStyles({
     animal: {
         position: "absolute",
+        filter: "drop-shadow(0.33vh 0.66vh 1.2vh black)",
         zIndex: 2,
         top: "18vh",
         left: "48vw",
@@ -29,6 +31,7 @@ const useStyles = makeStyles({
     },
     animal2: {
         position: "absolute",
+        filter: "drop-shadow(0.33vh 0.66vh 1.2vh black)",
         top: "140vh",
         left: "51vw",
         height: "16.7vh",
@@ -36,6 +39,7 @@ const useStyles = makeStyles({
     },
     guide: {
         position: "absolute",
+        filter: "drop-shadow(0.33vh 0.66vh 1.2vh black)",
         top: "38vh",
         left: "71vw",
         height: "58vh",
@@ -44,6 +48,7 @@ const useStyles = makeStyles({
     },
     guide2: {
         position: "absolute",
+        filter: "drop-shadow(0.33vh 0.66vh 1.2vh black)",
         top: "33.5vh",
         left: "-30vw",
         height: "70vh",
@@ -128,8 +133,8 @@ const useStyles = makeStyles({
     buttonDiv: {
         display: "flex",
         justifyContent: "space-evenly",
-        width: "70%",
-        margin: "8vh auto 0"
+        width: "37.8vw",
+        margin: "10vh auto 0vh"
     },
     logout: {
         position: "absolute",
@@ -150,7 +155,7 @@ const LandingPage = () => {
 
     const history = useHistory();
 
-    const { BGM, howler, setUser } = useContext(AppContext);
+    const { BGM, howler, setBGM, setHowler, setUser } = useContext(AppContext);
 
     const [text, setText] = useState("");
 
@@ -194,6 +199,15 @@ const LandingPage = () => {
                 duration: 2000,
                 complete: () => {
                     hideBackdrop(false);
+                    setBGM(true);
+
+                    setHowler({
+                        welcome: new Howl({
+                            src: [require("../assets/sounds/Welcome.mp3")],
+                            autoplay: true,
+                            loop: true
+                        })
+                    });
                 }
             })
             .add({
@@ -338,7 +352,7 @@ const LandingPage = () => {
             <div className={cls.body}>
                 {showAccess ? <Fragment>
                     <CILabel id="first">Access Code</CILabel>
-                    <CIInput onChange={handleChange} onEnter={handleSubmit} value={text} />
+                    <CIInput autoFocus onChange={handleChange} onEnter={handleSubmit} value={text} />
                     <CIButton onClick={handleSubmit}>Submit</CIButton>
                 </Fragment> : <Fragment>
                     <CILabel>Time to get Consent!</CILabel>

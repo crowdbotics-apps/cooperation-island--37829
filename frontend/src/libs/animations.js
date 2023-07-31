@@ -39,7 +39,7 @@ export const showResetPassword = () => {
     });
     anime({
         targets: "#guide",
-        left: "3vw",
+        left: "5vw",
         easing: "easeOutQuint",
         duration: 2000
     });
@@ -64,7 +64,7 @@ export const showReadingPane = (alt) => {
     });
     anime({
         targets: "#guide",
-        left: "2.5vw",
+        left: "5vw",
         easing: "easeOutQuint",
         duration: 2000
     });
@@ -128,7 +128,7 @@ export const showDetailsPage = () => {
         }, "-=1200");
 }
 
-export const showAvatarPage = () => {
+export const showAvatarPage = (callbackFn) => {
     anime
         .timeline()
         .add({
@@ -147,8 +147,8 @@ export const showAvatarPage = () => {
             duration: 2000
         })
         .add({
-            targets: "#title",
-            top: "2vh",
+            targets: "#logo2",
+            scale: [0, 1],
             easing: "easeOutQuint",
             duration: 2000
         }, "-=2000")
@@ -159,6 +159,7 @@ export const showAvatarPage = () => {
             duration: 2000,
             complete: () => {
                 $("#logout, #music").css("position", "sticky");
+                callbackFn && callbackFn();
             }
         }, "-=2000")
         .add({
@@ -168,7 +169,7 @@ export const showAvatarPage = () => {
             duration: 2000
         }, "-=2000")
         .add({
-            targets: "#avatar-page",
+            targets: "#avatar-frames, #avatar-page",
             height: "100vh",
             easing: "linear",
             duration: 2000

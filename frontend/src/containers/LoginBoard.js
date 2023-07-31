@@ -12,7 +12,7 @@ import CIButton from "../shared/CIButton";
 import CIInput from "../shared/CIInput";
 import CILabel from "../shared/CILabel";
 import CILink from "../shared/CILink";
-import { AppContext } from "../App";
+import { AppContext, LoginContext } from "../App";
 import { toast } from "react-toastify";
 import { Howl } from "howler";
 import anime from "animejs";
@@ -31,6 +31,7 @@ const useStyles = makeStyles({
     },
     guide: {
         position: "absolute",
+        filter: "drop-shadow(0.33vh 0.66vh 1.2vh black)",
         top: "33.5vh",
         left: "-30vw",
         height: "70vh",
@@ -39,6 +40,7 @@ const useStyles = makeStyles({
     },
     guide2: {
         position: "absolute",
+        filter: "drop-shadow(0.33vh 0.66vh 1.2vh black)",
         top: "44vh",
         left: "50vw",
         height: "70vh",
@@ -131,7 +133,10 @@ const useStyles = makeStyles({
             }
         },
         "& button": {
-            margin: "0vh 3vw"
+            margin: "2vh 3vw"
+        },
+        "& div": {
+            marginTop: "-1vh"
         },
         "& input": {
             marginBottom: "6vh",
@@ -186,23 +191,11 @@ const LoginBoard = () => {
 
     const history = useHistory();
 
-    const [login, setLogin] = useState({
-        username: "",
-        password: ""
-    });
-
-    const [signup, setSignup] = useState({
-        username: "",
-        password: "",
-        email: "",
-        age: ""
-    });
-
-    const [username, setUsername] = useState("");
-
     const [active, setActive] = useState(window.location.pathname.includes("/login"));
 
     const { setBGM, setHowler, setUser } = useContext(AppContext);
+
+    const { login, signup, username, setLogin, setSignup, setUsername } = useContext(LoginContext);
 
     useEffect(() => {
         history.push(active ? "/login" : "/signup");
@@ -481,16 +474,17 @@ const LoginBoard = () => {
         })
             .finished.then(() => {
                 setUser(data);
-                setBGM(true);
-                setHowler({
-                    welcome: new Howl({
-                        src: [require("../assets/sounds/Welcome.mp3")],
-                        autoplay: true,
-                        loop: true
-                    })
-                });
 
                 if (data.access) {
+                    setBGM(true);
+                    setHowler({
+                        welcome: new Howl({
+                            src: [require("../assets/sounds/Welcome.mp3")],
+                            autoplay: true,
+                            loop: true
+                        })
+                    });
+
                     if (data.details) {
                         if (data.avatar) {
                             history.push("/home");

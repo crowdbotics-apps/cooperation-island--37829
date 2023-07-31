@@ -326,44 +326,48 @@ const Module_3 = () => {
     }
 
     const handleClick = () => {
-        anime
-            .timeline()
-            .add({
-                targets: "#instructor",
-                left: "-30vw",
-                easing: "easeInQuint",
-                duration: 2000
-            })
-            .add({
-                targets: "#board",
-                rotateY: ["0deg", "90deg"],
-                easing: "linear",
-                duration: 2000
-            }, "-=2000")
-            .add({
-                targets: "#guide",
-                left: "1vw",
-                easing: "easeOutQuint",
-                duration: 2000
-            })
-            .add({
-                targets: "#block",
-                top: "23vh",
-                easing: "easeOutQuint",
-                duration: 2000
-            }, "-=2000")
-            .add({
-                targets: "#sections",
-                top: "22vh",
-                easing: "easeOutQuint",
-                duration: 2000
-            }, "-=2000")
-            .add({
-                targets: "#close, #music, #shell",
-                top: "4vh",
-                easing: "easeOutQuint",
-                duration: 2000
-            }, "-=2000");
+        if (window.confirm("Alright, let's get started then! You are about to start the real activity. Please be sure you fully understand the instructions because you will not be able to return to them later. Remember these decisions help us with real science, so please take them seriously!")) {
+            setTimeout(() => {
+                anime
+                    .timeline()
+                    .add({
+                        targets: "#instructor",
+                        left: "-30vw",
+                        easing: "easeInQuint",
+                        duration: 2000
+                    })
+                    .add({
+                        targets: "#board",
+                        rotateY: ["0deg", "90deg"],
+                        easing: "linear",
+                        duration: 2000
+                    }, "-=2000")
+                    .add({
+                        targets: "#guide",
+                        left: "1vw",
+                        easing: "easeOutQuint",
+                        duration: 2000
+                    })
+                    .add({
+                        targets: "#block",
+                        top: "23vh",
+                        easing: "easeOutQuint",
+                        duration: 2000
+                    }, "-=2000")
+                    .add({
+                        targets: "#sections",
+                        top: "22vh",
+                        easing: "easeOutQuint",
+                        duration: 2000
+                    }, "-=2000")
+                    .add({
+                        targets: "#close, #music, #shell",
+                        top: "4vh",
+                        easing: "easeOutQuint",
+                        duration: 2000
+                    }, "-=2000");
+            }, 1);
+        }
     }
 
     const handleClose = () => {
@@ -493,7 +497,7 @@ const Module_3 = () => {
                 <CILabel>
                     Are you ready?
                 </CILabel>
-                <CIButton onClick={handleClick}>Let's GO</CIButton>
+                <CIButton onClick={handleClick}>Let's Go</CIButton>
             </div>
         </div>
         <div className={cls.block} id="block">
