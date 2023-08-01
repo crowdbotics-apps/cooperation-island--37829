@@ -276,13 +276,16 @@ const useStyles = makeStyles((theme) => ({
         "& button": {
             backgroundSize: "10vw 7vh",
             width: "10vw",
-            marginTop: "4vh"
+            marginTop: "6vh"
         },
         "& label": {
             color: "black",
             marginTop: "12vh"
         },
         "& img": {
+            "& + label": {
+                marginBottom: "-2vh"
+            },
             width: "5vw",
             marginTop: "10vh",
             marginBottom: "-8vh"
@@ -582,7 +585,7 @@ const Module_1 = () => {
             },
         });
 
-        if (trial === 5) {
+        if (trial === 1) {
             setTimeout(() => {
                 setFeedback(true);
 
