@@ -177,7 +177,7 @@ const Avatar = forwardRef((_, ref) => {
 
     useImperativeHandle(ref, () => ({
         setUser: () => {
-            setActive(user.avatar);
+            // setActive(user.avatar);
         }
     }));
 

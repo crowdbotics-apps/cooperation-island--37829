@@ -92,7 +92,7 @@ const useStyles = makeStyles({
     },
     signInSection: {
         "& button": {
-            marginTop: "3vh",
+            marginTop: "4vh",
             width: "auto"
         },
         "& input": {
