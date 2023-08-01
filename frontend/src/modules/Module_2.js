@@ -316,7 +316,7 @@ const Module_2 = () => {
                         }
                     }, "-=2000");
             }, 1);
-        }
+        // }
     }
 
     const handleClose = () => {

@@ -398,7 +398,7 @@ const Module_1 = () => {
                         duration: 2000
                     }, "-=2000");
             }, 1);
-        }
+        // }
     }
 
     const handleClose = () => {
