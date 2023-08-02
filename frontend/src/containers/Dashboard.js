@@ -17,6 +17,7 @@ import clsx from "clsx";
 
 const useStyles = makeStyles({
     board: {
+        filter: "drop-shadow(0.33vh 0.66vh 0.8vh black)",
         height: "11.9vh",
         width: "20vw"
     },
@@ -258,7 +259,7 @@ const Dashboard = () => {
                                         setFeedback(mapFeedback(data));
                                     });
 
-                                history.push("/tell-us-about-you", {
+                                history.push("/voice-your-values", {
                                     module: 3
                                 });
 

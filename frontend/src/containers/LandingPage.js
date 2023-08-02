@@ -18,7 +18,7 @@ import { toast } from "react-toastify";
 import { Howl } from "howler";
 import anime from "animejs";
 
-const useStyles = makeStyles({
+const useStyles = makeStyles((theme) => ({
     animal: {
         position: "absolute",
         filter: "drop-shadow(0.33vh 0.66vh 1.2vh black)",
@@ -57,6 +57,7 @@ const useStyles = makeStyles({
     },
     board: {
         position: "absolute",
+        filter: "drop-shadow(0.33vh 0.66vh 1.2vh black)",
         top: "110vh",
         left: "42vw",
         height: "60vh",
@@ -67,6 +68,7 @@ const useStyles = makeStyles({
     },
     board2: {
         position: "absolute",
+        filter: "drop-shadow(0.33vh 0.66vh 1.2vh black)",
         top: "110vh",
         left: "34vw",
         height: "80vh",
@@ -83,8 +85,11 @@ const useStyles = makeStyles({
         },
         "& label": {
             "&:first-child:has(+ label)": {
-                fontSize: "3.3vh",
+                color: theme.palette.primary.main,
+
+                fontSize: "4.5vh",
                 fontWeight: "bold",
+                letterSpacing: "0.1vw",
                 marginBottom: "12vh"
             },
             "&#first": {
@@ -98,10 +103,12 @@ const useStyles = makeStyles({
                 },
                 fontSize: "2vh",
                 letterSpacing: "0.05vw !important",
-                marginTop: "14vh"
+                marginTop: "14vh",
+                padding: "0vh 5vw"
             },
+            color: "black",
             display: "inline",
-            fontSize: "2.5vh",
+            fontSize: "2.6vh",
             letterSpacing: "0.1vw !important",
             marginTop: "1vh"
         },
@@ -148,7 +155,7 @@ const useStyles = makeStyles({
         left: "100vw",
         width: "4vw"
     }
-});
+}));
 
 const LandingPage = () => {
     const cls = useStyles();
@@ -355,11 +362,11 @@ const LandingPage = () => {
                     <CIInput autoFocus onChange={handleChange} onEnter={handleSubmit} value={text} />
                     <CIButton onClick={handleSubmit}>Submit</CIButton>
                 </Fragment> : <Fragment>
-                    <CILabel>Time to get Consent!</CILabel>
-                    <CILabel>Now, we need your parent to agree.</CILabel>
+                    <CILabel>Time To Get Consent!</CILabel>
+                    <CILabel>Now, we need your parent to give permission for you to play.</CILabel>
                     <CILabel>To send your parent an email, please <CILink onClick={handleLink(false)}>click here</CILink>.</CILabel>
                     <CILabel>Then ask your parent to respond to the email so you can get started as soon as possible.</CILabel>
-                    <CILabel id="last">If you have an access code, please <CILink onClick={handleInput}>click here</CILink>.</CILabel>
+                    <CILabel id="last">Your parent may need to check their junk folder for our email. If you have an access code, please <CILink onClick={handleInput}>click here</CILink>.</CILabel>
                 </Fragment>}
             </div>
         </div>

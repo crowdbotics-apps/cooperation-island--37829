@@ -161,6 +161,12 @@ const useStyles = makeStyles((theme) => ({
         left: "81vw",
         width: "4vw"
     },
+    button: {
+        position: "absolute",
+        filter: "drop-shadow(0.33vh 0.66vh 1.2vh black)",
+        top: "110vh",
+        left: "54.5vw"
+    },
     body: {
         "& button": {
             backgroundSize: "10vw 7vh",
@@ -246,61 +252,28 @@ const Module_3 = () => {
         if (!rankedQualities
             .filter(x => ![...state.section1, ...state.section2, ...state.section3].includes(x.id))
             .length) {
-            setTimeout(() => {
-                qualities([
-                    ...state.section1
-                        .map((x, i) => ({
-                            id: x,
-                            category: 1,
-                            rank: i + 1
-                        })),
-                    ...state.section2
-                        .map((x, i) => ({
-                            id: x,
-                            category: 2,
-                            rank: i + 1
-                        })),
-                    ...state.section3
-                        .map((x, i) => ({
-                            id: x,
-                            category: 3,
-                            rank: i + 1
-                        }))
-                ]);
-                setFeedback(true);
-
-                new Howl({
-                    src: require("../assets/sounds/Activity.mp3"),
-                    autoplay: true,
-                    onplay: () => {
-                        if (howler.module_3.volume())
-                            howler.module_3.fade(howler.module_3.volume(), 0.1, 1000);
-                    },
-                    onend: () => {
-                        if (howler.module_3.volume())
-                            howler.module_3.fade(0.1, 1, 1000);
-                    }
-                });
-
-                anime({
-                    targets: "#guide",
-                    left: "-30vw",
+            anime({
+                targets: "#block",
+                top: "110vh",
+                easing: "easeInQuint",
+                duration: 2000
+            });
+            anime
+                .timeline({
+                    delay: 500
+                })
+                .add({
+                    targets: "#sections",
+                    left: "32vw",
                     easing: "easeInQuint",
                     duration: 2000
-                });
-                anime({
-                    targets: "#block, #sections",
-                    top: "110vh",
-                    easing: "easeInQuint",
+                })
+                .add({
+                    targets: `.${cls.button}`,
+                    top: "91vh",
+                    easing: "easeOutQuint",
                     duration: 2000
-                });
-                anime({
-                    targets: "#close, #music, #shell",
-                    top: "-12vh",
-                    easing: "easeInQuint",
-                    duration: 2000
-                });
-            }, 500);
+                }, "-=1000");
         }
     }, [state]);
 
@@ -326,7 +299,7 @@ const Module_3 = () => {
     }
 
     const handleClick = () => {
-        // if (window.confirm("Alright, let's get started then! You are about to start the real activity. Please be sure you fully understand the instructions because you will not be able to return to them later. Remember these decisions help us with real science, so please take them seriously!")) {
+        if (window.confirm("Alright, let's get started then! You are about to start the real activity. Please be sure you fully understand the instructions because you will not be able to return to them later. Remember these decisions help us with real science, so please take them seriously!")) {
             setTimeout(() => {
                 anime
                     .timeline()
@@ -350,13 +323,13 @@ const Module_3 = () => {
                     })
                     .add({
                         targets: "#block",
-                        top: "23vh",
+                        top: "20vh",
                         easing: "easeOutQuint",
                         duration: 2000
                     }, "-=2000")
                     .add({
                         targets: "#sections",
-                        top: "22vh",
+                        top: "19vh",
                         easing: "easeOutQuint",
                         duration: 2000
                     }, "-=2000")
@@ -367,7 +340,7 @@ const Module_3 = () => {
                         duration: 2000
                     }, "-=2000");
             }, 1);
-        // }
+        }
     }
 
     const handleClose = () => {
@@ -476,6 +449,68 @@ const Module_3 = () => {
             });
     }
 
+    const handleSave = () => {
+        qualities([
+            ...state.section1
+                .map((x, i) => ({
+                    id: x,
+                    category: 1,
+                    rank: i + 1
+                })),
+            ...state.section2
+                .map((x, i) => ({
+                    id: x,
+                    category: 2,
+                    rank: i + 1
+                })),
+            ...state.section3
+                .map((x, i) => ({
+                    id: x,
+                    category: 3,
+                    rank: i + 1
+                }))
+        ]);
+        setFeedback(true);
+
+        new Howl({
+            src: require("../assets/sounds/Activity.mp3"),
+            autoplay: true,
+            onplay: () => {
+                if (howler.module_3.volume())
+                    howler.module_3.fade(howler.module_3.volume(), 0.1, 1000);
+            },
+            onend: () => {
+                if (howler.module_3.volume())
+                    howler.module_3.fade(0.1, 1, 1000);
+            }
+        });
+
+        anime({
+            targets: "#guide",
+            left: "-30vw",
+            easing: "easeInQuint",
+            duration: 2000
+        });
+        anime({
+            targets: "#sections",
+            top: "110vh",
+            easing: "easeInQuint",
+            duration: 2000
+        });
+        anime({
+            targets: `.${cls.button}`,
+            top: "192vh",
+            easing: "easeInQuint",
+            duration: 2000
+        });
+        anime({
+            targets: "#close, #music, #shell",
+            top: "-12vh",
+            easing: "easeInQuint",
+            duration: 2000
+        });
+    }
+
     return <div>
         <img className={cls.logo} id="logo2" src={require("../assets/modules/Module_3_Text.png")} />
         <img className={cls.instructor} id="instructor" src={require("../assets/avatars/xtras/Avatar_13.png")} />
@@ -556,6 +591,7 @@ const Module_3 = () => {
                 {...{ draggingId, setDragging }}
             />
         </div>
+        <CIButton className={cls.button} onClick={handleSave}>Save</CIButton>
         {feedback && <Feedback module="tell-us-about-you" onClose={handleExit} />}
     </div>
 }

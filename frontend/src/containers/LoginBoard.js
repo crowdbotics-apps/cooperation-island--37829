@@ -26,6 +26,7 @@ const useStyles = makeStyles({
         height: "94vh",
         width: "30vw",
         background: `url(${BoardImg})`,
+        filter: "drop-shadow(0.33vh 0.66vh 1.2vh black)",
         backgroundRepeat: "no-repeat",
         backgroundSize: "30vw 94vh"
     },

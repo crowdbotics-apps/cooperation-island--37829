@@ -21,6 +21,7 @@ import clsx from "clsx";
 const useStyles = makeStyles((theme) => ({
     board: {
         position: "absolute",
+        filter: "drop-shadow(0.33vh 0.66vh 1.2vh black)",
         top: "3vh",
         left: "110vw",
         height: "94vh",
@@ -239,8 +240,8 @@ const UserDetails = () => {
         <img className={cls.guide} id="guide" src={require("../assets/avatars/Avatar_7.png")} />
         <div className={cls.board} id="board">
             <div className={cls.body}>
-                <CILabel>Tell us more about YOU</CILabel>
-                <CILabel>If you don't know the answers to these questions, please ask a parent if possible.</CILabel>
+                <CILabel>Tell Us More About YOU</CILabel>
+                <CILabel>If you don't know the answers to these questions, please ask a parent.</CILabel>
                 <CIInput className={cls.input} placeholder="Nationality" onChange={handleDetails("nationality")} onEnter={handleNext} value={details.nationality} />
                 <CIInput className={cls.input} placeholder="Gender" onChange={handleDetails("gender")} onEnter={handleNext} value={details.gender} />
                 <CIInput className={cls.input} placeholder="Zip Code" onChange={handleDetails("zipcode")} onEnter={handleNext} value={details.zipcode} />

@@ -125,7 +125,7 @@ const App = () => {
           <Route path="/home" component={Dashboard} />
           <Route path="/fish-mind-reading" render={handleModule} />
           <Route path="/tree-shaking" render={handleModule} />
-          <Route path="/tell-us-about-you" render={handleModule} />
+          <Route path="/voice-your-values" render={handleModule} />
           <Redirect to="/" />
         </Switch>
       else

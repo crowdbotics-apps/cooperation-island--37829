@@ -22,6 +22,7 @@ const useStyles = makeStyles({
     },
     board: {
         position: "absolute",
+        filter: "drop-shadow(0.33vh 0.66vh 1.2vh black)",
         top: "15vh",
         left: "110vw",
         height: "68vh",
