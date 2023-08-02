@@ -206,6 +206,8 @@ const Module_3 = () => {
 
     const [feedback, setFeedback] = useState(false);
 
+    const [disabled, setDisabled] = useState(false);
+
     const [draggingId, setDragging] = useState(0);
 
     const { BGM, howler, user } = useContext(AppContext);
@@ -252,6 +254,8 @@ const Module_3 = () => {
         if (!rankedQualities
             .filter(x => ![...state.section1, ...state.section2, ...state.section3].includes(x.id))
             .length) {
+            setDisabled(true);
+
             anime({
                 targets: "#block",
                 top: "110vh",
@@ -260,6 +264,9 @@ const Module_3 = () => {
             });
             anime
                 .timeline({
+                    complete: () => {
+                        setDisabled(false);
+                    },
                     delay: 500
                 })
                 .add({
@@ -562,7 +569,7 @@ const Module_3 = () => {
                 style={{
                     marginLeft: "2.25vw"
                 }}
-                {...{ draggingId, setDragging }}
+                {...{ disabled, draggingId, setDragging }}
             />
             <Sections
                 addItems={addItems("section2")}
@@ -575,7 +582,7 @@ const Module_3 = () => {
                 style={{
                     marginLeft: "18.9vw"
                 }}
-                {...{ draggingId, setDragging }}
+                {...{ disabled, draggingId, setDragging }}
             />
             <Sections
                 addItems={addItems("section3")}
@@ -588,7 +595,7 @@ const Module_3 = () => {
                 style={{
                     marginLeft: "35.5vw"
                 }}
-                {...{ draggingId, setDragging }}
+                {...{ disabled, draggingId, setDragging }}
             />
         </div>
         <CIButton className={cls.button} onClick={handleSave}>Save</CIButton>

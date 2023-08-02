@@ -35,10 +35,16 @@ const useStyles = makeStyles((theme) => ({
         overflow: "hidden",
         textOverflow: "ellipsis",
         whiteSpace: "nowrap"
+    },
+    label: {
+        userSelect: "none",
+        "-ms-user-select": "none",
+        "-moz-user-select": "none",
+        "-webkit-user-select": "none"
     }
 }));
 
-const Qualities = ({ className, data, desc, draggingId, first, id, index, last, moveItems, setDragging, sm, text }) => {
+const Qualities = ({ className, data, desc, disabled, draggingId, first, id, index, last, moveItems, setDragging, sm, text }) => {
     const cls = useStyles();
 
     const qualityId = "quality" + id;
@@ -108,12 +114,16 @@ const Qualities = ({ className, data, desc, draggingId, first, id, index, last, 
         }
     }, [isDragging]);
 
+    const handleSelection = () => {
+        window.getSelection().removeAllRanges();
+    }
+
     return <div
         className={clsx(className, "pointer")}
         data-tooltip-id="tooltip"
         data-tooltip-content={desc}
         id={qualityId}
-        // ref={qualityRef}
+        // ref={disabled ? () => { } : qualityRef}
         ref={sm ? () => { } : qualityRef}
         style={{
             marginTop: sm ? "0vh" : first ? "1vh" : "3vh",
@@ -123,11 +133,11 @@ const Qualities = ({ className, data, desc, draggingId, first, id, index, last, 
             opacity: draggingId === id ? 0 : 1
         }}>
         {sm && <div className={cls.index}>
-            <CILabel className="pointer">
+            <CILabel className={clsx(cls.label, "pointer")} onMouseDown={handleSelection}>
                 {index + 1}
             </CILabel>
         </div>}
-        <CILabel className={clsx(cls.quality, sm ? cls.notCenter : cls.center, "pointer")}>
+        <CILabel className={clsx(cls.label, cls.quality, sm ? cls.notCenter : cls.center, "pointer")} onMouseDown={handleSelection}>
             {text}
         </CILabel>
     </div>
