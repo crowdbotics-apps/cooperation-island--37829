@@ -22,7 +22,7 @@ def export_fishgame_trials_csv(request, queryset=None, modeladmin=None):
 
     writer = csv.writer(response)
 
-    participants = queryset.values_list('participant__id', flat=True).distinct().order_by('participant__id')
+    participants = queryset.values_list('participant__id', 'original_participant_id').distinct().order_by('participant__id')
     trials = FishGameTrial.objects.values_list('trial_number', flat=True).distinct().order_by('trial_number')
 
     header = ['participantID']
@@ -34,17 +34,22 @@ def export_fishgame_trials_csv(request, queryset=None, modeladmin=None):
 
     participant_responses = {}
 
-    for participant_id in participants:
-        participant_responses[participant_id] = {
-            'participantID': participant_id,
-        }
+    for participant_id, original_participant_id in participants:
+        if participant_id:
+            participant_responses[participant_id] = {
+                'participantID': participant_id,
+            }
+        elif original_participant_id:
+            participant_responses[original_participant_id] = {
+                'participantID': original_participant_id,
+            }
 
     for trial in queryset:
-        participant_id = trial.participant.id
+        participant_id = trial.participant.id if trial.participant else trial.original_participant_id
         trial_number = trial.trial_number
 
         if trial_number == 1:
-            participant_data = participant_responses[participant_id]
+            participant_data = participant_responses.get(participant_id)
             if participant_data:
                 data_row = [participant_data['participantID']]
                 for trial_num in trials:
@@ -85,6 +90,7 @@ def export_fishgame_trials_csv(request, queryset=None, modeladmin=None):
         writer.writerow(data_row)
 
     return response
+
 export_fishgame_trials_csv.short_description = 'Export selected trials as CSV'
 
 
@@ -98,7 +104,7 @@ def export_treeshaking_trials_csv(request, queryset=None, modeladmin=None):
 
     writer = csv.writer(response)
 
-    participants = queryset.values_list('participant__id', flat=True).distinct().order_by('participant__id')
+    participants = queryset.values_list('participant__id', 'original_participant_id').distinct().order_by('participant__id')
     trials = TreeShakingGameTrial.objects.values_list('trial_number', flat=True).distinct().order_by('trial_number')
 
     header = ['participantID']
@@ -111,17 +117,22 @@ def export_treeshaking_trials_csv(request, queryset=None, modeladmin=None):
 
     participant_responses = {}
 
-    for participant_id in participants:
-        participant_responses[participant_id] = {
-            'participantID': participant_id,
-        }
+    for participant_id, original_participant_id in participants:
+        if participant_id:
+            participant_responses[participant_id] = {
+                'participantID': participant_id,
+            }
+        elif original_participant_id:
+            participant_responses[original_participant_id] = {
+                'participantID': original_participant_id,
+            }
 
     for trial in queryset:
-        participant_id = trial.participant.id
+        participant_id = trial.participant.id if trial.participant else trial.original_participant_id
         trial_number = trial.trial_number
 
         if trial_number == 1:
-            participant_data = participant_responses[participant_id]
+            participant_data = participant_responses.get(participant_id)
             if participant_data:
                 data_row = [participant_data['participantID']]
                 for trial_num in trials:
@@ -202,14 +213,16 @@ def export_rankedqualities_csv(request, queryset=None, modeladmin=None):
     participant_rankings = {}
 
     for ranked_quality in queryset:
-        participant_id = ranked_quality.participant_id
+        participant_id = ranked_quality.participant_id if ranked_quality.participant else ranked_quality.original_participant_id
         quality = quality_choices[ranked_quality.quality]
         category = category_choices[ranked_quality.category]
         rank = ranked_quality.rank
 
         if participant_id not in participant_rankings:
+            if ranked_quality.participant:
+                participant_id = ranked_quality.participant.id
             participant_rankings[participant_id] = {
-                'participant': ranked_quality.participant.username,
+                'participant': participant_id,
             }
 
         if category not in participant_rankings[participant_id]:
@@ -230,15 +243,6 @@ def export_rankedqualities_csv(request, queryset=None, modeladmin=None):
 export_rankedqualities_csv.short_description = 'Export selected trials as CSV'
 
 
-def get_tell_us_about_you_questions():
-    try:
-        tell_us_about_you_feedback = ActivityFeedback.objects.get(activity_type='tell-us-about-you')
-        questions = tell_us_about_you_feedback.questions.filter(question_type='rating').order_by('questionorder__order')
-        return [question.question_text for question in questions]
-    except ActivityFeedback.DoesNotExist:
-        return []
-
-
 def export_scores_csv(request, queryset=None, modeladmin=None):
     if queryset is None:
         queryset = IndividualRankingQualitiesScore.objects.all()
@@ -248,7 +252,14 @@ def export_scores_csv(request, queryset=None, modeladmin=None):
 
     writer = csv.writer(response)
 
-    tell_us_about_you_questions = get_tell_us_about_you_questions()
+    unique_questions = set()
+    for score in queryset:
+        if score.question:
+            unique_questions.add(score.question.question_text)
+        if score.original_question_text:
+            unique_questions.add(score.original_question_text)
+
+    tell_us_about_you_questions = list(unique_questions)
 
     header = ['participant']
     header.extend(tell_us_about_you_questions)
@@ -257,38 +268,41 @@ def export_scores_csv(request, queryset=None, modeladmin=None):
     participant_data = {}
 
     for score in queryset:
-        participant_id = score.participant_id
-        question_text = score.question.question_text
+        participant_id = score.participant_id if score.participant else score.original_participant_id
+        question_text = score.question.question_text if score.question else score.original_question_text
         score_value = score.score
 
         if participant_id not in participant_data:
             participant_data[participant_id] = {}
-            for question in tell_us_about_you_questions:
-                participant_data[participant_id][question] = ''
 
-        if participant_data[participant_id][question_text] == '':
-            participant_data[participant_id][question_text] = score_value
-        else:
-            writer.writerow([participant_id] + [participant_data[participant_id][q] for q in tell_us_about_you_questions])
-            participant_data[participant_id] = {question: '' for question in tell_us_about_you_questions}
-            participant_data[participant_id][question_text] = score_value
+        if not question_text or question_text not in tell_us_about_you_questions:
+            question_text = score.original_question_text  # Get question_text from original_question_text
 
+        if question_text:
+            participant_data[participant_id][question_text] = score_value
 
     for participant_id, data in participant_data.items():
-        writer.writerow([participant_id] + [data[q] for q in tell_us_about_you_questions])
+        row = [participant_id]
+        for question in tell_us_about_you_questions:
+            row.append(data.get(question, ''))
+        writer.writerow(row)
 
     return response
+
 
 export_scores_csv.short_description = 'Export selected trials as CSV'
 
 
 def calculate_age(birth_month, birth_year):
     current_date = datetime.date.today()
+    
+    if birth_year is None:
+        return None
+    
     age = current_date.year - birth_year
     if current_date.month < birth_month:
         age -= 1
     return age
-
 
 def export_profile_csv(request, queryset=None, modeladmin=None):
     if queryset is None:
@@ -310,8 +324,6 @@ def export_profile_csv(request, queryset=None, modeladmin=None):
         nationality = profile.nationality
         gender = profile.gender
         zipcode = profile.zipcode
-        writer.writerow([participant, age, nationality, gender, zipcode])
+        writer.writerow([participant, age if age is not None else '', nationality, gender, zipcode])
 
     return response
-
-

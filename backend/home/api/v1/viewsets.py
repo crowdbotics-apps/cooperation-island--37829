@@ -208,6 +208,12 @@ class ProfileAPIView(APIView):
         return Response({'profile': encrypted_payload}, status=status.HTTP_200_OK)
 
     def post(self, request, *args, **kwargs):
+        try:
+            profile = Profile.objects.get(participant=request.user)
+            return Response({'error': 'Profile already exists.'}, status=status.HTTP_400_BAD_REQUEST)
+        except Profile.DoesNotExist:
+            pass
+
         serializer = UserProfileSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 

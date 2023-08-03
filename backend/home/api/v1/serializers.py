@@ -93,18 +93,23 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Profile
-        fields = ['birth_month', 'birth_year', 'nationality', 'gender', 'zipcode' ]
+        fields = ['birth_month', 'birth_year', 'nationality', 'gender', 'zipcode']
 
-    
+    def to_internal_value(self, data):
+        data['birth_month'] = data.get('birth_month') or None
+        data['birth_year'] = data.get('birth_year') or None
+        return super().to_internal_value(data)
+
     def validate_birth_month(self, value):
-        if not 1 <= value <= 12:
-            raise serializers.ValidationError('Birth month should be between 1 and 12.')
+        if value is not None and not 1 <= int(value) <= 12:
+            raise serializers.ValidationError('Birth month should be between 1 and 12 or leave it empty.')
         return value
 
     def validate_birth_year(self, value):
-        current_year = date.today().year
-        if current_year - value >= 18:
-            raise serializers.ValidationError('Users must be below 18 years old')
+        if value is not None:
+            current_year = date.today().year
+            if current_year - int(value) >= 18:
+                raise serializers.ValidationError('Users must be below 18 years old or leave it empty.')
         return value
 
 
@@ -149,6 +154,11 @@ class FishGameTrialSerializer(serializers.ModelSerializer):
     class Meta:
         model = FishGameTrial
         fields = ['id','participant', 'trial_number', 'match', 'trial_response_time']
+
+    def to_internal_value(self, data):
+        if 'trial_response_time' in data:
+            data['trial_response_time'] = str(float(data['trial_response_time']) / 1000)
+        return super().to_internal_value(data)
 
 
 class AnswerOptionSerializer(serializers.ModelSerializer):
@@ -212,8 +222,8 @@ class QuestionAnswerSerializer(serializers.Serializer):
             raise serializers.ValidationError('Question not found.')
 
         if question.question_type == 'text_input':
-            if len(answer) != 1:
-                raise serializers.ValidationError('Invalid answer. Only one answer is allowed for text type question.')
+            if len(answer) > 1:
+                raise serializers.ValidationError(f'Invalid answer. Blank or One Answer is allowed for text type question.')
         elif question.question_type == 'dropdown':
             if len(answer) != 1:
                 raise serializers.ValidationError('Invalid answer. Please select one option for dropdown type question.')
@@ -227,8 +237,8 @@ class QuestionAnswerSerializer(serializers.Serializer):
         elif question.question_type == 'rating':
             if len(answer) != 1:
                 raise serializers.ValidationError('Invalid answer. Only one answer is allowed for rating type question.')
-            if int(answer[0]) not in range(1, 11):
-                raise serializers.ValidationError(f'Invalid answer {answer[0]}. Only answers in the range 1-10 are acceptable.')
+            if int(answer[0]) not in range(1, 6):
+                raise serializers.ValidationError(f'Invalid answer {answer[0]}. Only answers in the range 1-5 are acceptable.')
         else:
             raise serializers.ValidationError('Invalid question type.')
 
@@ -245,6 +255,11 @@ class TreeShakingGameTrialSerializer(serializers.ModelSerializer):
     class Meta:
         model = TreeShakingGameTrial
         fields = ['trial_number', 'shell', 'shared_shell', 'response', 'trial_response_time']
+
+    def to_internal_value(self, data):
+        if 'trial_response_time' in data:
+            data['trial_response_time'] = str(float(data['trial_response_time']) / 1000)
+        return super().to_internal_value(data)
 
 
 
