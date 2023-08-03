@@ -585,7 +585,7 @@ const Module_1 = () => {
             },
         });
 
-        if (trial === 1) {
+        if (trial === 5) {
             setTimeout(() => {
                 setFeedback(true);
 
