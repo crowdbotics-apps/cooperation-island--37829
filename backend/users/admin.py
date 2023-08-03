@@ -62,7 +62,7 @@ admin.site.register(TermAndCondition)
 
 
 class FishGameTrialAdmin(admin.ModelAdmin):
-    list_display = ['participant', 'trial_number', 'match', 'trial_response_time', 'created_at']
+    list_display = ['participant','original_participant_id', 'trial_number', 'match', 'trial_response_time', 'created_at']
     list_filter = [
         ('created_at'),
     ]
@@ -155,11 +155,16 @@ class QuestionOrderAdmin(admin.ModelAdmin):
     list_display = ['activity_feedback', 'question', 'order']
 
 
-admin.site.register(ParticipantResponse)
 
+class ParticipantResponseAdmin(admin.ModelAdmin):
+    list_display = ['participant', 'original_participant_id', 'activity_feedback', 'question', 'original_question_text', 'text_answer']
+    list_filter = [
+        ('created_at'),
+    ]
+admin.site.register(ParticipantResponse, ParticipantResponseAdmin)
 
 class RankedQualitiesAdmin(admin.ModelAdmin):
-    list_display = ['participant', 'quality', 'category', 'rank']
+    list_display = ['participant', 'original_participant_id', 'quality', 'category', 'rank']
     actions = ['export_selected_rankedqualities_csv']
     list_filter = [
         ('created_at'),
@@ -183,7 +188,7 @@ admin.site.register(RankedQualities, RankedQualitiesAdmin)
 
 
 class IndividualRankingQualitiesScoreAdmin(admin.ModelAdmin):
-    list_display = ['participant', 'question', 'score', 'created_at']
+    list_display = ['participant', 'original_participant_id','question', 'original_question_text', 'score', 'created_at']
     actions = ['export_selected_scores_csv']
     list_filter = [
         ('created_at'),
@@ -207,7 +212,7 @@ admin.site.register(IndividualRankingQualitiesScore, IndividualRankingQualitiesS
 
 
 class TreeShakingGameTrialAdmin(admin.ModelAdmin):
-    list_display = ['participant', 'trial_number', 'shell', 'shared_shell', 'response', 'trial_response_time', 'created_at']
+    list_display = ['participant', 'original_participant_id', 'trial_number', 'shell', 'shared_shell', 'response', 'trial_response_time', 'created_at']
     actions = ['export_selected_trials_csv']
     list_filter = [
         ('created_at'),
