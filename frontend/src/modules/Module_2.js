@@ -1,6 +1,7 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { makeStyles } from "@material-ui/core";
 import { useHistory } from "react-router-dom";
+import { shellsComposite, shuffleArray } from "../libs/utils";
 import { score } from "../services/v1";
 import { showHomePage } from "../libs/animations";
 import BoardImg from "../assets/images/Board-alt.png";
@@ -47,23 +48,23 @@ const useStyles = makeStyles({
         filter: "drop-shadow(0.33vh 0.66vh 1.2vh black)",
         transform: "scale(0)",
         top: "40vh",
-        left: "14vw",
+        left: "15vw",
         height: "120.52vh",
         width: "68vw"
     },
     palmWrapper: {
         position: "absolute",
         overflow: "hidden",
-        transform: "scale(0)",
-        top: "40vh",
-        left: "17vw",
+        top: "-9vh",
+        left: "15vw",
         height: "120.52vh",
         width: "68vw"
     },
     palm: {
         filter: "drop-shadow(0.33vh 0.66vh 1.2vh black)",
+        transform: "translateX(0vw)",
         height: "120.52vh",
-        width: "1428vw"
+        width: "2720vw"
     },
     instructor: {
         position: "absolute",
@@ -121,7 +122,7 @@ const useStyles = makeStyles({
         filter: "drop-shadow(0.33vh 0.66vh 1.2vh black)",
         transform: "rotateY(-90deg)",
         top: "78vh",
-        left: "21vw",
+        left: "20vw",
         width: "8vw",
     },
     shell2Alt: {
@@ -133,7 +134,7 @@ const useStyles = makeStyles({
         textAlign: "center",
         transform: "rotateY(-90deg)",
         top: "82vh",
-        left: "21vw",
+        left: "20vw",
         width: "8vw"
     },
     labelAlt: {
@@ -142,25 +143,26 @@ const useStyles = makeStyles({
     speech: {
         "& > div": {
             "& button": {
+                marginTop: "4vh",
                 marginLeft: "7vw"
             },
             "& button:last-child": {
                 marginLeft: "3.75vw"
             },
-            marginTop: "11.75vw"
+            marginTop: "6vh"
         },
         "& label": {
-            "& label": {
-                fontSize: "3.2vh",
-                marginTop: "4vh",
-                marginLeft: "5vw",
-                width: "20vw"
-            },
             fontSize: "5.2vh",
             textAlign: "center",
-            marginTop: "13vh",
+            marginTop: "11vh",
             marginLeft: "2vw",
             width: "30vw"
+        },
+        "& label:nth-child(2)": {
+            fontSize: "3.2vh",
+            marginTop: "14vh",
+            marginLeft: "7vw",
+            width: "20vw"
         },
         position: "absolute",
         filter: "drop-shadow(0.33vh 0.66vh 1.2vh black)",
@@ -198,6 +200,8 @@ const Module_2 = () => {
 
     const history = useHistory();
 
+    const closeRef = useRef();
+
     const timer = useTimer();
 
     const [showBGAnimations, setBGAnimation] = useState(false);
@@ -205,6 +209,8 @@ const Module_2 = () => {
     const [isAnimating, setAnimation] = useState(false);
 
     const [feedback, setFeedback] = useState(false);
+
+    const [shellsArray] = useState(shuffleArray(Array(24).fill().map((_, i) => i)));
 
     const [trial, setTrial] = useState(0);
 
@@ -255,73 +261,68 @@ const Module_2 = () => {
     }, []);
 
     const handleClick = () => {
-        anime
-            .timeline()
-            .add({
-                targets: "#instructor",
-                left: "-30vw",
-                easing: "easeInQuint",
-                duration: 2000
-            })
-            .add({
-                targets: "#board",
-                rotateY: ["0deg", "90deg"],
-                easing: "linear",
-                duration: 2000
-            }, "-=2000")
-            .add({
-                targets: "#guide",
-                left: "3vw",
-                easing: "easeOutQuint",
-                duration: 2000
-            })
-            .add({
-                targets: "#background",
-                width: "180vw",
-                height: "180vh",
-                marginTop: "-66vh",
-                marginLeft: "-76vw",
-                easing: "easeOutQuint",
-                duration: 2000
-            }, "-=2000")
-            .add({
-                targets: "#palmAlt",
-                scale: [0, 1],
-                top: "-18vh",
-                easing: "easeOutQuint",
-                duration: 2000
-            }, "-=2000")
-            .add({
-                targets: "#palmWrapper",
-                scale: [0, 1],
-                top: "-9vh",
-                easing: "easeOutQuint",
-                duration: 2000
-            }, "-=2000")
-            .add({
-                targets: "#guide2",
-                left: "74vw",
-                easing: "easeOutQuint",
-                duration: 2000
-            }, "-=2000")
-            .add({
-                targets: "#close, #music, #shell",
-                top: "4vh",
-                easing: "easeOutQuint",
-                duration: 2000,
-                complete: handleRestart
-            }, "-=2000")
+        if (window.confirm("Alright, let's get started then! You are about to start the real activity. Please be sure you fully understand the instructions because you will not be able to return to them later. Remember these decisions help us with real science, so please take them seriously!")) {
+            setTimeout(() => {
+                anime
+                    .timeline()
+                    .add({
+                        targets: "#instructor",
+                        left: "-30vw",
+                        easing: "easeInQuint",
+                        duration: 2000
+                    })
+                    .add({
+                        targets: "#board",
+                        rotateY: ["0deg", "90deg"],
+                        easing: "linear",
+                        duration: 2000
+                    }, "-=2000")
+                    .add({
+                        targets: "#guide",
+                        left: "1vw",
+                        easing: "easeOutQuint",
+                        duration: 2000
+                    })
+                    .add({
+                        targets: "#background",
+                        width: "180vw",
+                        height: "180vh",
+                        marginTop: "-66vh",
+                        marginLeft: "-76vw",
+                        easing: "easeOutQuint",
+                        duration: 2000
+                    }, "-=2000")
+                    .add({
+                        targets: "#palmAlt",
+                        scale: [0, 1],
+                        top: "-9vh",
+                        easing: "easeOutQuint",
+                        duration: 2000
+                    }, "-=2000")
+                    .add({
+                        targets: "#guide2",
+                        left: "76vw",
+                        easing: "easeOutQuint",
+                        duration: 2000
+                    }, "-=2000")
+                    .add({
+                        targets: "#close, #music, #shell",
+                        top: "4vh",
+                        easing: "easeOutQuint",
+                        duration: 2000,
+                        complete: () => {
+                            $("#palmAlt, #palmWrapper").toggle();
+                            setTimeout(handleRestart, 400);
+                        }
+                    }, "-=2000");
+            }, 1);
+        }
     }
 
     const handleClose = () => {
+        closeRef.current = true;
+
         if (isAnimating) {
-            anime({
-                targets: "#speech, #shell2, #shell2Alt, #label, #labelAlt",
-                opacity: 0,
-                duration: 1
-            });
-        }
-        else {
             anime({
                 targets: "#speech",
                 scale: [1, 0],
@@ -333,6 +334,13 @@ const Module_2 = () => {
                 rotateY: ["0deg", "-90deg"],
                 easing: "easeInQuint",
                 duration: 2000
+            });
+        }
+        else {
+            anime({
+                targets: "#speech, #shell2, #shell2Alt, #label, #labelAlt",
+                opacity: 0,
+                duration: 1
             });
         }
 
@@ -459,7 +467,7 @@ const Module_2 = () => {
     const handleResponse = (flag) => () => {
         score("tree-shaking", {
             trial_number: trial,
-            shells: shells.self + shells.partner,
+            shell: shells.self + shells.partner,
             shared_shell: shells.partner,
             response: flag,
             trial_response_time: timer.getElapsedRunningTime()
@@ -489,7 +497,7 @@ const Module_2 = () => {
                     targets: "#shell2",
                     scale: 1,
                     top: "78vh",
-                    left: "21vw",
+                    left: "20vw",
                     rotateY: ["0deg", "-90deg"],
                     duration: 1
                 });
@@ -515,7 +523,7 @@ const Module_2 = () => {
                     scale: 1,
                     opacity: 1,
                     top: "82vh",
-                    left: "21vw",
+                    left: "20vw",
                     rotateY: ["0deg", "-90deg"],
                     duration: 1
                 });
@@ -524,10 +532,44 @@ const Module_2 = () => {
 
         if (flag) {
             anime({
-                targets: "#shell2Alt, #labelAlt",
-                rotateY: ["0deg", "-90deg"],
+                targets: "#shell2Alt",
+                top: "60vh",
+                left: "83vw",
+                scale: [1, 0.5],
+                opacity: 0,
                 easing: "easeInQuint",
-                duration: 2000
+                duration: 2000,
+                complete: () => {
+                    anime({
+                        targets: "#shell2Alt",
+                        scale: 1,
+                        opacity: 1,
+                        top: "78vh",
+                        left: "73vw",
+                        rotateY: ["0deg", "-90deg"],
+                        duration: 1
+                    });
+                }
+            });
+            anime({
+                targets: "#labelAlt",
+                top: "65.5vh",
+                left: "83vw",
+                scale: [1, 0.5],
+                opacity: 0,
+                easing: "easeInQuint",
+                duration: 2000,
+                complete: () => {
+                    anime({
+                        targets: "#labelAlt",
+                        scale: 1,
+                        opacity: 1,
+                        top: "82vh",
+                        left: "73vw",
+                        rotateY: ["0deg", "-90deg"],
+                        duration: 1
+                    });
+                }
             });
         }
         else {
@@ -601,7 +643,7 @@ const Module_2 = () => {
                     duration: 2000
                 });
                 anime({
-                    targets: "#palmWrapper, #palmAlt",
+                    targets: "#palmWrapper",
                     scale: [1, 0],
                     top: "40vh",
                     easing: "easeInQuint",
@@ -621,39 +663,41 @@ const Module_2 = () => {
 
     const handleRestart = () => {
         setShells({
-            self: anime.random(1, 20),
-            partner: anime.random(1, 20)
+            self: shellsComposite[shellsArray[trial]].self,
+            partner: shellsComposite[shellsArray[trial]].partner
         });
         setTrial(trial + 1);
-        setAnimation(true);
+        setAnimation(false);
 
         anime({
             targets: "#palm",
-            translateX: ["68vw", "-1360vw"],
-            loop: 0,
-            direction: "alternate",
-            easing: "steps(21)",
-            duration: 700,
+            translateX: ["68vw", "-2652vw"],
+            easing: "steps(40)",
+            duration: 1600,
+            loop: 2,
             complete: () => {
-                setAnimation(false);
+                $("#palm").css("transform", "translateX(0vw)");
+                setAnimation(true);
 
-                anime({
-                    targets: "#speech",
-                    scale: [0, 1],
-                    easing: "easeOutQuint",
-                    delay: 500,
-                    duration: 2000
-                });
-                anime({
-                    targets: "#shell2, #shell2Alt, #label, #labelAlt",
-                    rotateY: ["-90deg", "0deg"],
-                    easing: "easeOutQuint",
-                    delay: 750,
-                    duration: 2000,
-                    complete: () => {
-                        timer.start();
-                    }
-                });
+                if (!closeRef.current) {
+                    anime({
+                        targets: "#speech",
+                        scale: [0, 1],
+                        easing: "easeOutQuint",
+                        delay: 500,
+                        duration: 2000
+                    });
+                    anime({
+                        targets: "#shell2, #shell2Alt, #label, #labelAlt",
+                        rotateY: ["-90deg", "0deg"],
+                        easing: "easeOutQuint",
+                        delay: 750,
+                        duration: 2000,
+                        complete: () => {
+                            timer.start();
+                        }
+                    });
+                }
             }
         });
     }
@@ -670,19 +714,19 @@ const Module_2 = () => {
         <CIClose className={cls.close} id="close" onClick={handleClose} />
         <CIMusic className={cls.music} id="music" />
         <CIShell className={cls.shell} id="shell" />
-        {/* <div className={cls.palmWrapper} id="palmWrapper">
+        <div className={cls.palmWrapper} style={{ display: "none" }} id="palmWrapper">
             <img className={cls.palm} id="palm" src={require("../assets/modules/Palm.png")} />
-        </div> */}
+        </div>
         <div className={cls.speech} id="speech">
             <CILabel>
                 {`You have gathered ${shells.self + shells.partner} shells from this search.`}
-                <CILabel>
-                    Would you like to share some with your partner?
-                </CILabel>
+            </CILabel>
+            <CILabel>
+                Would you like to share some with your partner?
             </CILabel>
             <div>
-                <CIButton alt onClick={handleResponse(true)}>Yes</CIButton>
-                <CIButton onClick={handleResponse(false)}>No</CIButton>
+                <CIButton alt onClick={handleResponse(true)}>Accept</CIButton>
+                <CIButton onClick={handleResponse(false)}>Reject</CIButton>
             </div>
         </div>
         <Shell alt className={cls.shell2} id="shell2" />
@@ -708,7 +752,7 @@ const Module_2 = () => {
                 <CILabel>
                     Are you ready?
                 </CILabel>
-                <CIButton onClick={handleClick}>Let's GO</CIButton>
+                <CIButton onClick={handleClick}>Let's Go</CIButton>
             </div>
         </div>
         {feedback && <Feedback module="tree-shaking" onClose={handleExit} />}

@@ -13,14 +13,16 @@ import clsx from "clsx";
 const useStyles = makeStyles((theme) => ({
     guide: {
         position: "absolute",
+        filter: "drop-shadow(0.33vh 0.66vh 1.2vh black)",
         top: "33.5vh",
         left: "-30vw",
-        height: "88vh",
-        width: "30vw",
+        height: "70vh",
+        width: "24vw",
         transform: "scaleX(-1)"
     },
     board: {
         position: "absolute",
+        filter: "drop-shadow(0.33vh 0.66vh 1.2vh black)",
         top: "1.5vh",
         left: "110vw",
         height: "94vh",
@@ -48,13 +50,15 @@ const useStyles = makeStyles((theme) => ({
         "&::-webkit-scrollbar-track": {
             background: "transparent"
         },
+        fontFamily: "Summer Show",
+        fontSize: "2.6vh",
         textAlign: "left",
-        margin: "2vh 5vw 1vh 7vw",
+        margin: "2vh 5vw -4vh 7vw",
         height: "62.3vh",
         overflowY: "scroll"
     },
     button: {
-        marginTop: "2vh",
+        marginTop: "7vh",
         marginLeft: "2vw"
     }
 }));
@@ -66,7 +70,7 @@ const ReadingPane = () => {
 
     const [body, setBody] = useState("");
 
-    const pageType = window.location.pathname === "/privacy" ? 0 : 1;
+    const pageType = window.location.pathname.includes("/privacy") ? 0 : 1;
 
     useEffect(() => {
         Promise.all([pageType ? terms() : privacy()])

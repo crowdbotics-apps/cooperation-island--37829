@@ -34,7 +34,7 @@ const HomePage = () => {
 
     const history = useHistory();
 
-    const { user, setHowler } = useContext(AppContext);
+    const { avatarRef, user, setHowler } = useContext(AppContext);
 
     const [loadedItems, setLoaded] = useState(0);
 
@@ -78,9 +78,9 @@ const HomePage = () => {
                     if (!user.active) {
                         if (window.location.pathname.includes("/reset-password"))
                             showResetPassword();
-                        else if (window.location.pathname === "/terms-conditions" || window.location.pathname === "/privacy")
+                        else if (window.location.pathname.includes("/terms-conditions") || window.location.pathname.includes("/privacy"))
                             showReadingPane(true);
-                        else if (window.location.pathname === "/") {
+                        else if (window.location.pathname.includes("/")) {
                             history.push("/login");
                             showLoginBoard(true);
                         }
@@ -96,7 +96,7 @@ const HomePage = () => {
                                 loop: true
                             })
                         }, 1000);
-                        if (window.location.pathname === "/access") {
+                        if (window.location.pathname.includes("/access")) {
                             anime({
                                 targets: "#logo",
                                 top: "-12vh",
@@ -109,7 +109,7 @@ const HomePage = () => {
                             });
                             showLandingPage();
                         }
-                        else if (window.location.pathname === "/details") {
+                        else if (window.location.pathname.includes("/details")) {
                             anime({
                                 targets: "#logo",
                                 top: "-12vh",
@@ -122,16 +122,16 @@ const HomePage = () => {
                             });
                             showDetailsPage();
                         }
-                        else if (window.location.pathname === "/avatar") {
+                        else if (window.location.pathname.includes("/avatar")) {
                             anime({
                                 targets: "#logo",
                                 top: "150vh",
                                 easing: "easeInElastic",
                                 duration: 2000
                             });
-                            showAvatarPage();
+                            showAvatarPage(avatarRef.current.setUser);
                         }
-                        else if (window.location.pathname === "/home") {
+                        else if (window.location.pathname.includes("/home")) {
                             anime({
                                 targets: "#logo",
                                 top: "-12vh",
@@ -144,7 +144,7 @@ const HomePage = () => {
                             });
                             showHomePage();
                         }
-                        else if (window.location.pathname === "/") {
+                        else if (window.location.pathname.includes("/")) {
                             if (user.access) {
                                 if (user.details) {
                                     if (user.avatar) {

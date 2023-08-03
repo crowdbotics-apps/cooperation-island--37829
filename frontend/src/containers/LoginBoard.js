@@ -12,7 +12,7 @@ import CIButton from "../shared/CIButton";
 import CIInput from "../shared/CIInput";
 import CILabel from "../shared/CILabel";
 import CILink from "../shared/CILink";
-import { AppContext } from "../App";
+import { AppContext, LoginContext } from "../App";
 import { toast } from "react-toastify";
 import { Howl } from "howler";
 import anime from "animejs";
@@ -26,11 +26,13 @@ const useStyles = makeStyles({
         height: "94vh",
         width: "30vw",
         background: `url(${BoardImg})`,
+        filter: "drop-shadow(0.33vh 0.66vh 1.2vh black)",
         backgroundRepeat: "no-repeat",
         backgroundSize: "30vw 94vh"
     },
     guide: {
         position: "absolute",
+        filter: "drop-shadow(0.33vh 0.66vh 1.2vh black)",
         top: "33.5vh",
         left: "-30vw",
         height: "70vh",
@@ -39,6 +41,7 @@ const useStyles = makeStyles({
     },
     guide2: {
         position: "absolute",
+        filter: "drop-shadow(0.33vh 0.66vh 1.2vh black)",
         top: "44vh",
         left: "50vw",
         height: "70vh",
@@ -90,7 +93,7 @@ const useStyles = makeStyles({
     },
     signInSection: {
         "& button": {
-            marginTop: "3vh",
+            marginTop: "4vh",
             width: "auto"
         },
         "& input": {
@@ -131,7 +134,10 @@ const useStyles = makeStyles({
             }
         },
         "& button": {
-            margin: "0vh 3vw"
+            margin: "2vh 3vw"
+        },
+        "& div": {
+            marginTop: "-1vh"
         },
         "& input": {
             marginBottom: "6vh",
@@ -186,23 +192,11 @@ const LoginBoard = () => {
 
     const history = useHistory();
 
-    const [login, setLogin] = useState({
-        username: "",
-        password: ""
-    });
-
-    const [signup, setSignup] = useState({
-        username: "",
-        password: "",
-        email: "",
-        age: ""
-    });
-
-    const [username, setUsername] = useState("");
-
-    const [active, setActive] = useState(window.location.pathname === "/login");
+    const [active, setActive] = useState(window.location.pathname.includes("/login"));
 
     const { setBGM, setHowler, setUser } = useContext(AppContext);
+
+    const { login, signup, username, setLogin, setSignup, setUsername } = useContext(LoginContext);
 
     useEffect(() => {
         history.push(active ? "/login" : "/signup");
@@ -481,16 +475,17 @@ const LoginBoard = () => {
         })
             .finished.then(() => {
                 setUser(data);
-                setBGM(true);
-                setHowler({
-                    welcome: new Howl({
-                        src: [require("../assets/sounds/Welcome.mp3")],
-                        autoplay: true,
-                        loop: true
-                    })
-                });
 
                 if (data.access) {
+                    setBGM(true);
+                    setHowler({
+                        welcome: new Howl({
+                            src: [require("../assets/sounds/Welcome.mp3")],
+                            autoplay: true,
+                            loop: true
+                        })
+                    });
+
                     if (data.details) {
                         if (data.avatar) {
                             history.push("/home");
@@ -514,27 +509,45 @@ const LoginBoard = () => {
     }
 
     const validateLogin = () => {
-        if (login.username.length < 6)
+        let isValid = true;
+
+        if (login.username.length < 6) {
             toast.error("Username must be more than 5 characters.");
-        else if (login.password.trim().length < 8)
+            isValid = false;
+        }
+        if (login.password.trim().length < 8) {
             toast.error("Password must be at least 8 characters.");
-        else
-            return true;
+            isValid = false;
+        }
+
+        return isValid;
     }
 
     const validateSignup = () => {
-        if (signup.username.length < 6)
+        let isValid = true;
+
+        if (signup.username.length < 6) {
             toast.error("Username must be more than 5 characters.");
-        else if (signup.password.trim().length < 8)
+            isValid = false;
+        }
+        if (signup.password.trim().length < 8) {
             toast.error("Password must be at least 8 characters.");
-        else if (!validateEmail(signup.email))
+            isValid = false;
+        }
+        if (!validateEmail(signup.email)) {
             toast.error("The Email is invalid.");
-        else if (!parseInt(signup.age))
+            isValid = false;
+        }
+        if (!parseInt(signup.age)) {
             toast.error("The Age cannot be empty or 0.");
-        else if (parseInt(signup.age) > 18)
+            isValid = false;
+        }
+        if (parseInt(signup.age) > 18) {
             toast.error("Children above 18 are not allowed.");
-        else
-            return true;
+            isValid = false;
+        }
+
+        return isValid;
     }
 
     const validateUsername = () => {

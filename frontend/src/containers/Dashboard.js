@@ -17,11 +17,13 @@ import clsx from "clsx";
 
 const useStyles = makeStyles({
     board: {
+        filter: "drop-shadow(0.33vh 0.66vh 0.8vh black)",
         height: "11.9vh",
         width: "20vw"
     },
     guide: {
         position: "absolute",
+        filter: "drop-shadow(0.33vh 0.66vh 1.2vh black)",
         top: "33.5vh",
         left: "-30vw",
         height: "70vh",
@@ -104,7 +106,7 @@ const Dashboard = () => {
 
     const history = useHistory();
 
-    const { BGM, howler, user, setFeedback, setHowler, setUser } = useContext(AppContext);
+    const { avatarRef, BGM, howler, user, setFeedback, setHowler, setUser } = useContext(AppContext);
 
     useEffect(() => {
         if (!user.avatar || !user.details)
@@ -147,7 +149,7 @@ const Dashboard = () => {
             duration: 2000,
             complete: () => {
                 history.push("/avatar");
-                showAvatarPage();
+                showAvatarPage(avatarRef.current.setUser);
             }
         });
     }
@@ -257,7 +259,7 @@ const Dashboard = () => {
                                         setFeedback(mapFeedback(data));
                                     });
 
-                                history.push("/tell-us-about-you", {
+                                history.push("/voice-your-values", {
                                     module: 3
                                 });
 

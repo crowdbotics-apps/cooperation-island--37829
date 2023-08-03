@@ -5,7 +5,10 @@ import clsx from "clsx";
 
 const useStyles = makeStyles({
     svg: {
-        height: "10vh"
+        filter: "drop-shadow(0.33vh 0.66vh 0.8vh black)",
+        height: "10vh",
+        outline: "none",
+        zIndex: 2
     }
 });
 
@@ -24,7 +27,8 @@ const CIShell = (props) => {
         });
     }
 
-    return <svg className={clsx(cls.svg, props.className, "pointer")} id={props.id} onClick={handleClick} viewBox="0 0 100 111">
+    return <svg className={clsx(cls.svg, props.className, "pointer")} id={props.id} onClick={handleClick} viewBox="0 0 100 111" data-tooltip-id="tooltip"
+        data-tooltip-content="Your Shells">
         <path className="pointer" opacity="0.3" d="M99.9987 58.4266C100.196 86.8848 77.9741 110.112 50.3618 110.305C22.7459 110.498 0.198183 87.5852 0.00134455 59.1252C-0.19904 30.667 22.0242 7.43836 49.6383 7.24684C77.2506 7.05178 99.7965 29.9666 99.9987 58.4266Z" fill="black" />
         <path className="pointer" d="M99.9987 51.1792C100.196 79.6374 77.9741 102.864 50.3618 103.058C22.7459 103.253 0.198183 80.3396 0.00134455 51.8796C-0.19904 23.4214 22.0242 0.192754 49.6383 0.0012362C77.2506 -0.193829 99.7965 22.721 99.9987 51.1792Z" fill="#552800" />
         <path className="pointer" d="M9.66767 26.1043C8.11779 30.8053 22.5863 22.6924 48.5973 23.5489C74.6119 24.4019 83.7125 22.8644 85.1436 19.6919C86.5782 16.5213 72.131 4.76061 57.8115 2.33649C43.4937 -0.0840905 16.6457 4.90957 9.66767 26.1043Z" fill="#A85C09" />

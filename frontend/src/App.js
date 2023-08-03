@@ -1,5 +1,5 @@
-import { createContext, useEffect, useState } from "react";
-import { Redirect, Route, Switch } from "react-router-dom";
+import { createContext, useEffect, useRef, useState } from "react";
+import { Redirect, Route, Switch, useHistory } from "react-router-dom";
 import { makeStyles } from "@material-ui/core";
 import { ToastContainer } from "react-toastify";
 import { parseToken, userState } from "./libs/utils";
@@ -17,9 +17,12 @@ import ReadingPane from "./components/ReadingPane";
 import Module_1 from "./modules/Module_1";
 import Module_2 from "./modules/Module_2";
 import Module_3 from "./modules/Module_3";
+import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.min.css";
 
 const AppContext = createContext();
+
+const LoginContext = createContext();
 
 const useStyles = makeStyles((theme) => ({
   tooltip: {
@@ -34,6 +37,10 @@ const useStyles = makeStyles((theme) => ({
 const App = () => {
   const cls = useStyles();
 
+  const history = useHistory();
+
+  const avatarRef = useRef();
+
   const localData = parseToken(localStorage["UserState"]);
 
   const [user, setUser] = useState(localData ? mapUserData(localData) : userState);
@@ -46,8 +53,40 @@ const App = () => {
 
   const [loader, setLoader] = useState(false);
 
+  const [tooltip, showTooltip] = useState(true);
+
+  const [login, setLogin] = useState({
+    username: "",
+    password: ""
+  });
+
+  const [signup, setSignup] = useState({
+    username: "",
+    password: "",
+    email: "",
+    age: ""
+  });
+
+  const [username, setUsername] = useState("");
+
   useEffect(() => {
     window.setLoader = setLoader;
+
+    const handleBlock = history.block((_, action) => {
+      if (action === "POP") {
+        toast.error("The navigation request has been blocked.");
+        return false;
+      }
+    });
+
+    const handleListen = history.listen((location) => {
+      window.top.history.replaceState({}, document.title, location.pathname);
+    });
+
+    return () => {
+      handleBlock();
+      handleListen();
+    }
   }, []);
 
   const handleUser = (data) => {
@@ -82,11 +121,11 @@ const App = () => {
       if (user.access)
         return <Switch>
           <Route path="/details" component={UserDetails} />
-          <Route path="/avatar" component={AvatarPage} />
+          <Route path="/avatar" render={() => <AvatarPage ref={avatarRef} />} />
           <Route path="/home" component={Dashboard} />
           <Route path="/fish-mind-reading" render={handleModule} />
           <Route path="/tree-shaking" render={handleModule} />
-          <Route path="/tell-us-about-you" render={handleModule} />
+          <Route path="/voice-your-values" render={handleModule} />
           <Redirect to="/" />
         </Switch>
       else
@@ -104,25 +143,27 @@ const App = () => {
     }
   }
 
-  return <AppContext.Provider value={{ BGM, feedback, howler, user, setBGM, setFeedback, setHowler: handleHowler, setUser: handleUser }}>
-    <Route path="/" component={HomePage} />
-    <Switch>
-      {getRoutes()}
-      <Redirect to="/" />
-    </Switch>
-    {loader && <CILoader />}
-    <ToastContainer
-      position="bottom-right"
-      autoClose={2000}
-      closeButton={false}
-      pauseOnHover={false}
-      pauseOnFocusLoss={false}
-      draggable={false}
-    />
-    <Tooltip className={cls.tooltip} id="tooltip" />
+  return <AppContext.Provider value={{ avatarRef, BGM, feedback, howler, user, setBGM, setFeedback, showTooltip, setHowler: handleHowler, setUser: handleUser }}>
+    <LoginContext.Provider value={{ login, signup, username, setLogin, setSignup, setUsername }}>
+      <Route path="/" component={HomePage} />
+      <Switch>
+        {getRoutes()}
+        <Redirect to="/" />
+      </Switch>
+      {loader && <CILoader />}
+      <ToastContainer
+        position="bottom-right"
+        autoClose={2000}
+        closeButton={false}
+        pauseOnHover={false}
+        pauseOnFocusLoss={false}
+        draggable={false}
+      />
+      {tooltip && <Tooltip className={cls.tooltip} id="tooltip" />}
+    </LoginContext.Provider>
   </AppContext.Provider>
 }
 
-export { AppContext };
+export { AppContext, LoginContext };
 
 export default App;

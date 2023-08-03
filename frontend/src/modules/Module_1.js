@@ -1,6 +1,7 @@
 import { Fragment, useContext, useEffect, useState } from "react";
 import { makeStyles } from "@material-ui/core";
 import { useHistory } from "react-router-dom";
+import { shuffleArray } from "../libs/utils";
 import { score } from "../services/v1";
 import { showHomePage } from "../libs/animations";
 import BoardImg from "../assets/images/Board-alt.png";
@@ -37,6 +38,7 @@ const useStyles = makeStyles((theme) => ({
     },
     dialog: {
         "& button": {
+            marginTop: "11vh",
             marginLeft: "13.2vw"
         },
         "& > div": {
@@ -46,21 +48,18 @@ const useStyles = makeStyles((theme) => ({
             "& button:last-child": {
                 marginLeft: "6vw"
             },
-            marginTop: "18vw"
+            marginTop: "21vh"
         },
         "& label": {
-            "& label": {
-                fontSize: "4vh",
-                marginTop: "8vh",
-                marginLeft: "0vw",
-            },
-            color: "black",
             fontSize: "6vh",
             textAlign: "center",
             marginTop: "10vh",
-            marginBottom: "28vh",
             marginLeft: "5vw",
             width: "25vw"
+        },
+        "& label:nth-child(2)": {
+            fontSize: "4vh",
+            marginTop: "16vh"
         },
         position: "absolute",
         filter: "drop-shadow(0.33vh 0.66vh 1.2vh black)",
@@ -74,8 +73,8 @@ const useStyles = makeStyles((theme) => ({
         backgroundSize: "45vw 60vh"
     },
     number: {
-        "& label": {
-            marginTop: "2vh !important"
+        "& + label": {
+            marginTop: "-6vh !important"
         },
         "& span": {
             color: theme.palette.primary.main,
@@ -83,7 +82,7 @@ const useStyles = makeStyles((theme) => ({
             filter: "drop-shadow(1vh 1.5vh 0.4vh black)",
             marginLeft: "-1vw !important"
         },
-        marginTop: "0vh !important"
+        marginTop: "11vh !important"
     },
     logo: {
         position: "absolute",
@@ -277,13 +276,16 @@ const useStyles = makeStyles((theme) => ({
         "& button": {
             backgroundSize: "10vw 7vh",
             width: "10vw",
-            marginTop: "4vh"
+            marginTop: "6vh"
         },
         "& label": {
             color: "black",
             marginTop: "12vh"
         },
         "& img": {
+            "& + label": {
+                marginBottom: "-2vh"
+            },
             width: "5vw",
             marginTop: "10vh",
             marginBottom: "-8vh"
@@ -302,7 +304,7 @@ const Module_1 = () => {
 
     const [showBGAnimations, setAnimation] = useState(false);
 
-    const [fishArray] = useState(Array(25).fill().map((_, i) => i + 1).sort(() => Math.random() - 0.5));
+    const [fishArray] = useState(shuffleArray(Array(24).fill().map((_, i) => i + 1)));
 
     const [fishID, setFish] = useState(0);
 
@@ -358,44 +360,48 @@ const Module_1 = () => {
     }, []);
 
     const handleClick = () => {
-        anime
-            .timeline()
-            .add({
-                targets: "#fish",
-                left: "-40vw",
-                easing: "easeInQuint",
-                duration: 2000
-            })
-            .add({
-                targets: "#board",
-                rotateY: ["0deg", "90deg"],
-                easing: "linear",
-                duration: 2000
-            }, "-=2000")
-            .add({
-                targets: "#guide",
-                left: "3vw",
-                easing: "easeOutQuint",
-                duration: 2000
-            })
-            .add({
-                targets: "#dialog",
-                scale: [0, 1],
-                easing: "easeOutQuint",
-                duration: 2000
-            }, "-=2000")
-            .add({
-                targets: "#fish2",
-                marginLeft: "0vw",
-                easing: "easeOutQuint",
-                duration: 2000
-            }, "-=2000")
-            .add({
-                targets: "#close, #music, #shell",
-                top: "4vh",
-                easing: "easeOutQuint",
-                duration: 2000
-            }, "-=2000");
+        if (window.confirm("Alright, let's get started then! You are about to start the real activity. Please be sure you fully understand the instructions because you will not be able to return to them later. Remember these decisions help us with real science, so please take them seriously!")) {
+            setTimeout(() => {
+                anime
+                    .timeline()
+                    .add({
+                        targets: "#fish",
+                        left: "-40vw",
+                        easing: "easeInQuint",
+                        duration: 2000
+                    })
+                    .add({
+                        targets: "#board",
+                        rotateY: ["0deg", "90deg"],
+                        easing: "linear",
+                        duration: 2000
+                    }, "-=2000")
+                    .add({
+                        targets: "#guide",
+                        left: "3vw",
+                        easing: "easeOutQuint",
+                        duration: 2000
+                    })
+                    .add({
+                        targets: "#dialog",
+                        scale: [0, 1],
+                        easing: "easeOutQuint",
+                        duration: 2000
+                    }, "-=2000")
+                    .add({
+                        targets: "#fish2",
+                        marginLeft: "0vw",
+                        easing: "easeOutQuint",
+                        duration: 2000
+                    }, "-=2000")
+                    .add({
+                        targets: "#close, #music, #shell",
+                        top: "4vh",
+                        easing: "easeOutQuint",
+                        duration: 2000
+                    }, "-=2000");
+            }, 1);
+        }
     }
 
     const handleClose = () => {
@@ -579,7 +585,7 @@ const Module_1 = () => {
             },
         });
 
-        if (trial === 5) {
+        if (trial === 1) {
             setTimeout(() => {
                 setFeedback(true);
 
@@ -666,9 +672,9 @@ const Module_1 = () => {
                     <span>
                         {number}
                     </span>
-                    <CILabel>
-                        Did you guess right?
-                    </CILabel>
+                </CILabel>
+                <CILabel>
+                    Did you guess right?
                 </CILabel>
                 {response && <div>
                     <CIButton alt onClick={handleRestart(true)}>Yes</CIButton>
@@ -677,9 +683,9 @@ const Module_1 = () => {
             </Fragment> : <Fragment>
                 <CILabel>
                     I’m thinking of a number between 1-6.
-                    <CILabel>
-                        What number am I thinking?
-                    </CILabel>
+                </CILabel>
+                <CILabel>
+                    What number am I thinking?
                 </CILabel>
                 <CIButton onClick={handleShow}>Show</CIButton>
             </Fragment>}
@@ -699,7 +705,7 @@ const Module_1 = () => {
                 <CILabel>
                     Are you ready?
                 </CILabel>
-                <CIButton onClick={handleClick}>Let's GO</CIButton>
+                <CIButton onClick={handleClick}>Let's Go</CIButton>
             </div>
         </div>
         {feedback && <Feedback module="fish-mind-reading" onClose={handleExit} />}

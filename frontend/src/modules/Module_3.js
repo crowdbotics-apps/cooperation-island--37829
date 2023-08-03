@@ -1,6 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 import { makeStyles } from "@material-ui/core";
 import { useHistory } from "react-router-dom";
+import update from "immutability-helper";
 import { rankedQualities } from "../libs/utils";
 import { qualities } from "../services/v1";
 import { showHomePage } from "../libs/animations";
@@ -118,13 +119,10 @@ const useStyles = makeStyles((theme) => ({
         marginLeft: "-0.75vw"
     },
     value: {
-        "& label": {
-            color: theme.palette.primary.contrast,
-            paddingTop: "1.75vh"
-        },
-        textAlign: "center",
         height: "8vh",
         width: "15vw",
+        filter: "drop-shadow(0.33vh 0.44vh 0.66vh black)",
+        touchAction: "none",
         background: `url(${ValuesImg})`,
         backgroundRepeat: "no-repeat",
         backgroundSize: "15vw 8vh"
@@ -162,6 +160,12 @@ const useStyles = makeStyles((theme) => ({
         top: "-12vh",
         left: "81vw",
         width: "4vw"
+    },
+    button: {
+        position: "absolute",
+        filter: "drop-shadow(0.33vh 0.66vh 1.2vh black)",
+        top: "110vh",
+        left: "54.5vw"
     },
     body: {
         "& button": {
@@ -201,6 +205,10 @@ const Module_3 = () => {
     });
 
     const [feedback, setFeedback] = useState(false);
+
+    const [disabled, setDisabled] = useState(false);
+
+    const [draggingId, setDragging] = useState(0);
 
     const { BGM, howler, user } = useContext(AppContext);
 
@@ -246,110 +254,100 @@ const Module_3 = () => {
         if (!rankedQualities
             .filter(x => ![...state.section1, ...state.section2, ...state.section3].includes(x.id))
             .length) {
-            setTimeout(() => {
-                qualities([
-                    ...state.section1
-                        .map((x, i) => ({
-                            id: x,
-                            category: 1,
-                            rank: i + 1
-                        })),
-                    ...state.section2
-                        .map((x, i) => ({
-                            id: x,
-                            category: 2,
-                            rank: i + 1
-                        })),
-                    ...state.section3
-                        .map((x, i) => ({
-                            id: x,
-                            category: 3,
-                            rank: i + 1
-                        }))
-                ]);
-                setFeedback(true);
+            setDisabled(true);
 
-                new Howl({
-                    src: require("../assets/sounds/Activity.mp3"),
-                    autoplay: true,
-                    onplay: () => {
-                        if (howler.module_3.volume())
-                            howler.module_3.fade(howler.module_3.volume(), 0.1, 1000);
+            anime({
+                targets: "#block",
+                top: "110vh",
+                easing: "easeInQuint",
+                duration: 2000
+            });
+            anime
+                .timeline({
+                    complete: () => {
+                        setDisabled(false);
                     },
-                    onend: () => {
-                        if (howler.module_3.volume())
-                            howler.module_3.fade(0.1, 1, 1000);
-                    }
-                });
-
-                anime({
-                    targets: "#guide",
-                    left: "-30vw",
+                    delay: 500
+                })
+                .add({
+                    targets: "#sections",
+                    left: "32vw",
                     easing: "easeInQuint",
                     duration: 2000
-                });
-                anime({
-                    targets: "#block, #sections",
-                    top: "110vh",
-                    easing: "easeInQuint",
+                })
+                .add({
+                    targets: `.${cls.button}`,
+                    top: "91vh",
+                    easing: "easeOutQuint",
                     duration: 2000
-                });
-                anime({
-                    targets: "#close, #music, #shell",
-                    top: "-12vh",
-                    easing: "easeInQuint",
-                    duration: 2000
-                });
-            }, 500);
+                }, "-=1000");
         }
     }, [state]);
 
     const addItems = (section) => (id) => {
         setState({
             ...state,
+            section1: state.section1.filter(x => x !== id),
+            section2: state.section2.filter(x => x !== id),
+            section3: state.section3.filter(x => x !== id),
             [section]: [...state[section], id]
         });
     }
 
+    const moveItems = (section) => (x1, x2) => {
+        setState((prev) => update(prev, {
+            [section]: {
+                $splice: [
+                    [x1, 1],
+                    [x2, 0, prev[section][x1]],
+                ]
+            }
+        }));
+    }
+
     const handleClick = () => {
-        anime
-            .timeline()
-            .add({
-                targets: "#instructor",
-                left: "-30vw",
-                easing: "easeInQuint",
-                duration: 2000
-            })
-            .add({
-                targets: "#board",
-                rotateY: ["0deg", "90deg"],
-                easing: "linear",
-                duration: 2000
-            }, "-=2000")
-            .add({
-                targets: "#guide",
-                left: "1vw",
-                easing: "easeOutQuint",
-                duration: 2000
-            })
-            .add({
-                targets: "#block",
-                top: "23vh",
-                easing: "easeOutQuint",
-                duration: 2000
-            }, "-=2000")
-            .add({
-                targets: "#sections",
-                top: "22vh",
-                easing: "easeOutQuint",
-                duration: 2000
-            }, "-=2000")
-            .add({
-                targets: "#close, #music, #shell",
-                top: "4vh",
-                easing: "easeOutQuint",
-                duration: 2000
-            }, "-=2000");
+        if (window.confirm("Alright, let's get started then! You are about to start the real activity. Please be sure you fully understand the instructions because you will not be able to return to them later. Remember these decisions help us with real science, so please take them seriously!")) {
+            setTimeout(() => {
+                anime
+                    .timeline()
+                    .add({
+                        targets: "#instructor",
+                        left: "-30vw",
+                        easing: "easeInQuint",
+                        duration: 2000
+                    })
+                    .add({
+                        targets: "#board",
+                        rotateY: ["0deg", "90deg"],
+                        easing: "linear",
+                        duration: 2000
+                    }, "-=2000")
+                    .add({
+                        targets: "#guide",
+                        left: "1vw",
+                        easing: "easeOutQuint",
+                        duration: 2000
+                    })
+                    .add({
+                        targets: "#block",
+                        top: "20vh",
+                        easing: "easeOutQuint",
+                        duration: 2000
+                    }, "-=2000")
+                    .add({
+                        targets: "#sections",
+                        top: "19vh",
+                        easing: "easeOutQuint",
+                        duration: 2000
+                    }, "-=2000")
+                    .add({
+                        targets: "#close, #music, #shell",
+                        top: "4vh",
+                        easing: "easeOutQuint",
+                        duration: 2000
+                    }, "-=2000");
+            }, 1);
+        }
     }
 
     const handleClose = () => {
@@ -458,6 +456,68 @@ const Module_3 = () => {
             });
     }
 
+    const handleSave = () => {
+        qualities([
+            ...state.section1
+                .map((x, i) => ({
+                    id: x,
+                    category: 1,
+                    rank: i + 1
+                })),
+            ...state.section2
+                .map((x, i) => ({
+                    id: x,
+                    category: 2,
+                    rank: i + 1
+                })),
+            ...state.section3
+                .map((x, i) => ({
+                    id: x,
+                    category: 3,
+                    rank: i + 1
+                }))
+        ]);
+        setFeedback(true);
+
+        new Howl({
+            src: require("../assets/sounds/Activity.mp3"),
+            autoplay: true,
+            onplay: () => {
+                if (howler.module_3.volume())
+                    howler.module_3.fade(howler.module_3.volume(), 0.1, 1000);
+            },
+            onend: () => {
+                if (howler.module_3.volume())
+                    howler.module_3.fade(0.1, 1, 1000);
+            }
+        });
+
+        anime({
+            targets: "#guide",
+            left: "-30vw",
+            easing: "easeInQuint",
+            duration: 2000
+        });
+        anime({
+            targets: "#sections",
+            top: "110vh",
+            easing: "easeInQuint",
+            duration: 2000
+        });
+        anime({
+            targets: `.${cls.button}`,
+            top: "192vh",
+            easing: "easeInQuint",
+            duration: 2000
+        });
+        anime({
+            targets: "#close, #music, #shell",
+            top: "-12vh",
+            easing: "easeInQuint",
+            duration: 2000
+        });
+    }
+
     return <div>
         <img className={cls.logo} id="logo2" src={require("../assets/modules/Module_3_Text.png")} />
         <img className={cls.instructor} id="instructor" src={require("../assets/avatars/xtras/Avatar_13.png")} />
@@ -479,7 +539,7 @@ const Module_3 = () => {
                 <CILabel>
                     Are you ready?
                 </CILabel>
-                <CIButton onClick={handleClick}>Let's GO</CIButton>
+                <CIButton onClick={handleClick}>Let's Go</CIButton>
             </div>
         </div>
         <div className={cls.block} id="block">
@@ -500,6 +560,7 @@ const Module_3 = () => {
         <div className={cls.sections} id="sections">
             <Sections
                 addItems={addItems("section1")}
+                moveItems={moveItems("section1")}
                 className={cls.section}
                 data={state.section1}
                 clsQuality={cls.value}
@@ -508,9 +569,11 @@ const Module_3 = () => {
                 style={{
                     marginLeft: "2.25vw"
                 }}
+                {...{ disabled, draggingId, setDragging }}
             />
             <Sections
                 addItems={addItems("section2")}
+                moveItems={moveItems("section2")}
                 className={cls.section}
                 data={state.section2}
                 clsQuality={cls.value}
@@ -519,9 +582,11 @@ const Module_3 = () => {
                 style={{
                     marginLeft: "18.9vw"
                 }}
+                {...{ disabled, draggingId, setDragging }}
             />
             <Sections
                 addItems={addItems("section3")}
+                moveItems={moveItems("section3")}
                 className={cls.section}
                 data={state.section3}
                 clsQuality={cls.value}
@@ -530,8 +595,10 @@ const Module_3 = () => {
                 style={{
                     marginLeft: "35.5vw"
                 }}
+                {...{ disabled, draggingId, setDragging }}
             />
         </div>
+        <CIButton className={cls.button} onClick={handleSave}>Save</CIButton>
         {feedback && <Feedback module="tell-us-about-you" onClose={handleExit} />}
     </div>
 }

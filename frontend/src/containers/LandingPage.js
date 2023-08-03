@@ -15,11 +15,13 @@ import CILogout from "../shared/CILogout";
 import CIMusic from "../shared/CIMusic";
 import { AppContext } from "../App";
 import { toast } from "react-toastify";
+import { Howl } from "howler";
 import anime from "animejs";
 
-const useStyles = makeStyles({
+const useStyles = makeStyles((theme) => ({
     animal: {
         position: "absolute",
+        filter: "drop-shadow(0.33vh 0.66vh 1.2vh black)",
         zIndex: 2,
         top: "18vh",
         left: "48vw",
@@ -29,6 +31,7 @@ const useStyles = makeStyles({
     },
     animal2: {
         position: "absolute",
+        filter: "drop-shadow(0.33vh 0.66vh 1.2vh black)",
         top: "140vh",
         left: "51vw",
         height: "16.7vh",
@@ -36,6 +39,7 @@ const useStyles = makeStyles({
     },
     guide: {
         position: "absolute",
+        filter: "drop-shadow(0.33vh 0.66vh 1.2vh black)",
         top: "38vh",
         left: "71vw",
         height: "58vh",
@@ -44,6 +48,7 @@ const useStyles = makeStyles({
     },
     guide2: {
         position: "absolute",
+        filter: "drop-shadow(0.33vh 0.66vh 1.2vh black)",
         top: "33.5vh",
         left: "-30vw",
         height: "70vh",
@@ -52,6 +57,7 @@ const useStyles = makeStyles({
     },
     board: {
         position: "absolute",
+        filter: "drop-shadow(0.33vh 0.66vh 1.2vh black)",
         top: "110vh",
         left: "42vw",
         height: "60vh",
@@ -62,6 +68,7 @@ const useStyles = makeStyles({
     },
     board2: {
         position: "absolute",
+        filter: "drop-shadow(0.33vh 0.66vh 1.2vh black)",
         top: "110vh",
         left: "34vw",
         height: "80vh",
@@ -76,19 +83,34 @@ const useStyles = makeStyles({
             marginTop: "1vh",
             marginBottom: "5vh"
         },
-        "& > label:first-child": {
-            "& label": {
-                display: "inline",
-                fontSize: "2.5vh",
+        "& label": {
+            "&:first-child:has(+ label)": {
+                color: theme.palette.primary.main,
+
+                fontSize: "4.5vh",
                 fontWeight: "bold",
-                letterSpacing: "0.1vw !important",
-                paddingTop: "3vh",
+                letterSpacing: "0.1vw",
                 marginBottom: "12vh"
             },
-            fontSize: "2.5vh",
+            "&#first": {
+                fontSize: "3.3vh",
+                marginTop: "12vh"
+            },
+            "&#last": {
+                "& label": {
+                    fontSize: "2vh",
+                    letterSpacing: "0.05vw !important"
+                },
+                fontSize: "2vh",
+                letterSpacing: "0.05vw !important",
+                marginTop: "14vh",
+                padding: "0vh 5vw"
+            },
+            color: "black",
+            display: "inline",
+            fontSize: "2.6vh",
             letterSpacing: "0.1vw !important",
-            paddingTop: "3vh",
-            marginBottom: "12vh"
+            marginTop: "1vh"
         },
         display: "flex",
         flexDirection: "column",
@@ -98,9 +120,6 @@ const useStyles = makeStyles({
         height: "50vh",
         width: "37vw",
         marginTop: "8vh"
-    },
-    label: {
-        marginTop: "16vh"
     },
     backdrop: {
         zIndex: 5
@@ -113,14 +132,16 @@ const useStyles = makeStyles({
         marginBottom: "8vh"
     },
     content: {
+        fontFamily: "Summer Show",
+        fontSize: "2.6vh",
         textAlign: "left",
-        margin: "2vh 5vw 1vh 7vw"
+        margin: "10vh 5vw 1vh 7vw"
     },
     buttonDiv: {
         display: "flex",
         justifyContent: "space-evenly",
-        width: "70%",
-        margin: "4.5vh auto 0"
+        width: "37.8vw",
+        margin: "10vh auto 0vh"
     },
     logout: {
         position: "absolute",
@@ -134,14 +155,14 @@ const useStyles = makeStyles({
         left: "100vw",
         width: "4vw"
     }
-});
+}));
 
 const LandingPage = () => {
     const cls = useStyles();
 
     const history = useHistory();
 
-    const { BGM, howler, user, setUser } = useContext(AppContext);
+    const { BGM, howler, setBGM, setHowler, setUser } = useContext(AppContext);
 
     const [text, setText] = useState("");
 
@@ -185,6 +206,15 @@ const LandingPage = () => {
                 duration: 2000,
                 complete: () => {
                     hideBackdrop(false);
+                    setBGM(true);
+
+                    setHowler({
+                        welcome: new Howl({
+                            src: [require("../assets/sounds/Welcome.mp3")],
+                            autoplay: true,
+                            loop: true
+                        })
+                    });
                 }
             })
             .add({
@@ -316,7 +346,7 @@ const LandingPage = () => {
             handleAccess(text)
                 .then(handleSave)
                 .catch(() => {
-                    toast.error("The Access Code is invalid.")
+                    toast.error("The Access Code is invalid.");
                 });
         }
     }
@@ -327,12 +357,16 @@ const LandingPage = () => {
         <img className={cls.guide2} id="guide2" src={require("../assets/avatars/Avatar_9.png")} />
         <div className={cls.board} id="board4">
             <div className={cls.body}>
-                {user.email ? <CILabel className={!showAccess && cls.label}>Please Accept or <CILink onClick={handleLink(true)}>Click Here</CILink> to resend the <b className="typer">User-Consent</b> document, sent on your registered email or If you already have an <b className="typer">Access-Code</b>, Please <CILink onClick={handleInput}>Click Here</CILink>.</CILabel> :
-                    <CILabel className={!showAccess && cls.label}>Please <CILink onClick={handleLink(false)}>Click Here</CILink> to receive the <b className="typer">User-Consent</b> document or If you already have an <b className="typer">Access-Code</b>, Please <CILink onClick={handleInput}>Click Here</CILink>.</CILabel>}
-                {showAccess && <Fragment>
-                    <CILabel>Access Code</CILabel>
-                    <CIInput onChange={handleChange} onEnter={handleSubmit} value={text} />
+                {showAccess ? <Fragment>
+                    <CILabel id="first">Access Code</CILabel>
+                    <CIInput autoFocus onChange={handleChange} onEnter={handleSubmit} value={text} />
                     <CIButton onClick={handleSubmit}>Submit</CIButton>
+                </Fragment> : <Fragment>
+                    <CILabel>Time To Get Consent!</CILabel>
+                    <CILabel>Now, we need your parent to give permission for you to play.</CILabel>
+                    <CILabel>To send your parent an email, please <CILink onClick={handleLink(false)}>click here</CILink>.</CILabel>
+                    <CILabel>Then ask your parent to respond to the email so you can get started as soon as possible.</CILabel>
+                    <CILabel id="last">Your parent may need to check their junk folder for our email. If you have an access code, please <CILink onClick={handleInput}>click here</CILink>.</CILabel>
                 </Fragment>}
             </div>
         </div>
@@ -340,10 +374,9 @@ const LandingPage = () => {
             <img className={cls.animal2} id="animal2" src={require("../assets/animals/Animal_2.png")} />
             <div className={cls.board2} id="board5">
                 <CILabel className={cls.title}>
-                    Disclaimer
+                    Welcome to Cooperation Island!
                 </CILabel>
                 <div className={cls.content}>
-                    <h4 className="typer">Welcome to Cooperation Island!</h4>
                     <p className="typer">Cooperation Island is a set of different activities made for children, just like you. On Cooperation Island, you will have the opportunity to explore different activities. For the most part, you will make decisions that can help you earn shells.</p>
                     <p className="typer">Unlike some activities you may play, your responses to these questions and your decisions help us with scientific research. That means that your responses to these activities will be used to help us better understand how children and adults make decisions and think about the world and will likely be a part of a scientific research project, so you should take your decisions seriously. You can be a part of this research project if you want to be. You do not have to be a part of it if you do not want to be. You should feel free to stop the activity at any point, and your name will not be put on any reports written about this project.</p>
                 </div>

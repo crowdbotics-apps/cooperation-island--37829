@@ -24,45 +24,66 @@ export const userState = {
 export const rankedQualities = [
     {
         id: 1,
-        desc: "Telling the truth always",
-        text: "Being Honest"
-    },
-    {
-        id: 2,
-        desc: "Making people laugh",
-        text: "Being Funny"
-    },
-    {
-        id: 3,
-        desc: "Following the rules without fail",
-        text: "Being Stickler"
-    },
-    {
-        id: 4,
-        desc: "Treat people and things equally",
+        desc: "like being equal with things between yourself and someone else",
         text: "Being Fair"
     },
     {
-        id: 5,
-        desc: "Being good at sports",
-        text: "Being Athletic"
+        id: 2,
+        desc: "like telling the truth",
+        text: "Being Honest"
     },
     {
-        id: 6,
-        desc: "Being patreon and kind towards others",
+        id: 3,
+        desc: "like doing what instructions say",
+        text: "Following the rules"
+    },
+    {
+        id: 4,
+        desc: "like being giving and kind towards others",
         text: "Being Generous"
     },
     {
+        id: 5,
+        desc: "like making people laugh",
+        text: "Being funny"
+    },
+    {
+        id: 6,
+        desc: "like being good at sport",
+        text: "Being athletic"
+    },
+    {
         id: 7,
-        desc: "Being good at understanding and learning things",
-        text: "Being Intelligent"
+        desc: "like being good at painting and drawing",
+        text: "Being artistic"
     },
     {
         id: 8,
-        desc: "Being good at painting and drawing",
-        text: "Being Artistic"
+        desc: "like being good at learning and understanding things",
+        text: "Being intelligent"
+    },
+    {
+        id: 9,
+        desc: "like saying it’s ok if someone does something wrong to you",
+        text: "Being forgiving"
+    },
+    {
+        id: 10,
+        desc: "like not staying quiet if you see someone being mean",
+        text: "Standing up for others"
+    },
+    {
+        id: 11,
+        desc: "like being reliable, or doing what you said you’d do",
+        text: "Being trustworthy"
     }
 ];
+
+export const shellsComposite = Array(4).fill().map((_, i) => 2 * (i + 1)).flatMap((x) => Array(x + 1).fill().map((_, y) => ({ self: x - y, partner: y })));
+
+export const shuffleArray = (arr) => {
+    return arr.sort(() => Math.random() - 0.5);
+}
 
 export const formatAge = (value, initial) => {
     if (value === "" || value && /[0-9]/.test(value))
