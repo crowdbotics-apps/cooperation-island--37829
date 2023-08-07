@@ -14,7 +14,7 @@ const useStyles = makeStyles({
     }
 });
 
-const bubblesArray = Array(anime.random(300, 500)).fill();
+const bubblesArray = Array(anime.random(60, 100)).fill();
 
 const Bubbles = () => {
     const cls = useStyles();

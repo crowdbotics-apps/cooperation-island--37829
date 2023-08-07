@@ -171,24 +171,22 @@ const useStyles = makeStyles((theme) => ({
         "& button": {
             backgroundSize: "10vw 7vh",
             width: "10vw",
-            marginTop: "4vh"
+            marginTop: "3vh"
         },
         "& label": {
-            "&:nth-child(2)": {
-                marginTop: "15vh"
+            "&:first-child": {
+                marginTop: "9vh"
             },
             "&:nth-child(3)": {
-                marginTop: "23vh"
+                marginTop: "28vh"
             },
+            "&:nth-child(4)": {
+                marginTop: "4vh"
+            },
+            fontSize: "3vh",
             color: "black",
-            marginTop: "12vh"
+            marginTop: "7vh"
         },
-        "& img": {
-            width: "5vw",
-            marginTop: "10vh",
-            marginBottom: "-8vh"
-        },
-        marginTop: "12vh",
         padding: "0vh 8vw"
     }
 }));
@@ -527,19 +525,22 @@ const Module_3 = () => {
         <CIShell className={cls.shell} id="shell" />
         <div className={cls.board} id="board">
             <CILabel className={cls.header}>
-                Welcome to the Tell Us About You activity!
+                Welcome to the Voice Your Values Activity!
             </CILabel>
             <div className={cls.body}>
                 <CILabel>
-                    In this activity you will tell us about things that are important to you, about yourself.
+                    In this activity, you will tell us about things that are important to you.
                 </CILabel>
                 <CILabel>
-                    You can drag each value into one of the three sections! You can also rank them within each box! The values that are closest to your avatar are the most important, and the ones furthest away are the least important.
+                    First, you will drag different values into bins. These bins will be labelled, "Very Important", "A Little Important" or "Not That Important". To learn more about a particular value, hover your cursor over it to get more information. Once you've placed all of the values into the bins, you will need to order the values within each bin. If a value is placed in the #1 position at the top of a bin, that means it is the most important to you within that category. Once you are done, press, "All Finished".
+                </CILabel>
+                <CILabel>
+                    Second, you will rate each of these values individually.
                 </CILabel>
                 <CILabel>
                     Are you ready?
                 </CILabel>
-                <CIButton onClick={handleClick}>Let's Go</CIButton>
+                <CIButton onClick={handleClick}>Let's Go!</CIButton>
             </div>
         </div>
         <div className={cls.block} id="block">

@@ -32,7 +32,7 @@ const useStyles = makeStyles({
     },
     header: {
         position: "absolute",
-        top: "-11.5vh",
+        top: "-13.5vh",
         left: "51.5vw"
     },
     label: {
@@ -138,7 +138,7 @@ const Dashboard = () => {
         });
         anime({
             targets: "#header",
-            top: "-11.5vh",
+            top: "-13.5vh",
             easing: "easeInQuint",
             duration: 2000
         });
@@ -190,7 +190,7 @@ const Dashboard = () => {
                 });
                 anime({
                     targets: "#header",
-                    top: "-11.5vh",
+                    top: "-13.5vh",
                     easing: "easeInQuint",
                     duration: 2000
                 });
