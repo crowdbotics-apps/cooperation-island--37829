@@ -153,15 +153,15 @@ const useStyles = makeStyles({
             marginTop: "6vh"
         },
         "& label": {
-            fontSize: "5.2vh",
+            fontSize: "4.2vh",
             textAlign: "center",
-            marginTop: "11vh",
-            marginLeft: "2vw",
-            width: "30vw"
+            marginTop: "12vh",
+            marginLeft: "3.5vw",
+            width: "26vw"
         },
         "& label:nth-child(2)": {
             fontSize: "3.2vh",
-            marginTop: "14vh",
+            marginTop: "13vh",
             marginLeft: "7vw",
             width: "20vw"
         },
@@ -704,10 +704,10 @@ const Module_2 = () => {
         </div>
         <div className={cls.speech} id="speech">
             <CILabel>
-                {`You have gathered ${shells.self + shells.partner} shells from this search.`}
+                {shells.self} shells have fallen to you. {shells.partner} shells have fallen to your partner.
             </CILabel>
             <CILabel>
-                Would you like to share some with your partner?
+                Do you want to accept or reject this split?
             </CILabel>
             <div>
                 <CIButton alt onClick={handleResponse(true)}>Accept</CIButton>
