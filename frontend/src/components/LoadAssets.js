@@ -158,7 +158,6 @@ const LoadAssets = ({ onLoad, progress }) => {
         <audio className={cls.hidden} id="assets" onCanPlay={onLoad} src={require("../assets/sounds/Module_1.mp3")} />
         <audio className={cls.hidden} id="assets" onCanPlay={onLoad} src={require("../assets/sounds/Module_2.mp3")} />
         <audio className={cls.hidden} id="assets" onCanPlay={onLoad} src={require("../assets/sounds/Module_3.mp3")} />
-        <audio className={cls.hidden} id="assets" onCanPlay={onLoad} src={require("../assets/sounds/No_Shell.mp3")} />
         <audio className={cls.hidden} id="assets" onCanPlay={onLoad} src={require("../assets/sounds/Number.mp3")} />
         <audio className={cls.hidden} id="assets" onCanPlay={onLoad} src={require("../assets/sounds/Pick_Up.mp3")} />
         <audio className={cls.hidden} id="assets" onCanPlay={onLoad} src={require("../assets/sounds/Put_Down.mp3")} />

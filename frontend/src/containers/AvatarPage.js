@@ -345,7 +345,7 @@ const Avatar = forwardRef((_, ref) => {
             <AvatarFrame active={active === 9} avatar={9} className={cls.frame} onClick={handleClick(9)} variant={3} />
             <AvatarFrame active={active === 10} avatar={10} className={cls.frame} onClick={handleClick(10)} variant={1} />
         </div>
-        {user.avatar ? <CIClose className={cls.logout} id="logout" onClick={handleClose} /> :
+        {user.avatar ? <CIClose className={cls.logout} id="logout" onClick={handleClose} tooltip="Go Back" /> :
             <CILogout className={cls.logout} id="logout" onClick={handleLogout} />}
         <CIMusic className={cls.music} id="music" />
         {Boolean(active) && <Fragment>

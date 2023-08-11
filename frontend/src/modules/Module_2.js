@@ -94,7 +94,8 @@ const useStyles = makeStyles({
     },
     header: {
         fontSize: "4vh",
-        marginTop: "10vh"
+        marginTop: "10vh",
+        marginBottom: "-4vh"
     },
     close: {
         position: "absolute",
@@ -152,15 +153,15 @@ const useStyles = makeStyles({
             marginTop: "6vh"
         },
         "& label": {
-            fontSize: "5.2vh",
+            fontSize: "4.2vh",
             textAlign: "center",
-            marginTop: "11vh",
-            marginLeft: "2vw",
-            width: "30vw"
+            marginTop: "12vh",
+            marginLeft: "3.5vw",
+            width: "26vw"
         },
         "& label:nth-child(2)": {
             fontSize: "3.2vh",
-            marginTop: "14vh",
+            marginTop: "13vh",
             marginLeft: "7vw",
             width: "20vw"
         },
@@ -182,13 +183,21 @@ const useStyles = makeStyles({
             marginTop: "4vh"
         },
         "& label": {
+            "&:nth-child(2)": {
+                marginTop: "9vh"
+            },
+            "&:nth-child(6)": {
+                marginTop: "2vh",
+                marginBottom: "-2vh"
+            },
             color: "black",
-            marginTop: "12vh"
+            fontSize: "2.6vh",
+            marginTop: "5vh"
         },
         "& img": {
+            height: "11.31vh",
             width: "5vw",
-            marginTop: "10vh",
-            marginBottom: "-8vh"
+            marginTop: "5vh"
         },
         marginTop: "12vh",
         padding: "0vh 8vw"
@@ -475,7 +484,7 @@ const Module_2 = () => {
         timer.stop();
 
         new Howl({
-            src: require(`../assets/sounds/${flag ? "Shell" : "No_Shell"}.mp3`),
+            src: require("../assets/sounds/Shell.mp3"),
             autoplay: true
         });
 
@@ -485,52 +494,52 @@ const Module_2 = () => {
             easing: "easeInQuint",
             duration: 2000
         });
-        anime({
-            targets: "#shell2",
-            top: "-0.83vh",
-            left: "79vw",
-            scale: [1, 0.28],
-            easing: "easeInQuint",
-            duration: 2000,
-            complete: () => {
-                anime({
-                    targets: "#shell2",
-                    scale: 1,
-                    top: "78vh",
-                    left: "20vw",
-                    rotateY: ["0deg", "-90deg"],
-                    duration: 1
-                });
-                anime({
-                    targets: "#shell",
-                    scale: [0.9, 1],
-                    delay: 100,
-                    duration: 1000
-                });
-            }
-        });
-        anime({
-            targets: "#label",
-            top: "5.5vh",
-            left: "79vw",
-            scale: [1, 0.28],
-            opacity: 0,
-            easing: "easeInQuint",
-            duration: 2000,
-            complete: () => {
-                anime({
-                    targets: "#label",
-                    scale: 1,
-                    opacity: 1,
-                    top: "82vh",
-                    left: "20vw",
-                    rotateY: ["0deg", "-90deg"],
-                    duration: 1
-                });
-            }
-        });
 
         if (flag) {
+            anime({
+                targets: "#shell2",
+                top: "-0.83vh",
+                left: "79vw",
+                scale: [1, 0.28],
+                easing: "easeInQuint",
+                duration: 2000,
+                complete: () => {
+                    anime({
+                        targets: "#shell2",
+                        scale: 1,
+                        top: "78vh",
+                        left: "20vw",
+                        rotateY: ["0deg", "-90deg"],
+                        duration: 1
+                    });
+                    anime({
+                        targets: "#shell",
+                        scale: [0.9, 1],
+                        delay: 100,
+                        duration: 1000
+                    });
+                }
+            });
+            anime({
+                targets: "#label",
+                top: "5.5vh",
+                left: "79vw",
+                scale: [1, 0.28],
+                opacity: 0,
+                easing: "easeInQuint",
+                duration: 2000,
+                complete: () => {
+                    anime({
+                        targets: "#label",
+                        scale: 1,
+                        opacity: 1,
+                        top: "82vh",
+                        left: "20vw",
+                        rotateY: ["0deg", "-90deg"],
+                        duration: 1
+                    });
+                }
+            });
             anime({
                 targets: "#shell2Alt",
                 top: "60vh",
@@ -574,38 +583,14 @@ const Module_2 = () => {
         }
         else {
             anime({
-                targets: "#shell2Alt",
-                top: "-0.83vh",
-                left: "79vw",
-                scale: [1, 0.28],
-                easing: "easeInQuint",
-                duration: 2000,
-                complete: () => {
-                    anime({
-                        targets: "#shell2Alt",
-                        scale: 1,
-                        top: "78vh",
-                        left: "73vw",
-                        rotateY: ["0deg", "-90deg"],
-                        duration: 1
-                    });
-                }
-            });
-            anime({
-                targets: "#labelAlt",
-                top: "5.5vh",
-                left: "79vw",
-                scale: [1, 0.28],
+                targets: "#shell2, #shell2Alt, #label, #labelAlt",
                 opacity: 0,
                 easing: "easeInQuint",
                 duration: 2000,
                 complete: () => {
                     anime({
-                        targets: "#labelAlt",
-                        scale: 1,
+                        targets: "#shell2, #shell2Alt, #label, #labelAlt",
                         opacity: 1,
-                        top: "82vh",
-                        left: "73vw",
                         rotateY: ["0deg", "-90deg"],
                         duration: 1
                     });
@@ -613,7 +598,7 @@ const Module_2 = () => {
             });
         }
 
-        if (trial === 5) {
+        if (trial === 500) {
             setTimeout(() => {
                 setFeedback(true);
 
@@ -719,10 +704,10 @@ const Module_2 = () => {
         </div>
         <div className={cls.speech} id="speech">
             <CILabel>
-                {`You have gathered ${shells.self + shells.partner} shells from this search.`}
+                {shells.self} shells have fallen to you. {shells.partner} shells have fallen to your partner.
             </CILabel>
             <CILabel>
-                Would you like to share some with your partner?
+                Do you want to accept or reject this split?
             </CILabel>
             <div>
                 <CIButton alt onClick={handleResponse(true)}>Accept</CIButton>
@@ -743,16 +728,22 @@ const Module_2 = () => {
             </CILabel>
             <div className={cls.body}>
                 <CILabel>
-                    In this activity, you’ll shake this palm tree on the island to get the shells.
+                    In this activity, you will work with a partner to shake trees on the island to get shells. When you shake a tree, different amounts of shells will fall to you and your partner.
                 </CILabel>
                 <CILabel>
-                    Then, you can keep all the shells to yourself or share some with your partner.
+                    After the shells have fallen, you will decide whether to accept the shells that have fallen or to reject the shells that have fallen.
+                </CILabel>
+                <CILabel>
+                    If you accept, then you and your partner will get to keep the shells that have fallen.
+                </CILabel>
+                <CILabel>
+                    If you reject, then you and your partner will not get to keep the shells that have fallen.
                 </CILabel>
                 <img src={require("../assets/modules/Shell-alt.png")} />
                 <CILabel>
                     Are you ready?
                 </CILabel>
-                <CIButton onClick={handleClick}>Let's Go</CIButton>
+                <CIButton onClick={handleClick}>Let's Go!</CIButton>
             </div>
         </div>
         {feedback && <Feedback module="tree-shaking" onClose={handleExit} />}

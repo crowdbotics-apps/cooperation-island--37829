@@ -37,9 +37,11 @@ const useStyles = makeStyles((theme) => ({
         backgroundSize: "55vw 90vh"
     },
     dialog: {
-        "& button": {
-            marginTop: "11vh",
-            marginLeft: "13.2vw"
+        "& > button": {
+            backgroundSize: "17vw 7vh",
+            width: "17vw",
+            marginTop: "6.5vh",
+            marginLeft: "9vw"
         },
         "& > div": {
             "& button": {
@@ -48,7 +50,7 @@ const useStyles = makeStyles((theme) => ({
             "& button:last-child": {
                 marginLeft: "6vw"
             },
-            marginTop: "21vh"
+            marginTop: "32vh"
         },
         "& label": {
             fontSize: "6vh",
@@ -60,6 +62,10 @@ const useStyles = makeStyles((theme) => ({
         "& label:nth-child(2)": {
             fontSize: "4vh",
             marginTop: "16vh"
+        },
+        "& label:nth-child(3)": {
+            fontSize: "4vh",
+            marginTop: "2vh"
         },
         position: "absolute",
         filter: "drop-shadow(0.33vh 0.66vh 1.2vh black)",
@@ -279,15 +285,18 @@ const useStyles = makeStyles((theme) => ({
             marginTop: "6vh"
         },
         "& label": {
+            "&:first-child": {
+                marginTop: "12vh"
+            },
             color: "black",
-            marginTop: "12vh"
+            marginTop: "10vh"
         },
         "& img": {
             "& + label": {
                 marginBottom: "-2vh"
             },
             width: "5vw",
-            marginTop: "10vh",
+            marginTop: "14vh",
             marginBottom: "-8vh"
         },
         marginTop: "12vh",
@@ -537,7 +546,7 @@ const Module_1 = () => {
         setResponse(false);
 
         new Howl({
-            src: require(`../assets/sounds/${flag ? "Shell" : "No_Shell"}.mp3`),
+            src: require("../assets/sounds/Shell.mp3"),
             autoplay: true
         });
 
@@ -585,7 +594,7 @@ const Module_1 = () => {
             },
         });
 
-        if (trial === 1) {
+        if (trial === 5) {
             setTimeout(() => {
                 setFeedback(true);
 
@@ -685,9 +694,12 @@ const Module_1 = () => {
                     I’m thinking of a number between 1-6.
                 </CILabel>
                 <CILabel>
-                    What number am I thinking?
+                        Can you guess what it is?
                 </CILabel>
-                <CIButton onClick={handleShow}>Show</CIButton>
+                    <CILabel>
+                        Guess now!
+                    </CILabel>
+                    <CIButton onClick={handleShow}>Show me the number</CIButton>
             </Fragment>}
         </div>
         <div className={cls.board} id="board">
@@ -696,16 +708,16 @@ const Module_1 = () => {
             </CILabel>
             <div className={cls.body}>
                 <CILabel>
-                    In this activity, fishes like me will think of a number between 1-6 and you will try to guess that number.
+                    In this activity, fishes like me will think of a number between 1-6, and you will try to guess that number.
                 </CILabel>
                 <CILabel>
-                    If you guess the number correctly, then you’ll get a shell, otherwise no shell.
+                    If you guess the number correctly, then you will get a shell. If you do not guess the number correctly, then you will not get a shell.
                 </CILabel>
                 <img src={require("../assets/modules/Shell-alt.png")} />
                 <CILabel>
                     Are you ready?
                 </CILabel>
-                <CIButton onClick={handleClick}>Let's Go</CIButton>
+                <CIButton onClick={handleClick}>Let's Go!</CIButton>
             </div>
         </div>
         {feedback && <Feedback module="fish-mind-reading" onClose={handleExit} />}
