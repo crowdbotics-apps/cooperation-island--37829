@@ -400,16 +400,20 @@ class ActivityFeedbackViewSet(APIView):
 
             question = self.get_question(question_id)
             
+            if not answer:
+                return Response({'detail': 'Response submitted successfully.'}, status=status.HTTP_200_OK)
+            
             if activity_type == 'tell-us-about-you':
                 if question.question_type == 'rating':
-                    score = int(answer[0])
-                    participant_score = IndividualRankingQualitiesScore(
-                        participant=request.user,
-                        question=question,
-                        score=score,
-                    )
-                    participant_score.save()
-                    return Response({'detail': 'Response submitted successfully.'}, status=status.HTTP_200_OK)
+                    if int(answer[0]) in range(1, 6):
+                        score = int(answer[0])
+                        participant_score = IndividualRankingQualitiesScore(
+                            participant=request.user,
+                            question=question,
+                            score=score,
+                        )
+                        participant_score.save()
+                        return Response({'detail': 'Response submitted successfully.'}, status=status.HTTP_200_OK)
                 else:
                     return Response({'error': 'Invalid question type for this activity type.'}, status=status.HTTP_400_BAD_REQUEST)
             else:

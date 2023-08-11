@@ -221,23 +221,18 @@ class QuestionAnswerSerializer(serializers.Serializer):
         except Question.DoesNotExist:
             raise serializers.ValidationError('Question not found.')
 
+        valid_answer_option_ids = question.answer_options.values_list('id', flat=True)
+
         if question.question_type == 'text_input':
             if len(answer) > 1:
                 raise serializers.ValidationError(f'Invalid answer. Blank or One Answer is allowed for text type question.')
-        elif question.question_type == 'dropdown':
-            if len(answer) != 1:
-                raise serializers.ValidationError('Invalid answer. Please select one option for dropdown type question.')
-            valid_answer_option_ids = question.answer_options.values_list('id', flat=True)
-            if not set(answer).issubset(set(str(opt_id) for opt_id in valid_answer_option_ids)):
-                raise serializers.ValidationError('Invalid answer. Answer options are not valid for dropdown question.')
-        elif question.question_type == 'multiple_choice':
-            valid_answer_option_ids = question.answer_options.values_list('id', flat=True)
-            if not set(answer).issubset(set(str(opt_id) for opt_id in valid_answer_option_ids)):
-                raise serializers.ValidationError('Invalid answer. Some answer options are not valid for multiple choice question.')
+        
+        elif question.question_type == 'dropdown' or question.question_type == 'multiple_choice':
+            if  len(answer) != 0 and not set(answer).issubset(set(str(opt_id) for opt_id in valid_answer_option_ids)) :
+                raise serializers.ValidationError('Invalid answer. Answer options are not valid for question.')
+
         elif question.question_type == 'rating':
-            if len(answer) != 1:
-                raise serializers.ValidationError('Invalid answer. Only one answer is allowed for rating type question.')
-            if int(answer[0]) not in range(1, 6):
+            if len(answer) != 0 and int(answer[0]) not in range(1, 6):
                 raise serializers.ValidationError(f'Invalid answer {answer[0]}. Only answers in the range 1-5 are acceptable.')
         else:
             raise serializers.ValidationError('Invalid question type.')
