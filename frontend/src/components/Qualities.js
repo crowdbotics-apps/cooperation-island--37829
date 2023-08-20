@@ -11,7 +11,7 @@ const useStyles = makeStyles((theme) => ({
     index: {
         "& label": {
             color: "#3F8477",
-            paddingTop: "0vh"
+            paddingTop: "0.1vh"
         },
         position: "absolute",
         textAlign: "center",
@@ -35,12 +35,6 @@ const useStyles = makeStyles((theme) => ({
         overflow: "hidden",
         textOverflow: "ellipsis",
         whiteSpace: "nowrap"
-    },
-    label: {
-        userSelect: "none",
-        "-ms-user-select": "none",
-        "-moz-user-select": "none",
-        "-webkit-user-select": "none"
     }
 }));
 
@@ -79,7 +73,7 @@ const Qualities = ({ className, data, desc, disabled, draggingId, first, id, ind
         canDrop: ({ id }) => sm && data.includes(id),
         drop: () => ({ qualityId }),
         hover: (item, monitor) => {
-            if (item.index !== index && monitor.canDrop()) {
+            if (item.index !== index && monitor.canDrop() && qualityRef.current) {
                 const hoverBoundingRect = qualityRef.current.getBoundingClientRect();
                 const hoverMiddleY = (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2;
                 const clientOffset = monitor.getClientOffset();
@@ -123,8 +117,8 @@ const Qualities = ({ className, data, desc, disabled, draggingId, first, id, ind
         data-tooltip-id="tooltip"
         data-tooltip-content={desc}
         id={qualityId}
-        // ref={disabled ? () => { } : qualityRef}
-        ref={sm ? () => { } : qualityRef}
+        ref={disabled ? () => { } : qualityRef}
+        unselectable
         style={{
             marginTop: sm ? "0vh" : first ? "1vh" : "3vh",
             marginBottom: (!sm && last) ? "1vh" : "0vh",
@@ -133,11 +127,11 @@ const Qualities = ({ className, data, desc, disabled, draggingId, first, id, ind
             opacity: draggingId === id ? 0 : 1
         }}>
         {sm && <div className={cls.index}>
-            <CILabel className={clsx(cls.label, "pointer")} onMouseDown={handleSelection}>
+            <CILabel onMouseDown={handleSelection}>
                 {index + 1}
             </CILabel>
         </div>}
-        <CILabel className={clsx(cls.label, cls.quality, sm ? cls.notCenter : cls.center, "pointer")} onMouseDown={handleSelection}>
+        <CILabel className={clsx(cls.quality, sm ? cls.notCenter : cls.center, "pointer")} onMouseDown={handleSelection}>
             {text}
         </CILabel>
     </div>

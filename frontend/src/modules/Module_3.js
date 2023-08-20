@@ -54,9 +54,9 @@ const useStyles = makeStyles((theme) => ({
         position: "absolute",
         filter: "drop-shadow(0.1vh 0.1vh 0.4vh black)",
         top: "-40vh",
-        left: "2vw",
-        height: "22.95vh",
-        width: "21vw"
+        left: "-1vw",
+        height: "21.83vh",
+        width: "28vw"
     },
     instructor: {
         position: "absolute",
@@ -171,7 +171,7 @@ const useStyles = makeStyles((theme) => ({
         "& button": {
             backgroundSize: "10vw 7vh",
             width: "10vw",
-            marginTop: "3vh"
+            margin: "3vh 2vw",
         },
         "& label": {
             "&:first-child": {
@@ -230,7 +230,7 @@ const Module_3 = () => {
             })
             .add({
                 targets: "#logo2",
-                top: "4vh",
+                top: "2vh",
                 easing: "easeOutQuint",
                 duration: 2000
             }, "-=1000")
@@ -270,6 +270,7 @@ const Module_3 = () => {
                 .add({
                     targets: "#sections",
                     left: "32vw",
+                    top: "19vh",
                     easing: "easeInQuint",
                     duration: 2000
                 })
@@ -303,49 +304,84 @@ const Module_3 = () => {
         }));
     }
 
+    const handleBack = () => {
+        anime
+            .timeline()
+            .add({
+                targets: "#background",
+                opacity: 0,
+                easing: "linear",
+                duration: 2000,
+                complete: () => {
+                    $("#background").attr("src", require("../assets/images/Application_BG.jpg"));
+                }
+            })
+            .add({
+                targets: "#background",
+                opacity: 1,
+                easing: "linear",
+                duration: 2000
+            })
+            .add({
+                targets: "#logo2",
+                left: "-30vw",
+                easing: "easeInQuint",
+                duration: 2000
+            }, "-=4000")
+            .add({
+                targets: "#instructor",
+                left: "-30vw",
+                easing: "easeInQuint",
+                duration: 2000
+            }, "-=4000")
+            .add({
+                targets: "#board",
+                rotateY: ["0deg", "90deg"],
+                easing: "linear",
+                duration: 2000
+            }, "-=4000")
+            .finished.then(goHome);
+    }
+
     const handleClick = () => {
-        if (window.confirm("Alright, let's get started then! You are about to start the real activity. Please be sure you fully understand the instructions because you will not be able to return to them later. Remember these decisions help us with real science, so please take them seriously!")) {
-            setTimeout(() => {
-                anime
-                    .timeline()
-                    .add({
-                        targets: "#instructor",
-                        left: "-30vw",
-                        easing: "easeInQuint",
-                        duration: 2000
-                    })
-                    .add({
-                        targets: "#board",
-                        rotateY: ["0deg", "90deg"],
-                        easing: "linear",
-                        duration: 2000
-                    }, "-=2000")
-                    .add({
-                        targets: "#guide",
-                        left: "1vw",
-                        easing: "easeOutQuint",
-                        duration: 2000
-                    })
-                    .add({
-                        targets: "#block",
-                        top: "20vh",
-                        easing: "easeOutQuint",
-                        duration: 2000
-                    }, "-=2000")
-                    .add({
-                        targets: "#sections",
-                        top: "19vh",
-                        easing: "easeOutQuint",
-                        duration: 2000
-                    }, "-=2000")
-                    .add({
-                        targets: "#close, #music, #shell",
-                        top: "4vh",
-                        easing: "easeOutQuint",
-                        duration: 2000
-                    }, "-=2000");
-            }, 1);
-        }
+        anime
+            .timeline()
+            .add({
+                targets: "#instructor",
+                left: "-30vw",
+                easing: "easeInQuint",
+                duration: 2000
+            })
+            .add({
+                targets: "#board",
+                rotateY: ["0deg", "90deg"],
+                easing: "linear",
+                duration: 2000
+            }, "-=2000")
+            .add({
+                targets: "#guide",
+                left: "1vw",
+                easing: "easeOutQuint",
+                duration: 2000
+            })
+            .add({
+                targets: "#block",
+                top: "24vh",
+                easing: "easeOutQuint",
+                duration: 2000
+            }, "-=2000")
+            .add({
+                targets: "#sections",
+                top: "23vh",
+                easing: "easeOutQuint",
+                duration: 2000
+            }, "-=2000")
+            .add({
+                targets: "#close, #music, #shell",
+                top: "4vh",
+                easing: "easeOutQuint",
+                duration: 2000
+            }, "-=2000");
     }
 
     const handleClose = () => {
@@ -385,29 +421,18 @@ const Module_3 = () => {
                 duration: 2000
             }, "-=4000")
             .add({
+                targets: `.${cls.button}`,
+                top: "192vh",
+                easing: "easeInQuint",
+                duration: 2000
+            }, "-=4000")
+            .add({
                 targets: "#close, #music, #shell",
                 top: "-12vh",
                 easing: "easeInQuint",
                 duration: 2000
             }, "-=4000")
-            .finished.then(() => {
-                howler.module_3.fade(howler.module_3.volume(), 0, 1000);
-                if (BGM)
-                    howler.welcome.fade(0, 1, 1000);
-
-                history.push("/home");
-                anime({
-                    targets: "#logo",
-                    top: "-12vh",
-                    left: "-12vw",
-                    scale: 0.45,
-                    translateX: ["-30vw", "0vw"],
-                    translateY: ["-30vh", "0vh"],
-                    easing: "easeOutQuint",
-                    duration: 2000
-                });
-                showHomePage();
-            });
+            .finished.then(goHome);
     }
 
     const handleExit = () => {
@@ -434,24 +459,7 @@ const Module_3 = () => {
                 easing: "easeInQuint",
                 duration: 2000
             }, "-=4000")
-            .finished.then(() => {
-                howler.module_3.fade(howler.module_3.volume(), 0, 1000);
-                if (BGM)
-                    howler.welcome.fade(0, 1, 1000);
-
-                history.push("/home");
-                anime({
-                    targets: "#logo",
-                    top: "-12vh",
-                    left: "-12vw",
-                    scale: 0.45,
-                    translateX: ["-30vw", "0vw"],
-                    translateY: ["-30vh", "0vh"],
-                    easing: "easeOutQuint",
-                    duration: 2000
-                });
-                showHomePage();
-            });
+            .finished.then(goHome);
     }
 
     const handleSave = () => {
@@ -516,6 +524,25 @@ const Module_3 = () => {
         });
     }
 
+    const goHome = () => {
+        howler.module_3.fade(howler.module_3.volume(), 0, 1000);
+        if (BGM)
+            howler.welcome.fade(0, 1, 1000);
+
+        history.push("/home");
+        anime({
+            targets: "#logo",
+            top: "-12vh",
+            left: "-12vw",
+            scale: 0.45,
+            translateX: ["-30vw", "0vw"],
+            translateY: ["-30vh", "0vh"],
+            easing: "easeOutQuint",
+            duration: 2000
+        });
+        showHomePage();
+    }
+
     return <div>
         <img className={cls.logo} id="logo2" src={require("../assets/modules/Module_3_Text.png")} />
         <img className={cls.instructor} id="instructor" src={require("../assets/avatars/xtras/Avatar_13.png")} />
@@ -540,7 +567,8 @@ const Module_3 = () => {
                 <CILabel>
                     Are you ready?
                 </CILabel>
-                <CIButton onClick={handleClick}>Let's Go!</CIButton>
+                <CIButton alt onClick={handleClick}>Let's Go!</CIButton>
+                <CIButton onClick={handleBack}>Go Back</CIButton>
             </div>
         </div>
         <div className={cls.block} id="block">
