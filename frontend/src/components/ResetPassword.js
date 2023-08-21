@@ -3,7 +3,7 @@ import { makeStyles } from "@material-ui/core";
 import { useHistory } from "react-router-dom";
 import { showLoginBoard } from "../libs/animations";
 import { getUsername, savePassword } from "../services/v1";
-import BoardImg from "../assets/images/Board-alt.png";
+import BoardImg from "../assets/images/Board.png";
 import CILabel from "../shared/CILabel";
 import CIInput from "../shared/CIInput";
 import CIButton from "../shared/CIButton";

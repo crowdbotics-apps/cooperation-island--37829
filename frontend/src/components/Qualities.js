@@ -118,7 +118,7 @@ const Qualities = ({ className, data, desc, disabled, draggingId, first, id, ind
         data-tooltip-content={desc}
         id={qualityId}
         ref={disabled ? () => { } : qualityRef}
-        unselectable
+        unselectable="on"
         style={{
             marginTop: sm ? "0vh" : first ? "1vh" : "3vh",
             marginBottom: (!sm && last) ? "1vh" : "0vh",

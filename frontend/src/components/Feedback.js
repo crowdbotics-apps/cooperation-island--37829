@@ -1,7 +1,7 @@
 import { Fragment, useContext, useEffect, useState } from "react";
 import { makeStyles } from "@material-ui/core";
 import { saveFeedback } from "../services/v1";
-import BoardImg from "../assets/images/Board-alt.png";
+import BoardImg from "../assets/images/Board.png";
 import CIButton from "../shared/CIButton";
 import CIInput from "../shared/CIInput";
 import CILabel from "../shared/CILabel";

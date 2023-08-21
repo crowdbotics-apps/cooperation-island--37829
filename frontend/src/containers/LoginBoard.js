@@ -5,7 +5,7 @@ import { mapUserData } from "../funnels/v1";
 import { formatAge, formatUsername, parseToken, validateEmail } from "../libs/utils";
 import { login as handleLogin, signup as handleSignup, resetPassword } from "../services/v1";
 import { showAvatarPage, showDetailsPage, showHomePage, showLandingPage, showReadingPane } from "../libs/animations";
-import BoardImg from "../assets/images/Board.png";
+import BoardImg from "../assets/images/Board-alt.png";
 import HeaderImg from "../assets/images/Header.png";
 import SwitchImg from "../assets/images/Switch.png";
 import CIButton from "../shared/CIButton";

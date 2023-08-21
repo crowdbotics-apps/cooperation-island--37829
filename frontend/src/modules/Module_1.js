@@ -1,10 +1,11 @@
 import { Fragment, useContext, useEffect, useState } from "react";
-import { makeStyles } from "@material-ui/core";
+import { Backdrop, makeStyles } from "@material-ui/core";
 import { useHistory } from "react-router-dom";
 import { shuffleArray } from "../libs/utils";
 import { score } from "../services/v1";
 import { showHomePage } from "../libs/animations";
-import BoardImg from "../assets/images/Board-alt.png";
+import BoardImg from "../assets/images/Board.png";
+import BoardSmImg from "../assets/images/Board-sm.png";
 import DialogImg from "../assets/modules/Dialog.png";
 import Bubbles from "../components/Bubbles";
 import Feedback from "../components/Feedback";
@@ -35,6 +36,32 @@ const useStyles = makeStyles((theme) => ({
         background: `url(${BoardImg})`,
         backgroundRepeat: "no-repeat",
         backgroundSize: "55vw 90vh"
+    },
+    board2: {
+        "& button": {
+            backgroundSize: "10vw 7vh",
+            width: "10vw",
+            margin: "24vh 2vw 0vh",
+        },
+        "& label": {
+            fontSize: "3.5vh",
+            marginTop: "13.5vh",
+            padding: "0vh 7vw"
+        },
+        position: "absolute",
+        filter: "drop-shadow(0.33vh 0.66vh 1.2vh black)",
+        textAlign: "center",
+        top: "23vh",
+        left: "25vw",
+        height: "54vh",
+        width: "50vw",
+        transform: "scale(0)",
+        background: `url(${BoardSmImg})`,
+        backgroundRepeat: "no-repeat",
+        backgroundSize: "50vw 54vh"
+    },
+    backdrop: {
+        zIndex: 5
     },
     dialog: {
         "& > button": {
@@ -327,6 +354,8 @@ const Module_1 = () => {
 
     const [trial, setTrial] = useState(1);
 
+    const [showBackdrop, hideBackdrop] = useState(false);
+
     const { BGM, howler, user } = useContext(AppContext);
 
     useEffect(() => {
@@ -410,6 +439,15 @@ const Module_1 = () => {
     const handleClick = () => {
         anime
             .timeline()
+            .add({
+                targets: "#board7",
+                scale: 0,
+                easing: "easeInQuint",
+                duration: 500,
+                complete: () => {
+                    hideBackdrop(false);
+                }
+            })
             .add({
                 targets: "#fish",
                 left: "-40vw",
@@ -524,6 +562,29 @@ const Module_1 = () => {
                 duration: 2000
             }, "-=4000")
             .finished.then(goHome);
+    }
+
+    const handlePopIn = () => {
+        anime({
+            targets: "#board7",
+            scale: [0, 1],
+            duration: 1000,
+            begin: () => {
+                hideBackdrop(true);
+            }
+        });
+    }
+
+    const handlePopOut = () => {
+        anime({
+            targets: "#board7",
+            scale: 0,
+            easing: "easeInQuint",
+            duration: 500,
+            complete: () => {
+                hideBackdrop(false);
+            }
+        });
     }
 
     const handleShow = () => {
@@ -737,10 +798,19 @@ const Module_1 = () => {
                 <CILabel>
                     Are you ready?
                 </CILabel>
-                <CIButton alt onClick={handleClick}>Let's Go!</CIButton>
+                <CIButton alt onClick={handlePopIn}>Let's Go!</CIButton>
                 <CIButton onClick={handleBack}>Go Back</CIButton>
             </div>
         </div>
+        <Backdrop className={cls.backdrop} open={showBackdrop}>
+            <div className={cls.board2} id="board7">
+                <CILabel>
+                    Alright, let's get started then! You are about to start the real activity. Please be sure you fully understand the instructions because you will not be able to return to them later. Remember these decisions help us with real science, so please take them seriously!
+                </CILabel>
+                <CIButton alt onClick={handleClick}>OK</CIButton>
+                <CIButton onClick={handlePopOut}>Go Back</CIButton>
+            </div>
+        </Backdrop>
         {feedback && <Feedback module="fish-mind-reading" onClose={handleExit} />}
     </div>
 }
