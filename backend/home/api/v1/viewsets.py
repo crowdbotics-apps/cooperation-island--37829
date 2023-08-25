@@ -1,3 +1,4 @@
+import uuid
 from datetime import datetime
 from django.contrib.auth import get_user_model
 from django.utils.http import urlsafe_base64_decode
@@ -20,14 +21,18 @@ from users.models import (  Profile,
                             PasswordResetSession, 
                             PrivacyPolicy, 
                             TermAndCondition, 
-                            FishGameTrial,
                             Question,
                             ActivityFeedback,
                             AnswerOption,
                             ParticipantResponse,
                             RankedQualities,
                             IndividualRankingQualitiesScore,
+                            IncentiveRangeSelection,
+                            FishGameDistribution,
+                            TreeShakingDistributionTrials,
                         )
+
+
 from home.api.v1.serializers import (
     SignupSerializer,
     UserDetailsSerializer,
@@ -40,7 +45,6 @@ from home.api.v1.serializers import (
     FishGameTrialSerializer,
     QuestionSerializer,
     QuestionAnswerSerializer,
-    RankedQualitiesSerializer,
     TreeShakingGameTrialSerializer,
 )
 
@@ -329,25 +333,6 @@ class TermAndConditionViewSet(ReadOnlyModelViewSet):
             return Response(serializer.data)
         
         return Response(status=status.HTTP_400_BAD_REQUEST)
-    
-
-class FishGameTrialAPIView(generics.ListCreateAPIView):
-    queryset = FishGameTrial.objects.all()
-    serializer_class = FishGameTrialSerializer
-    permission_classes = [IsAuthenticated]
-
-    def perform_create(self, serializer):
-        serializer.save(participant=self.request.user)
-
-    def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
-        
-        if serializer.is_valid():
-            return Response(status=status.HTTP_200_OK)
-        else:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 class ActivityFeedbackViewSet(APIView):
@@ -368,14 +353,14 @@ class ActivityFeedbackViewSet(APIView):
     def get(self, request, activity_type=None):
         activity_feedback = self.get_activity_feedback(activity_type)
         
-        if activity_type == 'tell-us-about-you':
+        if activity_type == 'voice-your-values':
             questions = activity_feedback.questions.filter(question_type='rating').order_by('questionorder__order')
         else:
             questions = activity_feedback.questions.order_by('questionorder__order')
         
         filtered_questions = []
         for question in questions:
-            if activity_type == 'tell-us-about-you':
+            if activity_type == 'voice-your-values':
                 if question.question_type == 'rating':
                     filtered_questions.append(question)
             else:
@@ -397,13 +382,11 @@ class ActivityFeedbackViewSet(APIView):
         if serializer.is_valid():
             question_id = serializer.validated_data['id']
             answer = serializer.validated_data['answer']
+            session_id = serializer.validated_data['session_id']
 
             question = self.get_question(question_id)
             
-            if not answer:
-                return Response({'detail': 'Response submitted successfully.'}, status=status.HTTP_200_OK)
-            
-            if activity_type == 'tell-us-about-you':
+            if activity_type == 'voice-your-values':
                 if question.question_type == 'rating':
                     if int(answer[0]) in range(1, 6):
                         score = int(answer[0])
@@ -411,6 +394,7 @@ class ActivityFeedbackViewSet(APIView):
                             participant=request.user,
                             question=question,
                             score=score,
+                            session_id=session_id,
                         )
                         participant_score.save()
                         return Response({'detail': 'Response submitted successfully.'}, status=status.HTTP_200_OK)
@@ -424,6 +408,7 @@ class ActivityFeedbackViewSet(APIView):
                         activity_feedback=activity_feedback,
                         question=question,
                         text_answer=text_answer,
+                        session_id=session_id,
                     )
                     participant_response.save()
                 else:
@@ -431,6 +416,7 @@ class ActivityFeedbackViewSet(APIView):
                         participant=request.user,
                         activity_feedback=activity_feedback,
                         question=question,
+                        session_id=session_id
                     )
                     participant_response.save()
 
@@ -455,16 +441,37 @@ class RankedQualitiesAPIView(APIView):
                 quality = ranked_quality['id']
                 category = ranked_quality['category']
                 rank = ranked_quality['rank']
+                session_id = ranked_quality['session_id']
 
                 if quality not in dict(RankedQualities.quality_choices):
                     return Response(f"Invalid quality choice: {quality}", status=status.HTTP_400_BAD_REQUEST)
 
-                RankedQualities.objects.create(participant=user, quality=quality, category=category, rank=rank)
+                RankedQualities.objects.create(participant=user, quality=quality, category=category, rank=rank, session_id=session_id)
         except Exception as e:
             return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
 
         return Response("Ranked qualities saved successfully.", status=status.HTTP_200_OK)
     
+
+class FishGameTrialAPIView(APIView):
+    serializer_class = FishGameTrialSerializer
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        participant = request.user
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            serializer.save(participant=participant)
+            user = request.user
+            user.shells += serializer.validated_data['shell']
+            user.save()
+            user_detail_serializer = UserDetailsSerializer(user)
+            payload=encrypt_payload(user_detail_serializer.data)
+            return Response(payload, status=status.HTTP_200_OK) 
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
 
 class TreeShakingGameTrialView(APIView):
     serializer_class = TreeShakingGameTrialSerializer
@@ -475,13 +482,54 @@ class TreeShakingGameTrialView(APIView):
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
             serializer.save(participant=participant)
-            return Response(status=status.HTTP_200_OK) 
+            user = request.user
+            number = serializer.validated_data['shell'] - serializer.validated_data['shared_shell']
+            user.shells += number
+            user.save()
+            user_detail_serializer = UserDetailsSerializer(user)
+            payload=encrypt_payload(user_detail_serializer.data)
+            return Response(payload, status=status.HTTP_200_OK) 
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
+class DataGenerateView(APIView):
+    permission_classes = [IsAuthenticated]
 
+    def get(self, request, activity_name):
+        response_data = {'session_id': str(uuid.uuid4())}  
 
+        try:
+            latest_stake_selection = IncentiveRangeSelection.objects.latest('id')
+            stake_level = latest_stake_selection.stake_level_selected
 
+            if activity_name == 'fish-mind-reading':
+                try:
+                    fish_distribution = FishGameDistribution.objects.get(stake_level=stake_level)
+                    response_data['min'] = fish_distribution.min
+                    response_data['max'] = fish_distribution.max
+                except FishGameDistribution.DoesNotExist:
+                    response_data['min'] = 0
+                    response_data['max'] = 0
 
+            elif activity_name == 'tree-shaking':
+                tree_shaking_distributions = TreeShakingDistributionTrials.objects.filter(tree_game_level__stake_level=stake_level)
+                
+                trials = [{'self': entry.self_distribution, 'partner': entry.partner_distribution} for entry in tree_shaking_distributions]
 
+                while len(trials) < 24:
+                    trials.append({'self': 0, 'partner': 0})
+                trials = trials[:24]
+
+                response_data['trials'] = trials
+
+            elif activity_name == 'voice-your-values':
+                pass
+
+            else:
+                return Response({'error': 'Invalid activity name'}, status=status.HTTP_400_BAD_REQUEST)
+
+        except IncentiveRangeSelection.DoesNotExist:
+            pass
+
+        return Response(response_data)

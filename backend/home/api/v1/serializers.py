@@ -86,7 +86,7 @@ class UserSerializer(serializers.ModelSerializer):
 class UserDetailsSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['username','age', 'avatar_id', 'consent_status', 'detail_status', 'consent_email']
+        fields = ['username','age', 'avatar_id', 'consent_email',  'consent_status', 'detail_status', 'shells']
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
@@ -153,12 +153,10 @@ class FishGameTrialSerializer(serializers.ModelSerializer):
     participant = serializers.PrimaryKeyRelatedField(read_only=True)
     class Meta:
         model = FishGameTrial
-        fields = ['id','participant', 'trial_number', 'match', 'trial_response_time']
+        fields = ['id','participant', 'trial_number', 'match', 'trial_response_time', 'number', 'session_id', 'shell']
 
-    def to_internal_value(self, data):
-        if 'trial_response_time' in data:
-            data['trial_response_time'] = str(float(data['trial_response_time']) / 1000)
-        return super().to_internal_value(data)
+    def validate_trial_response_time(self, value):
+        return round(value / 1000, 2)
 
 
 class AnswerOptionSerializer(serializers.ModelSerializer):
@@ -195,6 +193,8 @@ class QuestionSerializer(serializers.ModelSerializer):
             return '3'
         elif question_type == 'rating':
             return '4'
+        elif question_type == 'instruction':
+            return '5'
         return question_type
     
     def validate(self, data):
@@ -210,7 +210,8 @@ class QuestionSerializer(serializers.ModelSerializer):
 
 class QuestionAnswerSerializer(serializers.Serializer):
     id = serializers.IntegerField()
-    answer = serializers.ListField(child=serializers.CharField())
+    answer = serializers.ListField(child=serializers.CharField(allow_blank=True), required=False )
+    session_id = serializers.UUIDField()
 
     def validate(self, data):
         question_id = data.get('id')
@@ -243,18 +244,16 @@ class QuestionAnswerSerializer(serializers.Serializer):
 class RankedQualitiesSerializer(serializers.ModelSerializer):
     class Meta:
         model = RankedQualities
-        fields = ['id', 'category', 'rank']
+        fields = ['id', 'category', 'rank', 'session_id']
 
 
 class TreeShakingGameTrialSerializer(serializers.ModelSerializer):
     class Meta:
         model = TreeShakingGameTrial
-        fields = ['trial_number', 'shell', 'shared_shell', 'response', 'trial_response_time']
+        fields = ['trial_number', 'shell', 'shared_shell', 'response', 'trial_response_time', 'session_id']
 
-    def to_internal_value(self, data):
-        if 'trial_response_time' in data:
-            data['trial_response_time'] = str(float(data['trial_response_time']) / 1000)
-        return super().to_internal_value(data)
-
+    def validate_trial_response_time(self, value):
+        return round(value / 1000, 2)
+    
 
 

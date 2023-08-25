@@ -42,6 +42,7 @@ class User(AbstractUser):
     consent_status = models.BooleanField(default=False)
     detail_status = models.BooleanField(default=False)
     consent_email = models.BooleanField(default=False)
+    shells = models.PositiveIntegerField(default=10)
 
     USERNAME_FIELD = 'username'
 
@@ -172,6 +173,9 @@ class FishGameTrial(models.Model):
     trial_number = models.PositiveSmallIntegerField()
     match = models.BooleanField()
     trial_response_time = models.DecimalField(max_digits=10, decimal_places=2)
+    shell = models.PositiveSmallIntegerField()
+    number = models.PositiveSmallIntegerField()
+    session_id = models.CharField(max_length=36)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -179,11 +183,13 @@ class FishGameTrial(models.Model):
         return f"Participant: {participant_info} - Trial: {self.trial_number}"
 
 class ActivityFeedback(models.Model):
+    
     activity_type_choices = [
         ('fish-mind-reading', 'Fish Mind Reading'),
         ('tree-shaking', 'Tree Shaking'),
-        ('tell-us-about-you', 'Tell Us About You')
+        ('voice-your-values', 'Voice Your Values')
     ]
+
     
     activity_type = models.CharField(max_length=255, choices=activity_type_choices, unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -198,6 +204,7 @@ class Question(models.Model):
         ('multiple_choice', 'Multiple Choice Question'),
         ('dropdown', 'Dropdown Selection'),
         ('rating', 'Rating'),
+        ('instruction', 'Instruction')
     ]
 
     activity_feedback = models.ForeignKey(ActivityFeedback, on_delete=models.CASCADE, related_name='questions')
@@ -250,6 +257,7 @@ class ParticipantResponse(models.Model):
     original_question_text = models.CharField(blank=True, max_length=255,  default=None, null=True)
     text_answer = models.TextField(blank=True, null=True)
     answer_options = models.ManyToManyField(AnswerOption, blank=True)
+    session_id = models.CharField(max_length=36)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -283,6 +291,7 @@ class RankedQualities(models.Model):
     quality = models.PositiveSmallIntegerField(choices=quality_choices)
     category = models.PositiveSmallIntegerField(choices=category_choices)
     rank = models.PositiveSmallIntegerField()
+    session_id = models.CharField(max_length=36)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -298,6 +307,7 @@ class TreeShakingGameTrial(models.Model):
     shared_shell= models.PositiveIntegerField()
     trial_response_time = models.DecimalField(max_digits=10, decimal_places=2)
     response = models.BooleanField()
+    session_id = models.CharField(max_length=36)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -311,6 +321,7 @@ class IndividualRankingQualitiesScore(models.Model):
     question = models.ForeignKey(Question, on_delete=models.SET_NULL, null=True)
     original_question_text = models.CharField(blank=True, max_length=255, default=None, null=True)
     score = models.PositiveIntegerField()
+    session_id = models.CharField(max_length=36)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -320,3 +331,47 @@ class IndividualRankingQualitiesScore(models.Model):
 
 
 
+
+class IncentiveRangeSelection(models.Model):  
+    STAKE_CHOICES = [
+        ('low', 'Low'),
+        ('medium', 'Medium'),
+        ('high', 'High')
+    ]
+    stake_level_selected = models.CharField(max_length=10, choices=STAKE_CHOICES, unique=True)
+    author = models.ForeignKey(User, on_delete=models.PROTECT, related_name="incentive_author")
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    def __str__(self):
+        return f"Current Stake Level Selection: {self.stake_level_selected}"
+    
+
+class FishGameDistribution(models.Model):
+    stake_level = models.CharField(max_length=10, choices=IncentiveRangeSelection.STAKE_CHOICES, unique=True)
+    min = models.PositiveIntegerField()
+    max = models.PositiveIntegerField()
+    author = models.ForeignKey(User, on_delete=models.PROTECT, related_name="fishgame_author")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Fish game Distribution for Stake Level:{self.stake_level}"
+
+class TreeShakingDistribution(models.Model):
+    stake_level = models.CharField(max_length=10, choices=IncentiveRangeSelection.STAKE_CHOICES, unique=True)
+    author = models.ForeignKey(User, on_delete=models.PROTECT, related_name="treegame_author")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    def __str__(self):
+        return f"Tree Shaking game Distribution for Stake Level:{self.stake_level}"
+
+class TreeShakingDistributionTrials(models.Model):
+    tree_game_level = models.ForeignKey(TreeShakingDistribution, on_delete=models.CASCADE)
+    trial_number = models.PositiveIntegerField()
+    self_distribution = models.PositiveIntegerField()
+    partner_distribution = models.PositiveIntegerField()
+    def __str__(self):
+        return f"Tree Shaking Distribution for Trial {self.trial_number}"

@@ -22,6 +22,10 @@ from .models import (ConsentAccessCode,
                      RankedQualities,
                      TreeShakingGameTrial,
                      IndividualRankingQualitiesScore,
+                     IncentiveRangeSelection, 
+                     TreeShakingDistribution,
+                     TreeShakingDistributionTrials, 
+                     FishGameDistribution,
                     )
 
 from .utils import (
@@ -52,9 +56,9 @@ class UserAdmin(auth_admin.UserAdmin):
 
 admin.site.register(ConsentAccessCode)
 
-admin.site.register(EmailVerification)
+# admin.site.register(EmailVerification)
 
-admin.site.register(PasswordResetSession)
+# admin.site.register(PasswordResetSession)
 
 admin.site.register(PrivacyPolicy)
 
@@ -62,7 +66,7 @@ admin.site.register(TermAndCondition)
 
 
 class FishGameTrialAdmin(admin.ModelAdmin):
-    list_display = ['participant','original_participant_id', 'trial_number', 'match', 'trial_response_time', 'created_at']
+    list_display = ['participant','session_id', 'trial_number', 'match', 'trial_response_time', 'shell', 'number']
     list_filter = [
         ('created_at'),
     ]
@@ -145,9 +149,9 @@ class QuestionAdmin(admin.ModelAdmin):
     inlines = [AnswerOptionInline]
 
 
-@admin.register(AnswerOption)
-class AnswerOptionAdmin(admin.ModelAdmin):
-    list_display = ['option_text', 'question']
+# @admin.register(AnswerOption)
+# class AnswerOptionAdmin(admin.ModelAdmin):
+#     list_display = ['option_text', 'question']
 
 
 @admin.register(QuestionOrder)
@@ -157,14 +161,14 @@ class QuestionOrderAdmin(admin.ModelAdmin):
 
 
 class ParticipantResponseAdmin(admin.ModelAdmin):
-    list_display = ['participant', 'original_participant_id', 'activity_feedback', 'question', 'original_question_text', 'text_answer']
+    list_display = ['participant', 'session_id', 'activity_feedback', 'question', 'text_answer']
     list_filter = [
         ('created_at'),
     ]
 admin.site.register(ParticipantResponse, ParticipantResponseAdmin)
 
 class RankedQualitiesAdmin(admin.ModelAdmin):
-    list_display = ['participant', 'original_participant_id', 'quality', 'category', 'rank']
+    list_display = ['participant', 'session_id', 'quality', 'category', 'rank']
     actions = ['export_selected_rankedqualities_csv']
     list_filter = [
         ('created_at'),
@@ -188,7 +192,7 @@ admin.site.register(RankedQualities, RankedQualitiesAdmin)
 
 
 class IndividualRankingQualitiesScoreAdmin(admin.ModelAdmin):
-    list_display = ['participant', 'original_participant_id','question', 'original_question_text', 'score', 'created_at']
+    list_display = ['participant', 'session_id','question', 'score']
     actions = ['export_selected_scores_csv']
     list_filter = [
         ('created_at'),
@@ -212,7 +216,7 @@ admin.site.register(IndividualRankingQualitiesScore, IndividualRankingQualitiesS
 
 
 class TreeShakingGameTrialAdmin(admin.ModelAdmin):
-    list_display = ['participant', 'original_participant_id', 'trial_number', 'shell', 'shared_shell', 'response', 'trial_response_time', 'created_at']
+    list_display = ['participant', 'session_id', 'trial_number', 'shell', 'shared_shell', 'response', 'trial_response_time', 'created_at' ]
     actions = ['export_selected_trials_csv']
     list_filter = [
         ('created_at'),
@@ -257,3 +261,20 @@ class ProfileAdmin(admin.ModelAdmin):
         return super().changelist_view(request, extra_context=extra_context)
 
 admin.site.register(Profile, ProfileAdmin)
+
+
+
+class TreeShakingDistributionTrialsInline(admin.TabularInline):
+    model = TreeShakingDistributionTrials
+    extra = 24
+
+@admin.register(TreeShakingDistribution)
+class TreeShakingDistributionAdmin(admin.ModelAdmin):
+    list_display = ['stake_level']
+    inlines = [TreeShakingDistributionTrialsInline]
+
+@admin.register(FishGameDistribution)
+class FishGameDistributionAdmin(admin.ModelAdmin):
+    list_display=['stake_level', 'min', 'max']
+
+admin.site.register(IncentiveRangeSelection)
