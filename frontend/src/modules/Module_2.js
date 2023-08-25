@@ -1,10 +1,11 @@
 import { useContext, useEffect, useRef, useState } from "react";
-import { makeStyles } from "@material-ui/core";
+import { Backdrop, makeStyles } from "@material-ui/core";
 import { useHistory } from "react-router-dom";
 import { shellsComposite, shuffleArray } from "../libs/utils";
 import { score } from "../services/v1";
 import { showHomePage } from "../libs/animations";
-import BoardImg from "../assets/images/Board-alt.png";
+import BoardImg from "../assets/images/Board.png";
+import BoardSmImg from "../assets/images/Board-sm.png";
 import SpeechImg from "../assets/modules/Speech.png";
 import BirdsClouds from "../components/BirdsClouds";
 import Feedback from "../components/Feedback";
@@ -34,6 +35,32 @@ const useStyles = makeStyles({
         background: `url(${BoardImg})`,
         backgroundRepeat: "no-repeat",
         backgroundSize: "55vw 90vh"
+    },
+    board2: {
+        "& button": {
+            backgroundSize: "10vw 7vh",
+            width: "10vw",
+            margin: "24vh 2vw 0vh",
+        },
+        "& label": {
+            fontSize: "3.5vh",
+            marginTop: "13.5vh",
+            padding: "0vh 7vw"
+        },
+        position: "absolute",
+        filter: "drop-shadow(0.33vh 0.66vh 1.2vh black)",
+        textAlign: "center",
+        top: "23vh",
+        left: "25vw",
+        height: "54vh",
+        width: "50vw",
+        transform: "scale(0)",
+        background: `url(${BoardSmImg})`,
+        backgroundRepeat: "no-repeat",
+        backgroundSize: "50vw 54vh"
+    },
+    backdrop: {
+        zIndex: 5
     },
     logo: {
         position: "absolute",
@@ -160,8 +187,12 @@ const useStyles = makeStyles({
             width: "26vw"
         },
         "& label:nth-child(2)": {
+            marginTop: "2vh",
+            width: "28vw"
+        },
+        "& label:nth-child(3)": {
             fontSize: "3.2vh",
-            marginTop: "13vh",
+            marginTop: "8vh",
             marginLeft: "7vw",
             width: "20vw"
         },
@@ -180,7 +211,7 @@ const useStyles = makeStyles({
         "& button": {
             backgroundSize: "10vw 7vh",
             width: "10vw",
-            marginTop: "4vh"
+            margin: "4vh 2vw",
         },
         "& label": {
             "&:nth-child(2)": {
@@ -228,6 +259,8 @@ const Module_2 = () => {
         partner: 0
     });
 
+    const [showBackdrop, hideBackdrop] = useState(false);
+
     const { BGM, howler, user } = useContext(AppContext);
 
     useEffect(() => {
@@ -269,63 +302,111 @@ const Module_2 = () => {
             }, "-=2000");
     }, []);
 
+    const handleBack = () => {
+        anime
+            .timeline()
+            .add({
+                targets: "#background, #bg-animations",
+                opacity: 0,
+                width: "100vw",
+                height: "100vh",
+                marginTop: "0vh",
+                marginLeft: "0vw",
+                easing: "easeInQuint",
+                duration: 2000,
+                complete: () => {
+                    $("#background").attr("src", require("../assets/images/Application_BG.jpg"));
+                }
+            })
+            .add({
+                targets: "#background",
+                opacity: 1,
+                easing: "linear",
+                duration: 2000
+            })
+            .add({
+                targets: "#logo2",
+                left: "-30vw",
+                easing: "easeInQuint",
+                duration: 2000
+            }, "-=4000")
+            .add({
+                targets: "#instructor",
+                left: "-30vw",
+                easing: "easeInQuint",
+                duration: 2000
+            }, "-=4000")
+            .add({
+                targets: "#board",
+                rotateY: ["0deg", "90deg"],
+                easing: "linear",
+                duration: 2000
+            }, "-=4000")
+            .finished.then(goHome);
+    }
+
     const handleClick = () => {
-        if (window.confirm("Alright, let's get started then! You are about to start the real activity. Please be sure you fully understand the instructions because you will not be able to return to them later. Remember these decisions help us with real science, so please take them seriously!")) {
-            setTimeout(() => {
-                anime
-                    .timeline()
-                    .add({
-                        targets: "#instructor",
-                        left: "-30vw",
-                        easing: "easeInQuint",
-                        duration: 2000
-                    })
-                    .add({
-                        targets: "#board",
-                        rotateY: ["0deg", "90deg"],
-                        easing: "linear",
-                        duration: 2000
-                    }, "-=2000")
-                    .add({
-                        targets: "#guide",
-                        left: "1vw",
-                        easing: "easeOutQuint",
-                        duration: 2000
-                    })
-                    .add({
-                        targets: "#background",
-                        width: "180vw",
-                        height: "180vh",
-                        marginTop: "-66vh",
-                        marginLeft: "-76vw",
-                        easing: "easeOutQuint",
-                        duration: 2000
-                    }, "-=2000")
-                    .add({
-                        targets: "#palmAlt",
-                        scale: [0, 1],
-                        top: "-9vh",
-                        easing: "easeOutQuint",
-                        duration: 2000
-                    }, "-=2000")
-                    .add({
-                        targets: "#guide2",
-                        left: "76vw",
-                        easing: "easeOutQuint",
-                        duration: 2000
-                    }, "-=2000")
-                    .add({
-                        targets: "#close, #music, #shell",
-                        top: "4vh",
-                        easing: "easeOutQuint",
-                        duration: 2000,
-                        complete: () => {
-                            $("#palmAlt, #palmWrapper").toggle();
-                            setTimeout(handleRestart, 400);
-                        }
-                    }, "-=2000");
-            }, 1);
-        }
+        anime
+            .timeline()
+            .add({
+                targets: "#board7",
+                scale: 0,
+                easing: "easeInQuint",
+                duration: 500,
+                complete: () => {
+                    hideBackdrop(false);
+                }
+            })
+            .add({
+                targets: "#instructor",
+                left: "-30vw",
+                easing: "easeInQuint",
+                duration: 2000
+            })
+            .add({
+                targets: "#board",
+                rotateY: ["0deg", "90deg"],
+                easing: "linear",
+                duration: 2000
+            }, "-=2000")
+            .add({
+                targets: "#guide",
+                left: "1vw",
+                easing: "easeOutQuint",
+                duration: 2000
+            })
+            .add({
+                targets: "#background",
+                width: "180vw",
+                height: "180vh",
+                marginTop: "-66vh",
+                marginLeft: "-76vw",
+                easing: "easeOutQuint",
+                duration: 2000
+            }, "-=2000")
+            .add({
+                targets: "#palmAlt",
+                scale: [0, 1],
+                top: "-9vh",
+                easing: "easeOutQuint",
+                duration: 2000
+            }, "-=2000")
+            .add({
+                targets: "#guide2",
+                left: "76vw",
+                easing: "easeOutQuint",
+                duration: 2000
+            }, "-=2000")
+            .add({
+                targets: "#close, #music, #shell",
+                top: "4vh",
+                easing: "easeOutQuint",
+                duration: 2000,
+                complete: () => {
+                    $("#palmAlt, #palmWrapper").toggle();
+                    setTimeout(handleRestart, 400);
+                }
+            }, "-=2000");
     }
 
     const handleClose = () => {
@@ -405,24 +486,7 @@ const Module_2 = () => {
                 easing: "easeInQuint",
                 duration: 2000
             }, "-=4000")
-            .finished.then(() => {
-                howler.module_2.fade(howler.module_2.volume(), 0, 1000);
-                if (BGM)
-                    howler.welcome.fade(0, 1, 1000);
-
-                history.push("/home");
-                anime({
-                    targets: "#logo",
-                    top: "-12vh",
-                    left: "-12vw",
-                    scale: 0.45,
-                    translateX: ["-30vw", "0vw"],
-                    translateY: ["-30vh", "0vh"],
-                    easing: "easeOutQuint",
-                    duration: 2000
-                });
-                showHomePage();
-            });
+            .finished.then(goHome);
     }
 
     const handleExit = () => {
@@ -453,24 +517,30 @@ const Module_2 = () => {
                 easing: "easeInQuint",
                 duration: 2000
             }, "-=4000")
-            .finished.then(() => {
-                howler.module_2.fade(howler.module_2.volume(), 0, 1000);
-                if (BGM)
-                    howler.welcome.fade(0, 1, 1000);
+            .finished.then(goHome);
+    }
 
-                history.push("/home");
-                anime({
-                    targets: "#logo",
-                    top: "-12vh",
-                    left: "-12vw",
-                    scale: 0.45,
-                    translateX: ["-30vw", "0vw"],
-                    translateY: ["-30vh", "0vh"],
-                    easing: "easeOutQuint",
-                    duration: 2000
-                });
-                showHomePage();
-            });
+    const handlePopIn = () => {
+        anime({
+            targets: "#board7",
+            scale: [0, 1],
+            duration: 1000,
+            begin: () => {
+                hideBackdrop(true);
+            }
+        });
+    }
+
+    const handlePopOut = () => {
+        anime({
+            targets: "#board7",
+            scale: 0,
+            easing: "easeInQuint",
+            duration: 500,
+            complete: () => {
+                hideBackdrop(false);
+            }
+        });
     }
 
     const handleResponse = (flag) => () => {
@@ -598,7 +668,7 @@ const Module_2 = () => {
             });
         }
 
-        if (trial === 500) {
+        if (trial === 24) {
             setTimeout(() => {
                 setFeedback(true);
 
@@ -687,6 +757,25 @@ const Module_2 = () => {
         });
     }
 
+    const goHome = () => {
+        howler.module_2.fade(howler.module_2.volume(), 0, 1000);
+        if (BGM)
+            howler.welcome.fade(0, 1, 1000);
+
+        history.push("/home");
+        anime({
+            targets: "#logo",
+            top: "-12vh",
+            left: "-12vw",
+            scale: 0.45,
+            translateX: ["-30vw", "0vw"],
+            translateY: ["-30vh", "0vh"],
+            easing: "easeOutQuint",
+            duration: 2000
+        });
+        showHomePage();
+    }
+
     return <div>
         {showBGAnimations && <div id="bg-animations">
             <BirdsClouds />
@@ -704,7 +793,10 @@ const Module_2 = () => {
         </div>
         <div className={cls.speech} id="speech">
             <CILabel>
-                {shells.self} shells have fallen to you. {shells.partner} shells have fallen to your partner.
+                {shells.self} {shells.self === 1 ? "shell has" : "shells have"} fallen to you.
+            </CILabel>
+            <CILabel>
+                {shells.partner} {shells.partner === 1 ? "shell has" : "shells have"} fallen to your partner.
             </CILabel>
             <CILabel>
                 Do you want to accept or reject this split?
@@ -743,9 +835,19 @@ const Module_2 = () => {
                 <CILabel>
                     Are you ready?
                 </CILabel>
-                <CIButton onClick={handleClick}>Let's Go!</CIButton>
+                <CIButton alt onClick={handlePopIn}>Let's Go!</CIButton>
+                <CIButton onClick={handleBack}>Go Back</CIButton>
             </div>
         </div>
+        <Backdrop className={cls.backdrop} open={showBackdrop}>
+            <div className={cls.board2} id="board7">
+                <CILabel>
+                    Alright, let's get started then! You are about to start the real activity. Please be sure you fully understand the instructions because you will not be able to return to them later. Remember these decisions help us with real science, so please take them seriously!
+                </CILabel>
+                <CIButton alt onClick={handleClick}>OK</CIButton>
+                <CIButton onClick={handlePopOut}>Go Back</CIButton>
+            </div>
+        </Backdrop>
         {feedback && <Feedback module="tree-shaking" onClose={handleExit} />}
     </div>
 }

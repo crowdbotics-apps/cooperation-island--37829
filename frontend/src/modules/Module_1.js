@@ -1,10 +1,11 @@
 import { Fragment, useContext, useEffect, useState } from "react";
-import { makeStyles } from "@material-ui/core";
+import { Backdrop, makeStyles } from "@material-ui/core";
 import { useHistory } from "react-router-dom";
 import { shuffleArray } from "../libs/utils";
 import { score } from "../services/v1";
 import { showHomePage } from "../libs/animations";
-import BoardImg from "../assets/images/Board-alt.png";
+import BoardImg from "../assets/images/Board.png";
+import BoardSmImg from "../assets/images/Board-sm.png";
 import DialogImg from "../assets/modules/Dialog.png";
 import Bubbles from "../components/Bubbles";
 import Feedback from "../components/Feedback";
@@ -35,6 +36,32 @@ const useStyles = makeStyles((theme) => ({
         background: `url(${BoardImg})`,
         backgroundRepeat: "no-repeat",
         backgroundSize: "55vw 90vh"
+    },
+    board2: {
+        "& button": {
+            backgroundSize: "10vw 7vh",
+            width: "10vw",
+            margin: "24vh 2vw 0vh",
+        },
+        "& label": {
+            fontSize: "3.5vh",
+            marginTop: "13.5vh",
+            padding: "0vh 7vw"
+        },
+        position: "absolute",
+        filter: "drop-shadow(0.33vh 0.66vh 1.2vh black)",
+        textAlign: "center",
+        top: "23vh",
+        left: "25vw",
+        height: "54vh",
+        width: "50vw",
+        transform: "scale(0)",
+        background: `url(${BoardSmImg})`,
+        backgroundRepeat: "no-repeat",
+        backgroundSize: "50vw 54vh"
+    },
+    backdrop: {
+        zIndex: 5
     },
     dialog: {
         "& > button": {
@@ -282,7 +309,7 @@ const useStyles = makeStyles((theme) => ({
         "& button": {
             backgroundSize: "10vw 7vh",
             width: "10vw",
-            marginTop: "6vh"
+            margin: "6vh 2vw",
         },
         "& label": {
             "&:first-child": {
@@ -327,6 +354,8 @@ const Module_1 = () => {
 
     const [trial, setTrial] = useState(1);
 
+    const [showBackdrop, hideBackdrop] = useState(false);
+
     const { BGM, howler, user } = useContext(AppContext);
 
     useEffect(() => {
@@ -368,49 +397,93 @@ const Module_1 = () => {
             }, "-=2000");
     }, []);
 
+    const handleBack = () => {
+        anime
+            .timeline()
+            .add({
+                targets: "#background, #bg-animations",
+                opacity: 0,
+                easing: "linear",
+                duration: 2000,
+                complete: () => {
+                    $("#background").attr("src", require("../assets/images/Application_BG.jpg"));
+                }
+            })
+            .add({
+                targets: "#background",
+                opacity: 1,
+                easing: "linear",
+                duration: 2000
+            })
+            .add({
+                targets: "#logo2",
+                left: "-30vw",
+                easing: "easeInQuint",
+                duration: 2000
+            }, "-=4000")
+            .add({
+                targets: "#fish",
+                left: "-40vw",
+                easing: "easeInQuint",
+                duration: 2000
+            }, "-=4000")
+            .add({
+                targets: "#board",
+                rotateY: ["0deg", "90deg"],
+                easing: "linear",
+                duration: 2000
+            }, "-=4000")
+            .finished.then(goHome);
+    }
+
     const handleClick = () => {
-        if (window.confirm("Alright, let's get started then! You are about to start the real activity. Please be sure you fully understand the instructions because you will not be able to return to them later. Remember these decisions help us with real science, so please take them seriously!")) {
-            setTimeout(() => {
-                anime
-                    .timeline()
-                    .add({
-                        targets: "#fish",
-                        left: "-40vw",
-                        easing: "easeInQuint",
-                        duration: 2000
-                    })
-                    .add({
-                        targets: "#board",
-                        rotateY: ["0deg", "90deg"],
-                        easing: "linear",
-                        duration: 2000
-                    }, "-=2000")
-                    .add({
-                        targets: "#guide",
-                        left: "3vw",
-                        easing: "easeOutQuint",
-                        duration: 2000
-                    })
-                    .add({
-                        targets: "#dialog",
-                        scale: [0, 1],
-                        easing: "easeOutQuint",
-                        duration: 2000
-                    }, "-=2000")
-                    .add({
-                        targets: "#fish2",
-                        marginLeft: "0vw",
-                        easing: "easeOutQuint",
-                        duration: 2000
-                    }, "-=2000")
-                    .add({
-                        targets: "#close, #music, #shell",
-                        top: "4vh",
-                        easing: "easeOutQuint",
-                        duration: 2000
-                    }, "-=2000");
-            }, 1);
-        }
+        anime
+            .timeline()
+            .add({
+                targets: "#board7",
+                scale: 0,
+                easing: "easeInQuint",
+                duration: 500,
+                complete: () => {
+                    hideBackdrop(false);
+                }
+            })
+            .add({
+                targets: "#fish",
+                left: "-40vw",
+                easing: "easeInQuint",
+                duration: 2000
+            })
+            .add({
+                targets: "#board",
+                rotateY: ["0deg", "90deg"],
+                easing: "linear",
+                duration: 2000
+            }, "-=2000")
+            .add({
+                targets: "#guide",
+                left: "3vw",
+                easing: "easeOutQuint",
+                duration: 2000
+            })
+            .add({
+                targets: "#dialog",
+                scale: [0, 1],
+                easing: "easeOutQuint",
+                duration: 2000
+            }, "-=2000")
+            .add({
+                targets: "#fish2",
+                marginLeft: "0vw",
+                easing: "easeOutQuint",
+                duration: 2000
+            }, "-=2000")
+            .add({
+                targets: "#close, #music, #shell",
+                top: "4vh",
+                easing: "easeOutQuint",
+                duration: 2000
+            }, "-=2000");
     }
 
     const handleClose = () => {
@@ -461,24 +534,7 @@ const Module_1 = () => {
                 easing: "easeInQuint",
                 duration: 2000
             }, "-=4000")
-            .finished.then(() => {
-                howler.module_1.fade(howler.module_1.volume(), 0, 1000);
-                if (BGM)
-                    howler.welcome.fade(0, 1, 1000);
-
-                history.push("/home");
-                anime({
-                    targets: "#logo",
-                    top: "-12vh",
-                    left: "-12vw",
-                    scale: 0.45,
-                    translateX: ["-30vw", "0vw"],
-                    translateY: ["-30vh", "0vh"],
-                    easing: "easeOutQuint",
-                    duration: 2000
-                });
-                showHomePage();
-            });
+            .finished.then(goHome);
     }
 
     const handleExit = () => {
@@ -505,24 +561,30 @@ const Module_1 = () => {
                 easing: "easeInQuint",
                 duration: 2000
             }, "-=4000")
-            .finished.then(() => {
-                howler.module_1.fade(howler.module_1.volume(), 0, 1000);
-                if (BGM)
-                    howler.welcome.fade(0, 1, 1000);
+            .finished.then(goHome);
+    }
 
-                history.push("/home");
-                anime({
-                    targets: "#logo",
-                    top: "-12vh",
-                    left: "-12vw",
-                    scale: 0.45,
-                    translateX: ["-30vw", "0vw"],
-                    translateY: ["-30vh", "0vh"],
-                    easing: "easeOutQuint",
-                    duration: 2000
-                });
-                showHomePage();
-            });
+    const handlePopIn = () => {
+        anime({
+            targets: "#board7",
+            scale: [0, 1],
+            duration: 1000,
+            begin: () => {
+                hideBackdrop(true);
+            }
+        });
+    }
+
+    const handlePopOut = () => {
+        anime({
+            targets: "#board7",
+            scale: 0,
+            easing: "easeInQuint",
+            duration: 500,
+            complete: () => {
+                hideBackdrop(false);
+            }
+        });
     }
 
     const handleShow = () => {
@@ -594,7 +656,7 @@ const Module_1 = () => {
             },
         });
 
-        if (trial === 5) {
+        if (trial === 24) {
             setTimeout(() => {
                 setFeedback(true);
 
@@ -661,6 +723,25 @@ const Module_1 = () => {
         }
     }
 
+    const goHome = () => {
+        howler.module_1.fade(howler.module_1.volume(), 0, 1000);
+        if (BGM)
+            howler.welcome.fade(0, 1, 1000);
+
+        history.push("/home");
+        anime({
+            targets: "#logo",
+            top: "-12vh",
+            left: "-12vw",
+            scale: 0.45,
+            translateX: ["-30vw", "0vw"],
+            translateY: ["-30vh", "0vh"],
+            easing: "easeOutQuint",
+            duration: 2000
+        });
+        showHomePage();
+    }
+
     return <div>
         {showBGAnimations && <div id="bg-animations">
             <Fishes />
@@ -717,9 +798,19 @@ const Module_1 = () => {
                 <CILabel>
                     Are you ready?
                 </CILabel>
-                <CIButton onClick={handleClick}>Let's Go!</CIButton>
+                <CIButton alt onClick={handlePopIn}>Let's Go!</CIButton>
+                <CIButton onClick={handleBack}>Go Back</CIButton>
             </div>
         </div>
+        <Backdrop className={cls.backdrop} open={showBackdrop}>
+            <div className={cls.board2} id="board7">
+                <CILabel>
+                    Alright, let's get started then! You are about to start the real activity. Please be sure you fully understand the instructions because you will not be able to return to them later. Remember these decisions help us with real science, so please take them seriously!
+                </CILabel>
+                <CIButton alt onClick={handleClick}>OK</CIButton>
+                <CIButton onClick={handlePopOut}>Go Back</CIButton>
+            </div>
+        </Backdrop>
         {feedback && <Feedback module="fish-mind-reading" onClose={handleExit} />}
     </div>
 }

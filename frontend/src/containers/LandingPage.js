@@ -5,7 +5,7 @@ import { mapUserData } from "../funnels/v1";
 import { formatCode, parseToken, userState } from "../libs/utils";
 import { email, access as handleAccess, refresh as handleRefresh } from "../services/v1";
 import { showDetailsPage, showLoginBoard } from "../libs/animations";
-import BoardImg from "../assets/images/Board-alt.png";
+import BoardImg from "../assets/images/Board.png";
 import BoardLgImg from "../assets/images/Board-lg.png";
 import CIButton from "../shared/CIButton";
 import CIInput from "../shared/CIInput";

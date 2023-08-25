@@ -1,7 +1,7 @@
 import { Fragment, useContext, useEffect, useState } from "react";
 import { makeStyles } from "@material-ui/core";
 import { saveFeedback } from "../services/v1";
-import BoardImg from "../assets/images/Board-alt.png";
+import BoardImg from "../assets/images/Board.png";
 import CIButton from "../shared/CIButton";
 import CIInput from "../shared/CIInput";
 import CILabel from "../shared/CILabel";
@@ -155,10 +155,6 @@ const Feedback = ({ module, onClose }) => {
     const handleClick = () => {
         if (!feedback.length)
             handleClose();
-        else if (feedback[active].question_type === 2 && !selected.length)
-            toast.error("You must select one option.");
-        else if (feedback[active].question_type === 3 && !selected.length)
-            toast.error("You must select one or multiple option.");
         else if (feedback[active].question_type === 4 && !score)
             toast.error("You must select a rating.");
         else {
