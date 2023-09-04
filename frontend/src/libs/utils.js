@@ -79,8 +79,6 @@ export const rankedQualities = [
     }
 ];
 
-export const shellsComposite = Array(4).fill().map((_, i) => 2 * (i + 1)).flatMap((x) => Array(x + 1).fill().map((_, y) => ({ self: x - y, partner: y })));
-
 export const shuffleArray = (arr) => {
     return arr.sort(() => Math.random() - 0.5);
 }

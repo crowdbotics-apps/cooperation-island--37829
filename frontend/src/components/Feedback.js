@@ -113,11 +113,11 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const Feedback = ({ module, onClose }) => {
-    const isRated = module === "tell-us-about-you";
+    const isRated = module === "voice-your-values";
 
     const cls = useStyles();
 
-    const { feedback } = useContext(AppContext);
+    const { data: { feedback, session_id } } = useContext(AppContext);
 
     const [active, setActive] = useState(0);
 
@@ -159,6 +159,7 @@ const Feedback = ({ module, onClose }) => {
             toast.error("You must select a rating.");
         else {
             saveFeedback(module, {
+                session_id,
                 id: feedback[active].id,
                 answer: feedback[active].question_type === 1 ? [answer] : (feedback[active].question_type === 4 ? [score] : selected)
             });

@@ -1,7 +1,7 @@
 import { useContext, useEffect, useRef, useState } from "react";
 import { Backdrop, makeStyles } from "@material-ui/core";
 import { useHistory } from "react-router-dom";
-import { shellsComposite, shuffleArray } from "../libs/utils";
+import { shuffleArray } from "../libs/utils";
 import { score } from "../services/v1";
 import { showHomePage } from "../libs/animations";
 import BoardImg from "../assets/images/Board.png";
@@ -9,6 +9,7 @@ import BoardSmImg from "../assets/images/Board-sm.png";
 import SpeechImg from "../assets/modules/Speech.png";
 import BirdsClouds from "../components/BirdsClouds";
 import Feedback from "../components/Feedback";
+import IdlePrompt from "../components/IdlePrompt";
 import Shell from "../components/Shell";
 import CIButton from "../shared/CIButton";
 import CIClose from "../shared/CIClose";
@@ -261,7 +262,9 @@ const Module_2 = () => {
 
     const [showBackdrop, hideBackdrop] = useState(false);
 
-    const { BGM, howler, user } = useContext(AppContext);
+    const [isStarted, setStarted] = useState(false);
+
+    const { BGM, data, howler, user } = useContext(AppContext);
 
     useEffect(() => {
         anime
@@ -355,6 +358,7 @@ const Module_2 = () => {
                 duration: 500,
                 complete: () => {
                     hideBackdrop(false);
+                    setStarted(true);
                 }
             })
             .add({
@@ -520,6 +524,19 @@ const Module_2 = () => {
             .finished.then(goHome);
     }
 
+    const handleLeave = () => {
+        anime({
+            targets: "#board7",
+            scale: 0,
+            easing: "easeInQuint",
+            duration: 500,
+            complete: () => {
+                hideBackdrop(false);
+                handleBack();
+            }
+        })
+    }
+
     const handlePopIn = () => {
         anime({
             targets: "#board7",
@@ -545,6 +562,7 @@ const Module_2 = () => {
 
     const handleResponse = (flag) => () => {
         score("tree-shaking", {
+            session_id: data.session_id,
             trial_number: trial,
             shell: shells.self + shells.partner,
             shared_shell: shells.partner,
@@ -718,8 +736,8 @@ const Module_2 = () => {
 
     const handleRestart = () => {
         setShells({
-            self: shellsComposite[shellsArray[trial]].self,
-            partner: shellsComposite[shellsArray[trial]].partner
+            self: data.trials[shellsArray[trial]].self,
+            partner: data.trials[shellsArray[trial]].partner
         });
         setTrial(trial + 1);
         setAnimation(false);
@@ -848,6 +866,7 @@ const Module_2 = () => {
                 <CIButton onClick={handlePopOut}>Go Back</CIButton>
             </div>
         </Backdrop>
+        <IdlePrompt handleClose={isStarted ? handleClose : showBackdrop ? handleLeave : handleBack} />
         {feedback && <Feedback module="tree-shaking" onClose={handleExit} />}
     </div>
 }
