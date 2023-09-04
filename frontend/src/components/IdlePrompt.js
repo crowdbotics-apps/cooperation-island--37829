@@ -12,11 +12,11 @@ const useStyles = makeStyles({
         "& label": {
             "&:last-child": {
                 color: "black",
-                fontSize: "14vh",
+                fontSize: "15vh",
                 marginTop: "4vh"
             },
             fontSize: "5vh",
-            marginTop: "9vh",
+            marginTop: "8vh",
             padding: "0vh 4vw"
         },
         position: "absolute",
