@@ -15,6 +15,7 @@ from rest_framework.authtoken.serializers import AuthTokenSerializer
 from rest_framework.authtoken.models import Token
 from rest_framework import generics, status
 from rest_framework.response import Response
+from rest_framework.exceptions import ValidationError
 from home.utils import encrypt_payload
 from users.models import (  Profile, 
                             EmailVerification, 
@@ -342,7 +343,7 @@ class ActivityFeedbackViewSet(APIView):
         try:
             return ActivityFeedback.objects.get(activity_type=activity_type)
         except ActivityFeedback.DoesNotExist:
-            raise ObjectDoesNotExist('Activity feedback not found.')
+            raise ValidationError('Activity feedback not found.', code=status.HTTP_400_BAD_REQUEST)
         
     def get_question(self, question_id):
         try:
@@ -351,7 +352,10 @@ class ActivityFeedbackViewSet(APIView):
             raise ObjectDoesNotExist('Question not found.')
 
     def get(self, request, activity_type=None):
-        activity_feedback = self.get_activity_feedback(activity_type)
+        try:
+            activity_feedback = self.get_activity_feedback(activity_type)
+        except ValidationError as e:
+            return Response({}, status=status.HTTP_400_BAD_REQUEST)
         
         if activity_type == 'voice-your-values':
             questions = activity_feedback.questions.filter(question_type='rating').order_by('questionorder__order')
@@ -376,7 +380,11 @@ class ActivityFeedbackViewSet(APIView):
         return Response(serializer.data)
 
     def post(self, request, activity_type=None):
-        activity_feedback = self.get_activity_feedback(activity_type)
+        try:
+            activity_feedback = self.get_activity_feedback(activity_type)
+        except ValidationError as e:
+            return Response({}, status=status.HTTP_400_BAD_REQUEST)
+        
         serializer = QuestionAnswerSerializer(data=request.data, context={'participant': request.user})
         
         if serializer.is_valid():
@@ -463,11 +471,16 @@ class FishGameTrialAPIView(APIView):
         if serializer.is_valid():
             serializer.save(participant=participant)
             user = request.user
-            user.shells += serializer.validated_data['shell']
-            user.save()
+            data = serializer.validated_data
+            if data['match'] == True:
+                user.shells += data['shell']
+                user.save()
             user_detail_serializer = UserDetailsSerializer(user)
             payload=encrypt_payload(user_detail_serializer.data)
-            return Response(payload, status=status.HTTP_200_OK) 
+            response_data = {
+                'user': payload
+            }
+            return Response(response_data, status=status.HTTP_200_OK) 
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
@@ -483,12 +496,17 @@ class TreeShakingGameTrialView(APIView):
         if serializer.is_valid():
             serializer.save(participant=participant)
             user = request.user
-            number = serializer.validated_data['shell'] - serializer.validated_data['shared_shell']
-            user.shells += number
-            user.save()
+            data = serializer.validated_data
+            if data['response'] == True:
+                number = data['shell'] - data['shared_shell']
+                user.shells += number
+                user.save()
             user_detail_serializer = UserDetailsSerializer(user)
             payload=encrypt_payload(user_detail_serializer.data)
-            return Response(payload, status=status.HTTP_200_OK) 
+            response_data = {
+                'user': payload
+            }
+            return Response(response_data, status=status.HTTP_200_OK) 
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
