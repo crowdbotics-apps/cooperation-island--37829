@@ -91,5 +91,13 @@ export const score = (module, data) => {
 }
 
 export const qualities = (data) => {
-    return API.post(base + "/qualities/tell-us-about-you/", data);
+    return API.post(base + "/qualities/voice-your-values/", data);
+}
+
+export const moduleData = (module) => {
+    return API.get(base + `/data/${module}/`, {
+        env: {
+            noLoader: true
+        }
+    });
 }

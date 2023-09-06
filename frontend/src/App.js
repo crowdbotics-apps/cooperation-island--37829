@@ -47,7 +47,7 @@ const App = () => {
 
   const [BGM, setBGM] = useState(false);
 
-  const [feedback, setFeedback] = useState([]);
+  const [data, setData] = useState(null);
 
   const [howler, setHowler] = useState({});
 
@@ -143,7 +143,7 @@ const App = () => {
     }
   }
 
-  return <AppContext.Provider value={{ avatarRef, BGM, feedback, howler, user, setBGM, setFeedback, showTooltip, setHowler: handleHowler, setUser: handleUser }}>
+  return <AppContext.Provider value={{ avatarRef, BGM, data, howler, user, setBGM, setData, showTooltip, setHowler: handleHowler, setUser: handleUser }}>
     <LoginContext.Provider value={{ login, signup, username, setLogin, setSignup, setUsername }}>
       <Route path="/" component={HomePage} />
       <Switch>

@@ -14,6 +14,7 @@ import Section2Img from "../assets/modules/Section_2.png";
 import Section3Img from "../assets/modules/Section_3.png";
 import ValuesImg from "../assets/modules/Values.png";
 import Feedback from "../components/Feedback";
+import IdlePrompt from "../components/IdlePrompt";
 import Qualities from "../components/Qualities";
 import Sections from "../components/Sections";
 import CIButton from "../shared/CIButton";
@@ -237,7 +238,9 @@ const Module_3 = () => {
 
     const [showBackdrop, hideBackdrop] = useState(false);
 
-    const { BGM, howler, user } = useContext(AppContext);
+    const [isStarted, setStarted] = useState(false);
+
+    const { BGM, data, howler, user } = useContext(AppContext);
 
     useEffect(() => {
         anime
@@ -382,6 +385,7 @@ const Module_3 = () => {
                 duration: 500,
                 complete: () => {
                     hideBackdrop(false);
+                    setStarted(true);
                 }
             })
             .add({
@@ -500,6 +504,19 @@ const Module_3 = () => {
             .finished.then(goHome);
     }
 
+    const handleLeave = () => {
+        anime({
+            targets: "#board7",
+            scale: 0,
+            easing: "easeInQuint",
+            duration: 500,
+            complete: () => {
+                hideBackdrop(false);
+                handleBack();
+            }
+        })
+    }
+
     const handlePopIn = () => {
         anime({
             targets: "#board7",
@@ -527,18 +544,21 @@ const Module_3 = () => {
         qualities([
             ...state.section1
                 .map((x, i) => ({
+                    session_id: data.session_id,
                     id: x,
                     category: 1,
                     rank: i + 1
                 })),
             ...state.section2
                 .map((x, i) => ({
+                    session_id: data.session_id,
                     id: x,
                     category: 2,
                     rank: i + 1
                 })),
             ...state.section3
                 .map((x, i) => ({
+                    session_id: data.session_id,
                     id: x,
                     category: 3,
                     rank: i + 1
@@ -611,36 +631,6 @@ const Module_3 = () => {
         <CIClose className={cls.close} id="close" onClick={handleClose} />
         <CIMusic className={cls.music} id="music" />
         <CIShell className={cls.shell} id="shell" />
-        <div className={cls.board} id="board">
-            <CILabel className={cls.header}>
-                Welcome to the Voice Your Values Activity!
-            </CILabel>
-            <div className={cls.body}>
-                <CILabel>
-                    In this activity, you will tell us about things that are important to you.
-                </CILabel>
-                <CILabel>
-                    First, you will drag different values into bins. These bins will be labelled, "Very Important", "A Little Important" or "Not That Important". To learn more about a particular value, hover your cursor over it to get more information. Once you've placed all of the values into the bins, you will need to order the values within each bin. If a value is placed in the #1 position at the top of a bin, that means it is the most important to you within that category. Once you are done, press, "All Finished".
-                </CILabel>
-                <CILabel>
-                    Second, you will rate each of these values individually.
-                </CILabel>
-                <CILabel>
-                    Are you ready?
-                </CILabel>
-                <CIButton alt onClick={handlePopIn}>Let's Go!</CIButton>
-                <CIButton onClick={handleBack}>Go Back</CIButton>
-            </div>
-        </div>
-        <Backdrop className={cls.backdrop} open={showBackdrop}>
-            <div className={cls.board2} id="board7">
-                <CILabel>
-                    Alright, let's get started then! You are about to start the real activity. Please be sure you fully understand the instructions because you will not be able to return to them later. Remember these decisions help us with real science, so please take them seriously!
-                </CILabel>
-                <CIButton alt onClick={handleClick}>OK</CIButton>
-                <CIButton onClick={handlePopOut}>Go Back</CIButton>
-            </div>
-        </Backdrop>
         <div className={cls.block} id="block">
             <div className={cls.container}>
                 {rankedQualities
@@ -698,7 +688,38 @@ const Module_3 = () => {
             />
         </div>
         <CIButton className={cls.button} onClick={handleSave}>Save</CIButton>
-        {feedback && <Feedback module="tell-us-about-you" onClose={handleExit} />}
+        <div className={cls.board} id="board">
+            <CILabel className={cls.header}>
+                Welcome to the Voice Your Values Activity!
+            </CILabel>
+            <div className={cls.body}>
+                <CILabel>
+                    In this activity, you will tell us about things that are important to you.
+                </CILabel>
+                <CILabel>
+                    First, you will drag different values into bins. These bins will be labelled, "Very Important", "A Little Important" or "Not That Important". To learn more about a particular value, hover your cursor over it to get more information. Once you've placed all of the values into the bins, you will need to order the values within each bin. If a value is placed in the #1 position at the top of a bin, that means it is the most important to you within that category. Once you are done, press, "All Finished".
+                </CILabel>
+                <CILabel>
+                    Second, you will rate each of these values individually.
+                </CILabel>
+                <CILabel>
+                    Are you ready?
+                </CILabel>
+                <CIButton alt onClick={handlePopIn}>Let's Go!</CIButton>
+                <CIButton onClick={handleBack}>Go Back</CIButton>
+            </div>
+        </div>
+        <Backdrop className={cls.backdrop} open={showBackdrop}>
+            <div className={cls.board2} id="board7">
+                <CILabel>
+                    Alright, let's get started then! You are about to start the real activity. Please be sure you fully understand the instructions because you will not be able to return to them later. Remember these decisions help us with real science, so please take them seriously!
+                </CILabel>
+                <CIButton alt onClick={handleClick}>OK</CIButton>
+                <CIButton onClick={handlePopOut}>Go Back</CIButton>
+            </div>
+        </Backdrop>
+        <IdlePrompt handleClose={isStarted ? handleClose : showBackdrop ? handleLeave : handleBack} />
+        {feedback && <Feedback module="voice-your-values" onClose={handleExit} />}
     </div>
 }
 

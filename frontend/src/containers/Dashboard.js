@@ -3,7 +3,7 @@ import { makeStyles } from "@material-ui/core";
 import { useHistory } from "react-router-dom";
 import { mapFeedback } from "../funnels/v1";
 import { userState } from "../libs/utils";
-import { feedback } from "../services/v1";
+import { feedback, moduleData } from "../services/v1";
 import { showAvatarPage, showLoginBoard } from "../libs/animations";
 import CIAvatar from "../shared/CIAvatar";
 import CILabel from "../shared/CILabel";
@@ -106,11 +106,13 @@ const Dashboard = () => {
 
     const history = useHistory();
 
-    const { avatarRef, BGM, howler, user, setFeedback, setHowler, setUser } = useContext(AppContext);
+    const { avatarRef, BGM, howler, user, setData, setHowler, setUser } = useContext(AppContext);
 
     useEffect(() => {
         if (!user.avatar || !user.details)
             history.push("/");
+
+        localStorage.removeItem("LastActivity");
     }, []);
 
     const handleAvatar = () => {
@@ -212,9 +214,17 @@ const Dashboard = () => {
                                     })
                                 });
 
-                                feedback("fish-mind-reading")
-                                    .then(({ data }) => {
-                                        setFeedback(mapFeedback(data));
+                                Promise.all([
+                                    moduleData("fish-mind-reading"),
+                                    feedback("fish-mind-reading")
+                                ])
+                                    .then(([{ data: { max, min, session_id } }, { data }]) => {
+                                        setData({
+                                            feedback: mapFeedback(data),
+                                            session_id,
+                                            min,
+                                            max
+                                        });
                                     });
 
                                 history.push("/fish-mind-reading", {
@@ -233,9 +243,16 @@ const Dashboard = () => {
                                     })
                                 });
 
-                                feedback("tree-shaking")
-                                    .then(({ data }) => {
-                                        setFeedback(mapFeedback(data));
+                                Promise.all([
+                                    moduleData("tree-shaking"),
+                                    feedback("tree-shaking")
+                                ])
+                                    .then(([{ data: { session_id, trials } }, { data }]) => {
+                                        setData({
+                                            feedback: mapFeedback(data),
+                                            session_id,
+                                            trials
+                                        });
                                     });
 
                                 history.push("/tree-shaking", {
@@ -254,9 +271,15 @@ const Dashboard = () => {
                                     })
                                 });
 
-                                feedback("tell-us-about-you")
-                                    .then(({ data }) => {
-                                        setFeedback(mapFeedback(data));
+                                Promise.all([
+                                    moduleData("voice-your-values"),
+                                    feedback("voice-your-values")
+                                ])
+                                    .then(([{ data: { session_id } }, { data }]) => {
+                                        setData({
+                                            feedback: mapFeedback(data),
+                                            session_id
+                                        });
                                     });
 
                                 history.push("/voice-your-values", {

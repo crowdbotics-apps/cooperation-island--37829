@@ -10,6 +10,7 @@ import DialogImg from "../assets/modules/Dialog.png";
 import Bubbles from "../components/Bubbles";
 import Feedback from "../components/Feedback";
 import Fishes from "../components/Fishes";
+import IdlePrompt from "../components/IdlePrompt";
 import Shell from "../components/Shell";
 import CIButton from "../shared/CIButton";
 import CIClose from "../shared/CIClose";
@@ -148,9 +149,9 @@ const useStyles = makeStyles((theme) => ({
         marginLeft: "30vw"
     },
     fishId1: {
-        top: "72vh",
-        left: "78vw",
-        width: "18vw"
+        top: "60vh",
+        left: "80vw",
+        width: "15vw"
     },
     fishId2: {
         top: "43vh",
@@ -267,11 +268,6 @@ const useStyles = makeStyles((theme) => ({
         left: "79vw",
         width: "16vw"
     },
-    fishId25: {
-        top: "60vh",
-        left: "80vw",
-        width: "15vw"
-    },
     header: {
         fontSize: "4vh",
         marginTop: "10vh"
@@ -304,6 +300,16 @@ const useStyles = makeStyles((theme) => ({
         zIndex: 1,
         top: "37vh",
         left: "40vw"
+    },
+    label: {
+        position: "absolute",
+        fontSize: "20vh",
+        textAlign: "center",
+        transform: "scale(0)",
+        zIndex: 2,
+        top: "41vh",
+        left: "40vw",
+        width: "14vw"
     },
     body: {
         "& button": {
@@ -350,13 +356,17 @@ const Module_1 = () => {
 
     const [feedback, setFeedback] = useState(false);
 
+    const [shells, setShells] = useState(0);
+
     const [number, setNumber] = useState(0);
 
     const [trial, setTrial] = useState(1);
 
     const [showBackdrop, hideBackdrop] = useState(false);
 
-    const { BGM, howler, user } = useContext(AppContext);
+    const [isStarted, setStarted] = useState(false);
+
+    const { BGM, data, howler, user } = useContext(AppContext);
 
     useEffect(() => {
         anime
@@ -445,7 +455,9 @@ const Module_1 = () => {
                 easing: "easeInQuint",
                 duration: 500,
                 complete: () => {
+                    setShells(anime.random(data.min, data.max));
                     hideBackdrop(false);
+                    setStarted(true);
                 }
             })
             .add({
@@ -564,6 +576,19 @@ const Module_1 = () => {
             .finished.then(goHome);
     }
 
+    const handleLeave = () => {
+        anime({
+            targets: "#board7",
+            scale: 0,
+            easing: "easeInQuint",
+            duration: 500,
+            complete: () => {
+                hideBackdrop(false);
+                handleBack();
+            }
+        })
+    }
+
     const handlePopIn = () => {
         anime({
             targets: "#board7",
@@ -599,8 +624,11 @@ const Module_1 = () => {
 
     const handleRestart = (flag) => () => {
         score("fish-mind-reading", {
+            session_id: data.session_id,
             trial_number: trial,
             match: flag,
+            shell: shells,
+            number,
             trial_response_time: timer.getElapsedRunningTime()
         });
         timer.stop();
@@ -612,8 +640,32 @@ const Module_1 = () => {
             autoplay: true
         });
 
+        if (flag) {
+            anime({
+                targets: "#label",
+                opacity: {
+                    value: 0,
+                    delay: 1200,
+                    duration: 800
+                },
+                top: [
+                    {
+                        value: "37.5vh",
+                        easing: "easeOutElastic",
+                        duration: 1000,
+                    },
+                    {
+                        value: "4.85vh",
+                        delay: 200,
+                        duration: 800
+                    }
+                ],
+                easing: "linear"
+            });
+        }
+
         anime({
-            targets: flag ? "#shell2Alt" : "#shell2",
+            targets: flag ? "#shell2Alt, #label" : "#shell2",
             scale: [
                 {
                     value: 1.4,
@@ -622,7 +674,6 @@ const Module_1 = () => {
                 },
                 {
                     value: flag ? 0.16 : 0,
-                    easing: "easeOutExpo",
                     delay: 200,
                     duration: 800
                 }
@@ -633,7 +684,7 @@ const Module_1 = () => {
                 duration: 800
             },
             top: flag && {
-                value: "-7.55vh",
+                value: (_, i) => !i && "-7.55vh",
                 delay: 1200,
                 duration: 800
             },
@@ -644,6 +695,14 @@ const Module_1 = () => {
                         targets: "#shell2Alt",
                         scale: 0,
                         top: "37vh",
+                        left: "40vw",
+                        duration: 1
+                    });
+                    anime({
+                        targets: "#label",
+                        scale: 0,
+                        opacity: 1,
+                        top: "41vh",
                         left: "40vw",
                         duration: 1
                     });
@@ -748,7 +807,7 @@ const Module_1 = () => {
             <Bubbles />
         </div>}
         <img className={cls.logo} id="logo2" src={require("../assets/modules/Module_1_Text.png")} />
-        <img className={cls.fish} id="fish" src={require("../assets/fishes/Fish_1.png")} />
+        <img className={cls.fish} id="fish" src={require("../assets/fishes/Fish_25.png")} />
         <img className={cls.guide} id="guide" src={require(`../assets/avatars/aqua/Avatar_${user.avatar}.png`)} />
         <img className={clsx(cls.fishId, cls["fishId" + fishArray[fishID]])} id="fish2" src={require(`../assets/fishes/Fish_${fishArray[fishID]}.png`)} />
         <CIClose className={cls.close} id="close" onClick={handleClose} />
@@ -756,6 +815,9 @@ const Module_1 = () => {
         <CIShell className={cls.shell} id="shell" />
         <Shell className={cls.shell2} id="shell2" />
         <Shell alt className={cls.shell2} id="shell2Alt" />
+        <CILabel className={cls.label} id="label">
+            {shells}
+        </CILabel>
         <div className={cls.dialog} id="dialog">
             {show ? <Fragment>
                 <CILabel className={cls.number}>
@@ -811,6 +873,7 @@ const Module_1 = () => {
                 <CIButton onClick={handlePopOut}>Go Back</CIButton>
             </div>
         </Backdrop>
+        <IdlePrompt handleClose={isStarted ? handleClose : showBackdrop ? handleLeave : handleBack} />
         {feedback && <Feedback module="fish-mind-reading" onClose={handleExit} />}
     </div>
 }
