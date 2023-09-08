@@ -31,6 +31,8 @@ from users.models import (  Profile,
                             IncentiveRangeSelection,
                             FishGameDistribution,
                             TreeShakingDistributionTrials,
+                            DynamicPrompt,
+                            DynamicPromptResponse
                         )
 
 
@@ -396,8 +398,8 @@ class ActivityFeedbackViewSet(APIView):
             
             if activity_type == 'voice-your-values':
                 if question.question_type == 'rating':
-                    if int(answer[0]) in range(1, 6):
-                        score = int(answer[0])
+                    score = int(answer[0]) if answer else None
+                    if score is not None:  
                         participant_score = IndividualRankingQualitiesScore(
                             participant=request.user,
                             question=question,
@@ -406,6 +408,8 @@ class ActivityFeedbackViewSet(APIView):
                         )
                         participant_score.save()
                         return Response({'detail': 'Response submitted successfully.'}, status=status.HTTP_200_OK)
+                    else:
+                        return Response({'error': 'Invalid score provided.'}, status=status.HTTP_400_BAD_REQUEST)
                 else:
                     return Response({'error': 'Invalid question type for this activity type.'}, status=status.HTTP_400_BAD_REQUEST)
             else:
@@ -551,3 +555,35 @@ class DataGenerateView(APIView):
             pass
 
         return Response(response_data)
+    
+
+class DynamicPromptAPIView(APIView):
+    def get(self, request, activity_name):
+        try:
+            activity = ActivityFeedback.objects.get(activity_type=activity_name)
+            prompts = DynamicPrompt.objects.filter(activity=activity, is_active=True)
+            data = [{'id': prompt.id, 'prompt_text': prompt.prompt_text} for prompt in prompts]
+            return Response(data)
+        except ActivityFeedback.DoesNotExist:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+    def post(self, request, activity_name):
+        try:
+            activity = ActivityFeedback.objects.get(activity_type=activity_name)
+            data = request.data
+            prompt_id = data.get('id')
+            session_id = data.get('session_id')
+            
+            if not prompt_id or not session_id:
+                return Response({'error': 'Both id and session_id are required.'}, status=status.HTTP_400_BAD_REQUEST)
+            
+            try:
+                prompt = DynamicPrompt.objects.get(id=prompt_id, activity=activity)
+            except DynamicPrompt.DoesNotExist:
+                return Response({'error': 'Prompt not found for the given activity and id.'}, status=status.HTTP_404_NOT_FOUND)
+
+            DynamicPromptResponse.objects.create(dynamic_prompt=prompt, session_id=session_id)   
+
+            return Response(status=status.HTTP_200_OK)
+        except ActivityFeedback.DoesNotExist:
+            return Response(status=status.HTTP_400_BAD_REQUEST) 

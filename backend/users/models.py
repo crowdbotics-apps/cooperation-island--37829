@@ -204,7 +204,6 @@ class Question(models.Model):
         ('multiple_choice', 'Multiple Choice Question'),
         ('dropdown', 'Dropdown Selection'),
         ('rating', 'Rating'),
-        ('instruction', 'Instruction')
     ]
 
     activity_feedback = models.ForeignKey(ActivityFeedback, on_delete=models.CASCADE, related_name='questions')
@@ -375,3 +374,18 @@ class TreeShakingDistributionTrials(models.Model):
     partner_distribution = models.PositiveIntegerField()
     def __str__(self):
         return f"Tree Shaking Distribution for Trial {self.trial_number}"
+
+class DynamicPrompt(models.Model):
+    prompt_text = models.TextField()
+    activity = models.ForeignKey(ActivityFeedback, on_delete=models.CASCADE, related_name='dynamic_prompts')
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+
+class DynamicPromptResponse(models.Model):
+    dynamic_prompt = models.ForeignKey(DynamicPrompt, on_delete=models.CASCADE)
+    session_id = models.CharField(max_length=36)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Prompt for session_id: {self.session_id}"

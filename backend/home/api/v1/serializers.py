@@ -193,8 +193,6 @@ class QuestionSerializer(serializers.ModelSerializer):
             return '3'
         elif question_type == 'rating':
             return '4'
-        elif question_type == 'instruction':
-            return '5'
         return question_type
     
     def validate(self, data):
@@ -233,7 +231,7 @@ class QuestionAnswerSerializer(serializers.Serializer):
                 raise serializers.ValidationError('Invalid answer. Answer options are not valid for question.')
 
         elif question.question_type == 'rating':
-            if len(answer) != 0 and int(answer[0]) not in range(1, 6):
+            if len(answer) != 0 and int(answer[0]) not in range(0, 6):
                 raise serializers.ValidationError(f'Invalid answer {answer[0]}. Only answers in the range 1-5 are acceptable.')
         else:
             raise serializers.ValidationError('Invalid question type.')
@@ -254,6 +252,6 @@ class TreeShakingGameTrialSerializer(serializers.ModelSerializer):
 
     def validate_trial_response_time(self, value):
         return round(value / 1000, 2)
-    
+
 
 
