@@ -1,28 +1,39 @@
 {
   "files": {
     "main.css": "/static/css/main.7b5a6584.css",
-    "main.js": "/static/js/main.acf34b62.js",
+    "main.js": "/static/js/main.7011419f.js",
     "static/media/Module_3.mp3": "/static/media/Module_3.e3f8bba455fd18e41cff.mp3",
     "static/media/Palm.png": "/static/media/Palm.cf2f097f0886a4d281ad.png",
     "static/media/Module_1.mp3": "/static/media/Module_1.c011eb37d0d72aefbd98.mp3",
     "static/media/Module_2.mp3": "/static/media/Module_2.d17475b6e26ccea1c791.mp3",
     "static/media/Welcome.mp3": "/static/media/Welcome.9ff7057bd70b7e32cc85.mp3",
     "static/media/Avatar_1.png": "/static/media/Avatar_1.d436ae77872274cb3f3f.png",
-    "static/media/Avatar_12.png": "/static/media/Avatar_12.878ad001edbaead84f7f.png",
+    "static/media/Avatar_13.png": "/static/media/Avatar_13.36c530e234c9a79fd700.png",
     "static/media/Avatar_2.png": "/static/media/Avatar_2.49cc807bf7535bf0c78d.png",
     "static/media/Avatar_3.png": "/static/media/Avatar_3.83733caab61b6bcdde7e.png",
-    "static/media/Avatar_11.png": "/static/media/Avatar_11.5d3ce2b66a6c16f153af.png",
+    "static/media/Avatar_7.png": "/static/media/Avatar_7.645d009532f7a24a5b75.png",
     "static/media/Avatar_5.png": "/static/media/Avatar_5.ec4f6bf32d96b902f0fc.png",
+    "static/media/Avatar_21.png": "/static/media/Avatar_21.dc9f4292b0d6fb733181.png",
+    "static/media/Avatar_18.png": "/static/media/Avatar_18.a28ecc0671e67061e577.png",
     "static/media/Avatar_9.png": "/static/media/Avatar_9.d3d5237495ff283470c7.png",
+    "static/media/Avatar_15.png": "/static/media/Avatar_15.0bab6a51cb4ad315b3b3.png",
+    "static/media/Avatar_12.png": "/static/media/Avatar_12.39d41972cbc937821d3e.png",
     "static/media/Avatar_6.png": "/static/media/Avatar_6.3a3e7db5be605f171847.png",
-    "static/media/Avatar_13.png": "/static/media/Avatar_13.1c7bcb85b659c1fcee5e.png",
+    "static/media/Avatar_19.png": "/static/media/Avatar_19.39a03a80b4e0333456aa.png",
+    "static/media/Avatar_10.png": "/static/media/Avatar_10.14b50f86eea632050d05.png",
     "static/media/Avatar_8.png": "/static/media/Avatar_8.3f294950e597a0a60165.png",
     "static/media/Avatar_BG.png": "/static/media/Avatar_BG.7de1e10f66029cf9834b.png",
     "static/media/Module_2_BG.jpg": "/static/media/Module_2_BG.91f1ebcbb95e495df59b.jpg",
-    "static/media/Avatar_10.png": "/static/media/Avatar_10.14b50f86eea632050d05.png",
+    "static/media/Avatar_20.png": "/static/media/Avatar_20.c6636a4de6d67072ac68.png",
     "static/media/Avatar_4.png": "/static/media/Avatar_4.6ac8144eba4cc8df8fb6.png",
-    "static/media/Avatar_7.png": "/static/media/Avatar_7.645d009532f7a24a5b75.png",
+    "static/media/Avatar_17.png": "/static/media/Avatar_17.8bb18df9205743f32237.png",
+    "static/media/Avatar_11.png": "/static/media/Avatar_11.40bd943e7b529a70d008.png",
+    "static/media/Avatar_14.png": "/static/media/Avatar_14.24629b17445bad6cd157.png",
     "static/media/Application_BG.jpg": "/static/media/Application_BG.397a0ef24dca597eed8c.jpg",
+    "static/media/Avatar_16.png": "/static/media/Avatar_16.1d4ec5b0b0e7d2a769ff.png",
+    "static/media/Avatar_22.png": "/static/media/Avatar_22.967f895f6bf78d53d0ac.png",
+    "static/media/Avatar_23.png": "/static/media/Avatar_23.967f895f6bf78d53d0ac.png",
+    "static/media/Avatar_24.png": "/static/media/Avatar_24.967f895f6bf78d53d0ac.png",
     "static/media/Avatar_Text.png": "/static/media/Avatar_Text.2d5dde9e0c20554fe585.png",
     "static/media/Module_3_BG.jpg": "/static/media/Module_3_BG.e35bd9870775ff15b799.jpg",
     "static/media/Logo_Text.png": "/static/media/Logo_Text.0696e07d9af6a110f912.png",
@@ -80,10 +91,10 @@
     "static/media/Put_Down.mp3": "/static/media/Put_Down.e4c98b7f889fffeccd41.mp3",
     "index.html": "/index.html",
     "main.7b5a6584.css.map": "/static/css/main.7b5a6584.css.map",
-    "main.acf34b62.js.map": "/static/js/main.acf34b62.js.map"
+    "main.7011419f.js.map": "/static/js/main.7011419f.js.map"
   },
   "entrypoints": [
     "static/css/main.7b5a6584.css",
-    "static/js/main.acf34b62.js"
+    "static/js/main.7011419f.js"
   ]
 }
