@@ -18,6 +18,7 @@ from home.api.v1.viewsets import (
     RankedQualitiesAPIView,
     TreeShakingGameTrialView,
     DataGenerateView,
+    DynamicPromptAPIView,
 )
 
 
@@ -43,4 +44,5 @@ urlpatterns = [
     path('qualities/voice-your-values/', RankedQualitiesAPIView.as_view(), name='qualities'),
     path('score/tree-shaking/', TreeShakingGameTrialView.as_view(), name='fish-trial-list'),
     path('data/<str:activity_name>/', DataGenerateView.as_view(), name='activity-data'),
+    path('prompt/<str:activity_name>/', DynamicPromptAPIView.as_view(), name='prompt'),
 ]

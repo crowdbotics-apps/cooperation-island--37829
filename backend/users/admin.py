@@ -26,6 +26,8 @@ from .models import (ConsentAccessCode,
                      TreeShakingDistribution,
                      TreeShakingDistributionTrials, 
                      FishGameDistribution,
+                     DynamicPrompt,
+                     DynamicPromptResponse,
                     )
 
 from .utils import (
@@ -278,3 +280,15 @@ class FishGameDistributionAdmin(admin.ModelAdmin):
     list_display=['stake_level', 'min', 'max']
 
 admin.site.register(IncentiveRangeSelection)
+
+
+@admin.register(DynamicPrompt)
+class DynamicPromptAdmin(admin.ModelAdmin):
+    list_display = ['prompt_text', 'activity']
+    list_filter = [
+        ('activity'),
+        ('is_active'),
+    ]
+
+admin.site.register(DynamicPromptResponse)
+
