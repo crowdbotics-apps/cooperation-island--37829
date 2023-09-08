@@ -18,7 +18,8 @@ export const userState = {
     age: 0,
     avatar: 0,
     details: false,
-    email: false
+    email: false,
+    shells: 0
 };
 
 export const rankedQualities = [

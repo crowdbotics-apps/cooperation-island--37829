@@ -13,7 +13,7 @@ const useStyles = makeStyles((theme) => ({
         letterSpacing: 0,
         textDecoration: "underline"
     }
-}))
+}));
 
 const CILink = (props) => {
     const cls = useStyles();

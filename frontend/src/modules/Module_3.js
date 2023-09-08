@@ -626,7 +626,7 @@ const Module_3 = () => {
 
     return <div>
         <img className={cls.logo} id="logo2" src={require("../assets/modules/Module_3_Text.png")} />
-        <img className={cls.instructor} id="instructor" src={require("../assets/avatars/xtras/Avatar_13.png")} />
+        <img className={cls.instructor} id="instructor" src={require("../assets/avatars/xtras/Avatar_2.png")} />
         <img className={cls.guide} id="guide" src={require(`../assets/avatars/Avatar_${user.avatar}.png`)} />
         <CIClose className={cls.close} id="close" onClick={handleClose} />
         <CIMusic className={cls.music} id="music" />

@@ -1,6 +1,9 @@
 import { Fragment, useContext, useEffect, useState } from "react";
 import { makeStyles } from "@material-ui/core";
 import { useHistory } from "react-router-dom";
+import { mapUserData } from "../funnels/v1";
+import { parseToken } from "../libs/utils";
+import { refresh as handleRefresh } from "../services/v1";
 import { showAvatarPage, showDetailsPage, showHomePage, showLandingPage, showLoginBoard, showReadingPane, showResetPassword } from "../libs/animations";
 import LoadAssets from "../components/LoadAssets";
 import { AppContext } from "../App";
@@ -34,7 +37,7 @@ const HomePage = () => {
 
     const history = useHistory();
 
-    const { avatarRef, user, setHowler } = useContext(AppContext);
+    const { avatarRef, user, setHowler, setUser } = useContext(AppContext);
 
     const [loadedItems, setLoaded] = useState(0);
 
@@ -75,6 +78,7 @@ const HomePage = () => {
                         easing: "linear",
                         duration: 2000
                     });
+
                     if (!user.active) {
                         if (window.location.pathname.includes("/reset-password"))
                             showResetPassword();
@@ -88,6 +92,16 @@ const HomePage = () => {
                             showLoginBoard(true);
                     }
                     else {
+                        handleRefresh()
+                            .then(({ data }) => {
+                                const userData = parseToken(data.user);
+
+                                if (userData) {
+                                    localStorage["UserState"] = data.user;
+                                }
+                                setUser(mapUserData((userData)));
+                            });
+
                         setHowler({
                             welcome: new Howl({
                                 src: [require("../assets/sounds/Welcome.mp3")],
@@ -96,6 +110,7 @@ const HomePage = () => {
                                 loop: true
                             })
                         }, 1000);
+
                         if (window.location.pathname.includes("/access")) {
                             anime({
                                 targets: "#logo",

@@ -217,7 +217,7 @@ const UserDetails = () => {
                     left: "110vw",
                     easing: "easeInQuint",
                     duration: 2000
-                })
+                });
                 anime({
                     targets: "#logout, #music",
                     left: "100vw",

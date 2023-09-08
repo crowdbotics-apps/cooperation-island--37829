@@ -50,7 +50,7 @@ const IdlePrompt = (props) => {
         const idleTimer = setInterval(() => {
             const now = parseInt(new Date().getTime() / 1000);
 
-            if (parseInt(now - localStorage.LastActivity) === 299) {
+            if (parseInt(now - localStorage["LastActivity"]) === 299) {
                 const timer = setInterval(() => {
                     const timeLeft = 61 - parseInt(new Date().getTime() / 1000 - now);
 
@@ -64,7 +64,7 @@ const IdlePrompt = (props) => {
             }
         }, 1000);
 
-        localStorage.LastActivity = parseInt(new Date().getTime() / 1000);
+        localStorage["LastActivity"] = parseInt(new Date().getTime() / 1000);
 
         ["click", "keypress", "load", "mousemove"].forEach(x => {
             window.addEventListener(x, handleActivity);
@@ -85,7 +85,7 @@ const IdlePrompt = (props) => {
     }, [props.handleClose]);
 
     const handleActivity = () => {
-        localStorage.LastActivity = parseInt(new Date().getTime() / 1000);
+        localStorage["LastActivity"] = parseInt(new Date().getTime() / 1000);
         handleClose();
     }
 

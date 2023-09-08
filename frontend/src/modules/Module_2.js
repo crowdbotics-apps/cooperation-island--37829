@@ -1,7 +1,8 @@
 import { useContext, useEffect, useRef, useState } from "react";
 import { Backdrop, makeStyles } from "@material-ui/core";
 import { useHistory } from "react-router-dom";
-import { shuffleArray } from "../libs/utils";
+import { mapUserData } from "../funnels/v1";
+import { parseToken, shuffleArray } from "../libs/utils";
 import { score } from "../services/v1";
 import { showHomePage } from "../libs/animations";
 import BoardImg from "../assets/images/Board.png";
@@ -115,7 +116,7 @@ const useStyles = makeStyles({
     guide2: {
         position: "absolute",
         filter: "drop-shadow(0.33vh 0.66vh 1.2vh black)",
-        top: "33.5vh",
+        top: "34.5vh",
         left: "108vw",
         height: "70vh",
         width: "24vw"
@@ -247,6 +248,10 @@ const Module_2 = () => {
 
     const [showBGAnimations, setBGAnimation] = useState(false);
 
+    const [avatarsArray] = useState(shuffleArray(Array(24).fill().map((_, i) => i + 1)));
+
+    const [avatarID, setAvatar] = useState(0);
+
     const [isAnimating, setAnimation] = useState(false);
 
     const [feedback, setFeedback] = useState(false);
@@ -264,7 +269,7 @@ const Module_2 = () => {
 
     const [isStarted, setStarted] = useState(false);
 
-    const { BGM, data, howler, user } = useContext(AppContext);
+    const { BGM, data, howler, user, setUser } = useContext(AppContext);
 
     useEffect(() => {
         anime
@@ -568,7 +573,14 @@ const Module_2 = () => {
             shared_shell: shells.partner,
             response: flag,
             trial_response_time: timer.getElapsedRunningTime()
-        });
+        })
+            .then(({ data }) => {
+                const userData = parseToken(data.user);
+
+                if (userData) {
+                    localStorage["UserState"] = data.user;
+                }
+            });
         timer.stop();
 
         new Howl({
@@ -582,6 +594,24 @@ const Module_2 = () => {
             easing: "easeInQuint",
             duration: 2000
         });
+
+        anime
+            .timeline()
+            .add({
+                targets: "#guide2",
+                left: "130vw",
+                easing: "easeInQuint",
+                duration: 1500,
+                complete: () => {
+                    setAvatar(avatarID + 1);
+                }
+            })
+            .add({
+                targets: "#guide2",
+                left: "76vw",
+                easing: "easeOutQuint",
+                duration: 1500
+            });
 
         if (flag) {
             anime({
@@ -604,7 +634,10 @@ const Module_2 = () => {
                         targets: "#shell",
                         scale: [0.9, 1],
                         delay: 100,
-                        duration: 1000
+                        duration: 1000,
+                        begin: () => {
+                            setUser(mapUserData(parseToken(localStorage["UserState"])));
+                        }
                     });
                 }
             });
@@ -800,9 +833,9 @@ const Module_2 = () => {
         </div>}
         <img className={cls.logo} id="logo2" src={require("../assets/modules/Module_2_Text.png")} />
         <img className={cls.palmAlt} id="palmAlt" src={require("../assets/modules/Palm-alt.png")} />
-        <img className={cls.instructor} id="instructor" src={require("../assets/avatars/xtras/Avatar_11.png")} />
+        <img className={cls.instructor} id="instructor" src={require("../assets/avatars/xtras/Avatar_1.png")} />
         <img className={cls.guide} id="guide" src={require(`../assets/avatars/Avatar_${user.avatar}.png`)} />
-        <img className={cls.guide2} id="guide2" src={require("../assets/avatars/xtras/Avatar_12.png")} />
+        <img className={cls.guide2} id="guide2" src={require(`../assets/avatars/partners/Avatar_${avatarsArray[avatarID]}.png`)} />
         <CIClose className={cls.close} id="close" onClick={handleClose} />
         <CIMusic className={cls.music} id="music" />
         <CIShell className={cls.shell} id="shell" />
@@ -849,7 +882,7 @@ const Module_2 = () => {
                 <CILabel>
                     If you reject, then you and your partner will not get to keep the shells that have fallen.
                 </CILabel>
-                <img src={require("../assets/modules/Shell-alt.png")} />
+                <img src={require("../assets/modules/Shell.png")} />
                 <CILabel>
                     Are you ready?
                 </CILabel>
