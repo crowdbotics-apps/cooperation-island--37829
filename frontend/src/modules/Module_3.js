@@ -232,6 +232,8 @@ const Module_3 = () => {
 
     const [feedback, setFeedback] = useState(false);
 
+    const [flag, setFlag] = useState(true);
+
     const [disabled, setDisabled] = useState(false);
 
     const [draggingId, setDragging] = useState(0);
@@ -384,6 +386,7 @@ const Module_3 = () => {
                 easing: "easeInQuint",
                 duration: 500,
                 complete: () => {
+                    setFeedback(true);
                     hideBackdrop(false);
                     setStarted(true);
                 }
@@ -398,30 +401,6 @@ const Module_3 = () => {
                 targets: "#board",
                 rotateY: ["0deg", "90deg"],
                 easing: "linear",
-                duration: 2000
-            }, "-=2000")
-            .add({
-                targets: "#guide",
-                left: "1vw",
-                easing: "easeOutQuint",
-                duration: 2000
-            })
-            .add({
-                targets: "#block",
-                top: "24vh",
-                easing: "easeOutQuint",
-                duration: 2000
-            }, "-=2000")
-            .add({
-                targets: "#sections",
-                top: "23vh",
-                easing: "easeOutQuint",
-                duration: 2000
-            }, "-=2000")
-            .add({
-                targets: "#close, #music, #shell",
-                top: "4vh",
-                easing: "easeOutQuint",
                 duration: 2000
             }, "-=2000");
     }
@@ -605,6 +584,36 @@ const Module_3 = () => {
         });
     }
 
+    const handleStart = () => {
+        setFeedback(false);
+        setFlag(false);
+
+        anime({
+            targets: "#guide",
+            left: "1vw",
+            easing: "easeOutQuint",
+            duration: 2000
+        });
+        anime({
+            targets: "#block",
+            top: "24vh",
+            easing: "easeOutQuint",
+            duration: 2000
+        });
+        anime({
+            targets: "#sections",
+            top: "23vh",
+            easing: "easeOutQuint",
+            duration: 2000
+        });
+        anime({
+            targets: "#close, #music, #shell",
+            top: "4vh",
+            easing: "easeOutQuint",
+            duration: 2000
+        });
+    }
+
     const goHome = () => {
         howler.module_3.fade(howler.module_3.volume(), 0, 1000);
         if (BGM)
@@ -719,7 +728,7 @@ const Module_3 = () => {
             </div>
         </Backdrop>
         <IdlePrompt handleClose={isStarted ? handleClose : showBackdrop ? handleLeave : handleBack} />
-        {feedback && <Feedback module="voice-your-values" onClose={handleExit} />}
+        {feedback && <Feedback alt={flag} module="voice-your-values" onClose={handleExit} onStart={handleStart} />}
     </div>
 }
 

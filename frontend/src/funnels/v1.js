@@ -29,3 +29,11 @@ export const mapFeedback = (data) => {
             options: x.options
         }));
 }
+
+export const mapPrompt = (data) => {
+    return data
+        .map(x => ({
+            id: x.id,
+            prompt: x.prompt_text
+        }));
+}

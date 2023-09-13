@@ -357,6 +357,8 @@ const Module_1 = () => {
 
     const [feedback, setFeedback] = useState(false);
 
+    const [flag, setFlag] = useState(true);
+
     const [shells, setShells] = useState(0);
 
     const [number, setNumber] = useState(0);
@@ -456,6 +458,7 @@ const Module_1 = () => {
                 easing: "easeInQuint",
                 duration: 500,
                 complete: () => {
+                    setFeedback(true);
                     setShells(anime.random(data.min, data.max));
                     hideBackdrop(false);
                     setStarted(true);
@@ -471,30 +474,6 @@ const Module_1 = () => {
                 targets: "#board",
                 rotateY: ["0deg", "90deg"],
                 easing: "linear",
-                duration: 2000
-            }, "-=2000")
-            .add({
-                targets: "#guide",
-                left: "3vw",
-                easing: "easeOutQuint",
-                duration: 2000
-            })
-            .add({
-                targets: "#dialog",
-                scale: [0, 1],
-                easing: "easeOutQuint",
-                duration: 2000
-            }, "-=2000")
-            .add({
-                targets: "#fish2",
-                marginLeft: "0vw",
-                easing: "easeOutQuint",
-                duration: 2000
-            }, "-=2000")
-            .add({
-                targets: "#close, #music, #shell",
-                top: "4vh",
-                easing: "easeOutQuint",
                 duration: 2000
             }, "-=2000");
     }
@@ -621,6 +600,36 @@ const Module_1 = () => {
         });
         setShow(true);
         setNumber(anime.random(1, 6));
+    }
+
+    const handleStart = () => {
+        setFeedback(false);
+        setFlag(false);
+
+        anime({
+            targets: "#guide",
+            left: "3vw",
+            easing: "easeOutQuint",
+            duration: 2000
+        });
+        anime({
+            targets: "#dialog",
+            scale: [0, 1],
+            easing: "easeOutQuint",
+            duration: 2000
+        });
+        anime({
+            targets: "#fish2",
+            marginLeft: "0vw",
+            easing: "easeOutQuint",
+            duration: 2000
+        });
+        anime({
+            targets: "#close, #music, #shell",
+            top: "4vh",
+            easing: "easeOutQuint",
+            duration: 2000
+        });
     }
 
     const handleRestart = (flag) => () => {
@@ -885,7 +894,7 @@ const Module_1 = () => {
             </div>
         </Backdrop>
         <IdlePrompt handleClose={isStarted ? handleClose : showBackdrop ? handleLeave : handleBack} />
-        {feedback && <Feedback module="fish-mind-reading" onClose={handleExit} />}
+        {feedback && <Feedback alt={flag} module="fish-mind-reading" onClose={handleExit} onStart={handleStart} />}
     </div>
 }
 

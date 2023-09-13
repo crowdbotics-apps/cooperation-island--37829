@@ -1,15 +1,16 @@
 import { useContext, useEffect } from "react";
 import { makeStyles } from "@material-ui/core";
 import { useHistory } from "react-router-dom";
-import { mapFeedback } from "../funnels/v1";
+import { mapFeedback, mapPrompt } from "../funnels/v1";
 import { userState } from "../libs/utils";
-import { feedback, moduleData } from "../services/v1";
+import { feedback, moduleData, prompt } from "../services/v1";
 import { showAvatarPage, showLoginBoard } from "../libs/animations";
 import CIAvatar from "../shared/CIAvatar";
 import CILabel from "../shared/CILabel";
 import CILogout from "../shared/CILogout";
 import CIMusic from "../shared/CIMusic";
 import CIShell from "../shared/CIShell";
+import CIShop from "../shared/CIShop";
 import { AppContext } from "../App";
 import { Howl } from "howler";
 import anime from "animejs";
@@ -33,7 +34,7 @@ const useStyles = makeStyles({
     header: {
         position: "absolute",
         top: "-13.5vh",
-        left: "51.5vw"
+        left: "45vw"
     },
     label: {
         position: "absolute",
@@ -48,22 +49,28 @@ const useStyles = makeStyles({
         left: "22.6vw",
         width: "4vw"
     },
-    avatar: {
+    shop: {
         position: "absolute",
         top: "0vh",
         left: "29vw",
         width: "4vw"
     },
+    avatar: {
+        position: "absolute",
+        top: "0vh",
+        left: "35.5vw",
+        width: "4vw"
+    },
     music: {
         position: "absolute",
         top: "0vh",
-        left: "35.4vw",
+        left: "42.1vw",
         width: "4vw"
     },
     logout: {
         position: "absolute",
         top: "0vh",
-        left: "42vw",
+        left: "48.6vw",
         width: "4vw"
     },
     module: {
@@ -216,11 +223,13 @@ const Dashboard = () => {
 
                                 Promise.all([
                                     moduleData("fish-mind-reading"),
-                                    feedback("fish-mind-reading")
+                                    feedback("fish-mind-reading"),
+                                    prompt("fish-mind-reading")
                                 ])
-                                    .then(([{ data: { max, min, session_id } }, { data }]) => {
+                                    .then(([{ data: { max, min, session_id } }, { data: feedback }, { data: prompt }]) => {
                                         setData({
-                                            feedback: mapFeedback(data),
+                                            feedback: mapFeedback(feedback),
+                                            prompt: mapPrompt(prompt),
                                             session_id,
                                             min,
                                             max
@@ -245,11 +254,13 @@ const Dashboard = () => {
 
                                 Promise.all([
                                     moduleData("tree-shaking"),
-                                    feedback("tree-shaking")
+                                    feedback("tree-shaking"),
+                                    prompt("tree-shaking")
                                 ])
-                                    .then(([{ data: { session_id, trials } }, { data }]) => {
+                                    .then(([{ data: { session_id, trials } }, { data: feedback }, { data: prompt }]) => {
                                         setData({
-                                            feedback: mapFeedback(data),
+                                            feedback: mapFeedback(feedback),
+                                            prompt: mapPrompt(prompt),
                                             session_id,
                                             trials
                                         });
@@ -273,11 +284,13 @@ const Dashboard = () => {
 
                                 Promise.all([
                                     moduleData("voice-your-values"),
-                                    feedback("voice-your-values")
+                                    feedback("voice-your-values"),
+                                    prompt("voice-your-values")
                                 ])
-                                    .then(([{ data: { session_id } }, { data }]) => {
+                                    .then(([{ data: { session_id } }, { data: feedback }, { data: prompt }]) => {
                                         setData({
-                                            feedback: mapFeedback(data),
+                                            feedback: mapFeedback(feedback),
+                                            prompt: mapPrompt(prompt),
                                             session_id
                                         });
                                     });
@@ -324,12 +337,17 @@ const Dashboard = () => {
             });
     }
 
+    const handleShop = () => {
+
+    }
+
     return <div>
         <img className={cls.guide} id="guide" src={user.avatar && require(`../assets/avatars/Avatar_${user.avatar}.png`)} />
         <div className={cls.header} id="header">
             <img className={cls.board} src={require("../assets/images/Name_Plate.png")} />
             <CILabel className={cls.label}>{user.id}</CILabel>
             <CIShell className={cls.shell} id="shell" />
+            <CIShop className={cls.shop} id="shop" onClick={handleShop} />
             <CIAvatar className={cls.avatar} id="avatar" onClick={handleAvatar} />
             <CIMusic className={cls.music} id="music" />
             <CILogout className={cls.logout} id="logout" onClick={handleLogout} />

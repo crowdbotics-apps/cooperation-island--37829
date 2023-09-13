@@ -256,6 +256,8 @@ const Module_2 = () => {
 
     const [feedback, setFeedback] = useState(false);
 
+    const [flag, setFlag] = useState(true);
+
     const [shellsArray] = useState(shuffleArray(Array(24).fill().map((_, i) => i)));
 
     const [trial, setTrial] = useState(0);
@@ -362,6 +364,7 @@ const Module_2 = () => {
                 easing: "easeInQuint",
                 duration: 500,
                 complete: () => {
+                    setFeedback(true);
                     hideBackdrop(false);
                     setStarted(true);
                 }
@@ -377,44 +380,6 @@ const Module_2 = () => {
                 rotateY: ["0deg", "90deg"],
                 easing: "linear",
                 duration: 2000
-            }, "-=2000")
-            .add({
-                targets: "#guide",
-                left: "1vw",
-                easing: "easeOutQuint",
-                duration: 2000
-            })
-            .add({
-                targets: "#background",
-                width: "180vw",
-                height: "180vh",
-                marginTop: "-66vh",
-                marginLeft: "-76vw",
-                easing: "easeOutQuint",
-                duration: 2000
-            }, "-=2000")
-            .add({
-                targets: "#palmAlt",
-                scale: [0, 1],
-                top: "-9vh",
-                easing: "easeOutQuint",
-                duration: 2000
-            }, "-=2000")
-            .add({
-                targets: "#guide2",
-                left: "76vw",
-                easing: "easeOutQuint",
-                duration: 2000
-            }, "-=2000")
-            .add({
-                targets: "#close, #music, #shell",
-                top: "4vh",
-                easing: "easeOutQuint",
-                duration: 2000,
-                complete: () => {
-                    $("#palmAlt, #palmWrapper").toggle();
-                    setTimeout(handleRestart, 400);
-                }
             }, "-=2000");
     }
 
@@ -561,6 +526,50 @@ const Module_2 = () => {
             duration: 500,
             complete: () => {
                 hideBackdrop(false);
+            }
+        });
+    }
+
+    const handleStart = () => {
+        setFeedback(false);
+        setFlag(false);
+
+        anime({
+            targets: "#guide",
+            left: "1vw",
+            easing: "easeOutQuint",
+            duration: 2000
+        });
+        anime({
+            targets: "#background",
+            width: "180vw",
+            height: "180vh",
+            marginTop: "-66vh",
+            marginLeft: "-76vw",
+            easing: "easeOutQuint",
+            duration: 2000
+        });
+        anime({
+            targets: "#palmAlt",
+            scale: [0, 1],
+            top: "-9vh",
+            easing: "easeOutQuint",
+            duration: 2000
+        });
+        anime({
+            targets: "#guide2",
+            left: "76vw",
+            easing: "easeOutQuint",
+            duration: 2000
+        });
+        anime({
+            targets: "#close, #music, #shell",
+            top: "4vh",
+            easing: "easeOutQuint",
+            duration: 2000,
+            complete: () => {
+                $("#palmAlt, #palmWrapper").toggle();
+                setTimeout(handleRestart, 400);
             }
         });
     }
@@ -900,7 +909,7 @@ const Module_2 = () => {
             </div>
         </Backdrop>
         <IdlePrompt handleClose={isStarted ? handleClose : showBackdrop ? handleLeave : handleBack} />
-        {feedback && <Feedback module="tree-shaking" onClose={handleExit} />}
+        {feedback && <Feedback alt={flag} module="tree-shaking" onClose={handleExit} onStart={handleStart} />}
     </div>
 }
 

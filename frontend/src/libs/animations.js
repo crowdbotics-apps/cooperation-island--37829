@@ -190,7 +190,7 @@ export const showHomePage = () => {
         duration: 2000
     });
     anime({
-        targets: "#shell, #avatar, #music, #logout",
+        targets: "#shell, #shop, #avatar, #music, #logout",
         top: "1.75vh",
         easing: "easeOutQuint",
         duration: 2000
