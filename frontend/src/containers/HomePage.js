@@ -103,6 +103,12 @@ const HomePage = () => {
                             });
 
                         setHowler({
+                            shop: new Howl({
+                                src: [require("../assets/sounds/Shop.mp3")],
+                                autoplay: true,
+                                volume: 0,
+                                loop: true
+                            }),
                             welcome: new Howl({
                                 src: [require("../assets/sounds/Welcome.mp3")],
                                 autoplay: true,
@@ -147,15 +153,6 @@ const HomePage = () => {
                             showAvatarPage(avatarRef.current.setUser);
                         }
                         else if (window.location.pathname.includes("/shop")) {
-                            setHowler({
-                                shop: new Howl({
-                                    src: [require("../assets/sounds/Shop.mp3")],
-                                    autoplay: true,
-                                    volume: 0,
-                                    loop: true
-                                })
-                            });
-
                             anime({
                                 targets: "#logo",
                                 top: "150vh",
