@@ -131,10 +131,10 @@ const useStyles = makeStyles((theme) => ({
         position: "absolute",
         filter: "drop-shadow(0.33vh 0.66vh 1.2vh black)",
         transform: "scaleX(-1)",
-        top: "33.5vh",
+        top: "34.5vh",
         left: "-30vw",
-        height: "70vh",
-        width: "24vw"
+        height: "66.2vh",
+        width: "22vw"
     },
     fish: {
         position: "absolute",
@@ -608,7 +608,7 @@ const Module_1 = () => {
 
         anime({
             targets: "#guide",
-            left: "3vw",
+            left: "5vw",
             easing: "easeOutQuint",
             duration: 2000
         });

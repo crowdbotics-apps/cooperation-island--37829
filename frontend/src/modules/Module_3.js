@@ -90,10 +90,10 @@ const useStyles = makeStyles((theme) => ({
         position: "absolute",
         filter: "drop-shadow(0.33vh 0.66vh 1.2vh black)",
         transform: "scaleX(-1)",
-        top: "33.5vh",
+        top: "36vh",
         left: "-30vw",
-        height: "70vh",
-        width: "24vw"
+        height: "66.2vh",
+        width: "22vw"
     },
     block: {
         position: "absolute",
@@ -159,10 +159,10 @@ const useStyles = makeStyles((theme) => ({
         position: "absolute",
         filter: "drop-shadow(0.33vh 0.66vh 1.2vh black)",
         transform: "scaleX(-1)",
-        top: "33.5vh",
+        top: "34.5vh",
         left: "-30vw",
-        height: "70vh",
-        width: "24vw"
+        height: "66.2vh",
+        width: "22vw"
     },
     header: {
         fontSize: "4vh",
@@ -270,7 +270,7 @@ const Module_3 = () => {
             }, "-=1000")
             .add({
                 targets: "#instructor",
-                left: "-0.5vw",
+                left: "1.5vw",
                 easing: "easeOutQuint",
                 duration: 2000
             }, "-=2000")
@@ -590,7 +590,7 @@ const Module_3 = () => {
 
         anime({
             targets: "#guide",
-            left: "1vw",
+            left: "2.75vw",
             easing: "easeOutQuint",
             duration: 2000
         });

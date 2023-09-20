@@ -4,7 +4,7 @@ import { useHistory } from "react-router-dom";
 import { mapFeedback, mapPrompt } from "../funnels/v1";
 import { userState } from "../libs/utils";
 import { feedback, moduleData, prompt } from "../services/v1";
-import { showAvatarPage, showLoginBoard } from "../libs/animations";
+import { showAvatarPage, showLoginBoard, showShopPage } from "../libs/animations";
 import CIAvatar from "../shared/CIAvatar";
 import CILabel from "../shared/CILabel";
 import CILogout from "../shared/CILogout";
@@ -25,10 +25,10 @@ const useStyles = makeStyles({
     guide: {
         position: "absolute",
         filter: "drop-shadow(0.33vh 0.66vh 1.2vh black)",
-        top: "33.5vh",
+        top: "34.5vh",
         left: "-30vw",
-        height: "70vh",
-        width: "24vw",
+        height: "66.2vh",
+        width: "22vw",
         transform: "scaleX(-1)"
     },
     header: {
@@ -122,7 +122,7 @@ const Dashboard = () => {
         localStorage.removeItem("LastActivity");
     }, []);
 
-    const handleAvatar = () => {
+    const handleRoute = (alt) => () => {
         anime({
             targets: "#background",
             width: "100vw",
@@ -157,8 +157,24 @@ const Dashboard = () => {
             easing: "easeInQuint",
             duration: 2000,
             complete: () => {
-                history.push("/avatar");
-                showAvatarPage(avatarRef.current.setUser);
+                if (alt) {
+                    history.push("/avatar");
+                    showAvatarPage(avatarRef.current.setUser);
+                }
+                else {
+                    howler.welcome.fade(howler.welcome.volume(), 0, 1000);
+                    setHowler({
+                        shop: new Howl({
+                            src: [require("../assets/sounds/Shop.mp3")],
+                            autoplay: true,
+                            volume: BGM ? 1 : 0,
+                            loop: true
+                        })
+                    });
+
+                    history.push("/shop");
+                    showShopPage();
+                }
             }
         });
     }
@@ -337,18 +353,14 @@ const Dashboard = () => {
             });
     }
 
-    const handleShop = () => {
-
-    }
-
     return <div>
         <img className={cls.guide} id="guide" src={user.avatar && require(`../assets/avatars/Avatar_${user.avatar}.png`)} />
         <div className={cls.header} id="header">
             <img className={cls.board} src={require("../assets/images/Name_Plate.png")} />
             <CILabel className={cls.label}>{user.id}</CILabel>
             <CIShell className={cls.shell} id="shell" />
-            <CIShop className={cls.shop} id="shop" onClick={handleShop} />
-            <CIAvatar className={cls.avatar} id="avatar" onClick={handleAvatar} />
+            <CIShop className={cls.shop} id="shop" onClick={handleRoute(false)} />
+            <CIAvatar className={cls.avatar} id="avatar" onClick={handleRoute(true)} />
             <CIMusic className={cls.music} id="music" />
             <CILogout className={cls.logout} id="logout" onClick={handleLogout} />
         </div>

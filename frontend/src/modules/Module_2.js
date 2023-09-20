@@ -99,27 +99,27 @@ const useStyles = makeStyles({
         position: "absolute",
         filter: "drop-shadow(0.33vh 0.66vh 1.2vh black)",
         transform: "scaleX(-1)",
-        top: "33.5vh",
+        top: "36.5vh",
         left: "-30vw",
-        height: "70vh",
-        width: "24vw"
+        height: "66.2vh",
+        width: "22vw"
     },
     guide: {
         position: "absolute",
         filter: "drop-shadow(0.33vh 0.66vh 1.2vh black)",
         transform: "scaleX(-1)",
-        top: "33.5vh",
+        top: "34.5vh",
         left: "-30vw",
-        height: "70vh",
-        width: "24vw"
+        height: "66.2vh",
+        width: "22vw"
     },
     guide2: {
         position: "absolute",
         filter: "drop-shadow(0.33vh 0.66vh 1.2vh black)",
-        top: "34.5vh",
+        top: "35.5vh",
         left: "108vw",
-        height: "70vh",
-        width: "24vw"
+        height: "66.2vh",
+        width: "22vw"
     },
     header: {
         fontSize: "4vh",
@@ -300,7 +300,7 @@ const Module_2 = () => {
             }, "-=1000")
             .add({
                 targets: "#instructor",
-                left: "0vw",
+                left: "1vw",
                 easing: "easeOutQuint",
                 duration: 2000
             }, "-=2000")
@@ -536,7 +536,7 @@ const Module_2 = () => {
 
         anime({
             targets: "#guide",
-            left: "1vw",
+            left: "2vw",
             easing: "easeOutQuint",
             duration: 2000
         });
@@ -558,7 +558,7 @@ const Module_2 = () => {
         });
         anime({
             targets: "#guide2",
-            left: "76vw",
+            left: "77vw",
             easing: "easeOutQuint",
             duration: 2000
         });
@@ -617,7 +617,7 @@ const Module_2 = () => {
             })
             .add({
                 targets: "#guide2",
-                left: "76vw",
+                left: "77vw",
                 easing: "easeOutQuint",
                 duration: 1500
             });

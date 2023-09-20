@@ -209,9 +209,10 @@ const Avatar = forwardRef((_, ref) => {
             })
             .add({
                 targets: "#logo",
+                top: "-12vh",
                 left: "-50vw",
                 easing: "easeInQuint",
-                duration: 2000
+                duration: 1
             }, "-=4000")
             .add({
                 targets: "#logo2",

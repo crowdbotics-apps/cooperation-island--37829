@@ -12,6 +12,7 @@ import LandingPage from "./containers/LandingPage";
 import UserDetails from "./containers/UserDetails";
 import AvatarPage from "./containers/AvatarPage";
 import Dashboard from "./containers/Dashboard";
+import ShopPage from "./containers/ShopPage";
 import ResetPassword from "./components/ResetPassword";
 import ReadingPane from "./components/ReadingPane";
 import Module_1 from "./modules/Module_1";
@@ -122,6 +123,7 @@ const App = () => {
         return <Switch>
           <Route path="/details" component={UserDetails} />
           <Route path="/avatar" render={() => <AvatarPage ref={avatarRef} />} />
+          <Route path="/shop" component={ShopPage} />
           <Route path="/home" component={Dashboard} />
           <Route path="/fish-mind-reading" render={handleModule} />
           <Route path="/tree-shaking" render={handleModule} />

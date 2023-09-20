@@ -44,6 +44,8 @@ const CIMusic = (props) => {
                 howler.module_2.fade(howler.module_2.volume(), 0, 1000);
             else if (window.location.pathname.includes("/voice-your-values"))
                 howler.module_3.fade(howler.module_3.volume(), 0, 1000);
+            else if (window.location.pathname.includes("/shop"))
+                howler.shop.fade(howler.shop.volume(), 0, 1000);
             else
                 howler.welcome.fade(howler.welcome.volume(), 0, 1000);
         }
@@ -54,6 +56,8 @@ const CIMusic = (props) => {
                 howler.module_2.fade(0, 1, 1000);
             else if (window.location.pathname.includes("/voice-your-values"))
                 howler.module_3.fade(0, 1, 1000);
+            else if (window.location.pathname.includes("/shop"))
+                howler.shop.fade(0, 1, 1000);
             else
                 howler.welcome.fade(0, 1, 1000);
         setBGM(!BGM);

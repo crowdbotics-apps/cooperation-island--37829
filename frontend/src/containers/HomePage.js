@@ -4,7 +4,7 @@ import { useHistory } from "react-router-dom";
 import { mapUserData } from "../funnels/v1";
 import { parseToken } from "../libs/utils";
 import { refresh as handleRefresh } from "../services/v1";
-import { showAvatarPage, showDetailsPage, showHomePage, showLandingPage, showLoginBoard, showReadingPane, showResetPassword } from "../libs/animations";
+import { showAvatarPage, showDetailsPage, showHomePage, showLandingPage, showLoginBoard, showReadingPane, showResetPassword, showShopPage } from "../libs/animations";
 import LoadAssets from "../components/LoadAssets";
 import { AppContext } from "../App";
 import { Howl } from "howler";
@@ -145,6 +145,24 @@ const HomePage = () => {
                                 duration: 2000
                             });
                             showAvatarPage(avatarRef.current.setUser);
+                        }
+                        else if (window.location.pathname.includes("/shop")) {
+                            setHowler({
+                                shop: new Howl({
+                                    src: [require("../assets/sounds/Shop.mp3")],
+                                    autoplay: true,
+                                    volume: 0,
+                                    loop: true
+                                })
+                            });
+
+                            anime({
+                                targets: "#logo",
+                                top: "150vh",
+                                easing: "easeInElastic",
+                                duration: 2000
+                            });
+                            showShopPage();
                         }
                         else if (window.location.pathname.includes("/home")) {
                             anime({
