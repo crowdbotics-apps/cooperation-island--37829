@@ -41,8 +41,7 @@ const useStyles = makeStyles((theme) => ({
 const CIShell = (props) => {
     const cls = useStyles();
 
-    // const { user: { shells } } = useContext(AppContext);
-    const shells = 1892;
+    const { user: { shells } } = useContext(AppContext);
 
     const prevShells = usePrevious(shells);
 
