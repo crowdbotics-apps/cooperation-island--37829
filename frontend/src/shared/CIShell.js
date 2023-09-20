@@ -13,22 +13,22 @@ const useStyles = makeStyles((theme) => ({
         fontFamily: "Summer Show",
         dominantBaseline: "middle",
         textAnchor: "middle",
-        translate: "8.4vh 4vw"
+        translate: "50% 46%"
     },
     size1: {
-        fontSize: "8vh"
+        fontSize: "300%"
     },
     size2: {
-        fontSize: "6.2vh"
+        fontSize: "237%"
     },
     size3: {
-        fontSize: "4.4vh"
+        fontSize: "175%"
     },
     size4: {
-        fontSize: "3.5vh"
+        fontSize: "131%"
     },
     size5: {
-        fontSize: "3vh"
+        fontSize: "112%"
     },
     svg: {
         filter: "drop-shadow(0.33vh 0.66vh 0.8vh black)",
@@ -41,7 +41,8 @@ const useStyles = makeStyles((theme) => ({
 const CIShell = (props) => {
     const cls = useStyles();
 
-    const { user: { shells } } = useContext(AppContext);
+    // const { user: { shells } } = useContext(AppContext);
+    const shells = 1892;
 
     const prevShells = usePrevious(shells);
 
