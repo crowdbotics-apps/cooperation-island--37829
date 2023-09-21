@@ -25,11 +25,40 @@ const useStyles = makeStyles({
     guide: {
         position: "absolute",
         filter: "drop-shadow(0.33vh 0.66vh 1.2vh black)",
-        top: "34.5vh",
         left: "-30vw",
         height: "66.2vh",
         width: "22vw",
         transform: "scaleX(-1)"
+    },
+    guide1: {
+        top: "36.5vh"
+    },
+    guide2: {
+        top: "36vh"
+    },
+    guide3: {
+        top: "35vh"
+    },
+    guide4: {
+        top: "34.5vh"
+    },
+    guide5: {
+        top: "35.75vh"
+    },
+    guide6: {
+        top: "37vh"
+    },
+    guide7: {
+        top: "34vh"
+    },
+    guide8: {
+        top: "35.75vh"
+    },
+    guide9: {
+        top: "34.25vh"
+    },
+    guide10: {
+        top: "34.25vh"
     },
     header: {
         position: "absolute",
@@ -354,7 +383,7 @@ const Dashboard = () => {
     }
 
     return <div>
-        <img className={cls.guide} id="guide" src={user.avatar && require(`../assets/avatars/Avatar_${user.avatar}.png`)} />
+        <img className={clsx(cls.guide, cls["guide" + user.avatar])} id="guide" src={user.avatar && require(`../assets/avatars/Avatar_${user.avatar}.png`)} />
         <div className={cls.header} id="header">
             <img className={cls.board} src={require("../assets/images/Name_Plate.png")} />
             <CILabel className={cls.label}>{user.id}</CILabel>

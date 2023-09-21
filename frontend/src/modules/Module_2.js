@@ -108,12 +108,41 @@ const useStyles = makeStyles({
         position: "absolute",
         filter: "drop-shadow(0.33vh 0.66vh 1.2vh black)",
         transform: "scaleX(-1)",
-        top: "34.5vh",
         left: "-30vw",
         height: "66.2vh",
         width: "22vw"
     },
+    guide1: {
+        top: "36.5vh"
+    },
     guide2: {
+        top: "36vh"
+    },
+    guide3: {
+        top: "35vh"
+    },
+    guide4: {
+        top: "34.5vh"
+    },
+    guide5: {
+        top: "35.75vh"
+    },
+    guide6: {
+        top: "37vh"
+    },
+    guide7: {
+        top: "34vh"
+    },
+    guide8: {
+        top: "35.75vh"
+    },
+    guide9: {
+        top: "34.25vh"
+    },
+    guide10: {
+        top: "34.25vh"
+    },
+    partner: {
         position: "absolute",
         filter: "drop-shadow(0.33vh 0.66vh 1.2vh black)",
         top: "35.5vh",
@@ -442,7 +471,7 @@ const Module_2 = () => {
                 duration: 2000
             }, "-=4000")
             .add({
-                targets: "#guide2",
+                targets: "#partner",
                 left: "130vw",
                 easing: "easeInQuint",
                 duration: 2000
@@ -557,7 +586,7 @@ const Module_2 = () => {
             duration: 2000
         });
         anime({
-            targets: "#guide2",
+            targets: "#partner",
             left: "77vw",
             easing: "easeOutQuint",
             duration: 2000
@@ -607,7 +636,7 @@ const Module_2 = () => {
         anime
             .timeline()
             .add({
-                targets: "#guide2",
+                targets: "#partner",
                 left: "130vw",
                 easing: "easeInQuint",
                 duration: 1500,
@@ -616,7 +645,7 @@ const Module_2 = () => {
                 }
             })
             .add({
-                targets: "#guide2",
+                targets: "#partner",
                 left: "77vw",
                 easing: "easeOutQuint",
                 duration: 1500
@@ -752,7 +781,7 @@ const Module_2 = () => {
                     duration: 2000
                 });
                 anime({
-                    targets: "#guide2",
+                    targets: "#partner",
                     left: "130vw",
                     easing: "easeInQuint",
                     duration: 2000
@@ -843,8 +872,8 @@ const Module_2 = () => {
         <img className={cls.logo} id="logo2" src={require("../assets/modules/Module_2_Text.png")} />
         <img className={cls.palmAlt} id="palmAlt" src={require("../assets/modules/Palm-alt.png")} />
         <img className={cls.instructor} id="instructor" src={require("../assets/avatars/xtras/Avatar_1.png")} />
-        <img className={cls.guide} id="guide" src={require(`../assets/avatars/Avatar_${user.avatar}.png`)} />
-        <img className={cls.guide2} id="guide2" src={require(`../assets/avatars/partners/Avatar_${avatarsArray[avatarID]}.png`)} />
+        <img className={clsx(cls.guide, cls["guide" + user.avatar])} id="guide" src={require(`../assets/avatars/Avatar_${user.avatar}.png`)} />
+        <img className={cls.partner} id="partner" src={require(`../assets/avatars/partners/Avatar_${avatarsArray[avatarID]}.png`)} />
         <CIClose className={cls.close} id="close" onClick={handleClose} />
         <CIMusic className={cls.music} id="music" />
         <CIShell className={cls.shell} id="shell" />

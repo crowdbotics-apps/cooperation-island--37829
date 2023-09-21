@@ -25,6 +25,7 @@ import CIShell from "../shared/CIShell";
 import { AppContext } from "../App";
 import { Howl } from "howler";
 import anime from "animejs";
+import clsx from "clsx";
 import $ from "jquery";
 
 const useStyles = makeStyles((theme) => ({
@@ -159,10 +160,39 @@ const useStyles = makeStyles((theme) => ({
         position: "absolute",
         filter: "drop-shadow(0.33vh 0.66vh 1.2vh black)",
         transform: "scaleX(-1)",
-        top: "34.5vh",
         left: "-30vw",
         height: "66.2vh",
         width: "22vw"
+    },
+    guide1: {
+        top: "36.5vh"
+    },
+    guide2: {
+        top: "36vh"
+    },
+    guide3: {
+        top: "35vh"
+    },
+    guide4: {
+        top: "34.5vh"
+    },
+    guide5: {
+        top: "35.75vh"
+    },
+    guide6: {
+        top: "37vh"
+    },
+    guide7: {
+        top: "34vh"
+    },
+    guide8: {
+        top: "35.75vh"
+    },
+    guide9: {
+        top: "34.25vh"
+    },
+    guide10: {
+        top: "34.25vh"
     },
     header: {
         fontSize: "4vh",
@@ -636,7 +666,7 @@ const Module_3 = () => {
     return <div>
         <img className={cls.logo} id="logo2" src={require("../assets/modules/Module_3_Text.png")} />
         <img className={cls.instructor} id="instructor" src={require("../assets/avatars/xtras/Avatar_2.png")} />
-        <img className={cls.guide} id="guide" src={require(`../assets/avatars/Avatar_${user.avatar}.png`)} />
+        <img className={clsx(cls.guide, cls["guide" + user.avatar])} id="guide" src={require(`../assets/avatars/Avatar_${user.avatar}.png`)} />
         <CIClose className={cls.close} id="close" onClick={handleClose} />
         <CIMusic className={cls.music} id="music" />
         <CIShell className={cls.shell} id="shell" />
