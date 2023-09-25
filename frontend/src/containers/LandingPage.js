@@ -2,7 +2,7 @@ import { Fragment, useContext, useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { Backdrop, makeStyles } from "@material-ui/core";
 import { mapUserData } from "../funnels/v1";
-import { formatCode, parseToken, userState } from "../libs/utils";
+import { anime, formatCode, parseToken, userState } from "../libs/utils";
 import { email, access as handleAccess, refresh as handleRefresh } from "../services/v1";
 import { showDetailsPage, showLoginBoard } from "../libs/animations";
 import BoardImg from "../assets/images/Board.png";
@@ -16,7 +16,6 @@ import CIMusic from "../shared/CIMusic";
 import { AppContext } from "../App";
 import { toast } from "react-toastify";
 import { Howl } from "howler";
-import anime from "animejs";
 
 const useStyles = makeStyles((theme) => ({
     animal: {

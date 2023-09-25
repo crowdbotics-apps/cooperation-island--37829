@@ -2,13 +2,12 @@ import { Fragment, useContext, useEffect, useState } from "react";
 import { makeStyles } from "@material-ui/core";
 import { useHistory } from "react-router-dom";
 import { mapUserData } from "../funnels/v1";
-import { parseToken } from "../libs/utils";
+import { anime, parseToken } from "../libs/utils";
 import { refresh as handleRefresh } from "../services/v1";
 import { showAvatarPage, showDetailsPage, showHomePage, showLandingPage, showLoginBoard, showReadingPane, showResetPassword, showShopPage } from "../libs/animations";
 import LoadAssets from "../components/LoadAssets";
 import { AppContext } from "../App";
 import { Howl } from "howler";
-import anime from "animejs";
 
 const useStyles = makeStyles((theme) => ({
     BG: {

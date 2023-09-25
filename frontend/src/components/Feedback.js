@@ -1,5 +1,6 @@
 import { Fragment, useContext, useEffect, useState } from "react";
 import { makeStyles } from "@material-ui/core";
+import { anime } from "../libs/utils";
 import { saveFeedback, sendPrompt } from "../services/v1";
 import BoardImg from "../assets/images/Board.png";
 import CIButton from "../shared/CIButton";
@@ -8,7 +9,6 @@ import CILabel from "../shared/CILabel";
 import Option from "./Option";
 import Rating from "./Rating";
 import { AppContext } from "../App";
-import anime from "animejs";
 import clsx from "clsx";
 
 const useStyles = makeStyles((theme) => ({

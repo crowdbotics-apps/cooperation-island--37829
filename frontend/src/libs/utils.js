@@ -1,5 +1,10 @@
 import { useEffect, useRef } from "react";
 import jwtDecode from "jwt-decode";
+import anime from "animejs";
+
+anime.suspendWhenDocumentHidden = false;
+
+export { anime };
 
 export const usePrevious = (value) => {
     const ref = useRef();
@@ -19,8 +24,18 @@ export const userState = {
     avatar: 0,
     details: false,
     email: false,
-    shells: 0
+    shells: 0,
+    posters: []
 };
+
+export const postersData = Array(9).fill()
+    .map((_, i) => ({
+        id: i + 1,
+        name: "",
+        description: "",
+        shells: "",
+        variant: [1, 3, 8].includes(i) ? 2 : [0, 5, 7].includes(i) ? 1 : 0
+    }));
 
 export const rankedQualities = [
     {
@@ -134,3 +149,67 @@ export const validateEmail = (value) => {
 export const validateZipCode = (value) => {
     return /^[0-9]{5}(?:-[0-9]{4})?$/.test(value);
 }
+
+
+export const tempData = [
+    {
+        id: 1,
+        name: "Surf's Up!",
+        description: "Surf's Up!",
+        shells: 8,
+        variant: 1
+    },
+    {
+        id: 2,
+        name: "Ancient Ruins",
+        description: "Ancient Ruins",
+        shells: 11,
+        variant: 2
+    },
+    {
+        id: 3,
+        name: "Pirate Adventure",
+        description: "Pirate Adventure",
+        shells: 47
+    },
+    {
+        id: 4,
+        name: "Aqua Adventure",
+        description: "Aqua Adventure",
+        shells: 69,
+        variant: 2
+    },
+    {
+        id: 5,
+        name: "Moonlit Campfire",
+        description: "Moonlit Campfire",
+        shells: 78
+    },
+    {
+        id: 6,
+        name: "Mystical Enchantment",
+        description: "Mystical Enchantment",
+        shells: 305,
+        variant: 1
+    },
+    {
+        id: 7,
+        name: "Tropical Paradise",
+        description: "Tropical Paradise",
+        shells: 902
+    },
+    {
+        id: 8,
+        name: "Jungle Explorer",
+        description: "Jungle Explorer",
+        shells: 4811,
+        variant: 1
+    },
+    {
+        id: 9,
+        name: "Celestial Voyager",
+        description: "Celestial Voyager",
+        shells: 68212,
+        variant: 2
+    }
+];

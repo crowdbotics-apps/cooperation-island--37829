@@ -2,7 +2,7 @@ import { Fragment, forwardRef, useContext, useEffect, useImperativeHandle, useSt
 import { makeStyles } from "@material-ui/core";
 import { useHistory } from "react-router-dom";
 import { mapUserData } from "../funnels/v1";
-import { parseToken, usePrevious, userState } from "../libs/utils";
+import { anime, parseToken, usePrevious, userState } from "../libs/utils";
 import { avatar as handleAvatar } from "../services/v1";
 import { showHomePage, showLoginBoard } from "../libs/animations";
 import AvatarFrame from "../components/AvatarFrame";
@@ -13,7 +13,6 @@ import CIMusic from "../shared/CIMusic";
 import { AppContext } from "../App";
 import { toast } from "react-toastify";
 import { Howl } from "howler";
-import anime from "animejs";
 import clsx from "clsx";
 import $ from "jquery";
 
@@ -58,7 +57,7 @@ const useStyles = makeStyles((theme) => ({
         paddingLeft: "8vw",
         left: "0vw",
         top: "0vh",
-        height: "141vh",
+        height: "207vh",
         width: "24vw",
         overflowX: "hidden"
     },
@@ -234,6 +233,12 @@ const Avatar = forwardRef((_, ref) => {
                 scale: 0,
                 easing: "easeInQuint",
                 delay: (_, i) => i % 5 * 300,
+                duration: 2000
+            }, "-=4000")
+            .add({
+                targets: "#avatar-frames",
+                height: "207vh",
+                easing: "linear",
                 duration: 2000
             }, "-=4000")
             .add({

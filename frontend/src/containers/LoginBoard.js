@@ -2,7 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import { makeStyles } from "@material-ui/core";
 import { useHistory } from "react-router-dom";
 import { mapUserData } from "../funnels/v1";
-import { formatAge, formatUsername, parseToken, validateEmail } from "../libs/utils";
+import { anime, formatAge, formatUsername, parseToken, validateEmail } from "../libs/utils";
 import { login as handleLogin, signup as handleSignup, resetPassword } from "../services/v1";
 import { showAvatarPage, showDetailsPage, showHomePage, showLandingPage, showReadingPane } from "../libs/animations";
 import BoardImg from "../assets/images/Board-alt.png";
@@ -15,7 +15,6 @@ import CILink from "../shared/CILink";
 import { AppContext, LoginContext } from "../App";
 import { toast } from "react-toastify";
 import { Howl } from "howler";
-import anime from "animejs";
 import clsx from "clsx";
 
 const useStyles = makeStyles({

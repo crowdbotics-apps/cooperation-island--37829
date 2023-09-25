@@ -2,7 +2,7 @@ import { useContext, useEffect, useRef, useState } from "react";
 import { Backdrop, makeStyles } from "@material-ui/core";
 import { useHistory } from "react-router-dom";
 import { mapUserData } from "../funnels/v1";
-import { parseToken, shuffleArray } from "../libs/utils";
+import { anime, parseToken, shuffleArray } from "../libs/utils";
 import { score } from "../services/v1";
 import { showHomePage } from "../libs/animations";
 import BoardImg from "../assets/images/Board.png";
@@ -20,7 +20,6 @@ import CIShell from "../shared/CIShell";
 import { AppContext } from "../App";
 import { useTimer } from "react-use-precision-timer";
 import { Howl } from "howler";
-import anime from "animejs";
 import clsx from "clsx";
 import $ from "jquery";
 
@@ -533,7 +532,7 @@ const Module_2 = () => {
                 hideBackdrop(false);
                 handleBack();
             }
-        })
+        });
     }
 
     const handlePopIn = () => {
@@ -632,24 +631,6 @@ const Module_2 = () => {
             easing: "easeInQuint",
             duration: 2000
         });
-
-        anime
-            .timeline()
-            .add({
-                targets: "#partner",
-                left: "130vw",
-                easing: "easeInQuint",
-                duration: 1500,
-                complete: () => {
-                    setAvatar(avatarID + 1);
-                }
-            })
-            .add({
-                targets: "#partner",
-                left: "77vw",
-                easing: "easeOutQuint",
-                duration: 1500
-            });
 
         if (flag) {
             anime({
@@ -801,8 +782,27 @@ const Module_2 = () => {
                 });
             }, 1000);
         }
-        else
+        else {
             setTimeout(handleRestart, 2500);
+
+            anime
+                .timeline()
+                .add({
+                    targets: "#partner",
+                    left: "130vw",
+                    easing: "easeInQuint",
+                    duration: 1500,
+                    complete: () => {
+                        setAvatar(avatarID + 1);
+                    }
+                })
+                .add({
+                    targets: "#partner",
+                    left: "77vw",
+                    easing: "easeOutQuint",
+                    duration: 1500
+                });
+        }
     }
 
     const handleRestart = () => {

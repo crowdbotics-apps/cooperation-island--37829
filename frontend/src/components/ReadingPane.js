@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
 import { makeStyles } from "@material-ui/core";
 import { useHistory } from "react-router-dom";
+import { anime } from "../libs/utils";
 import { privacy, terms } from "../services/v1";
 import { showLoginBoard } from "../libs/animations";
 import ReactHtmlParser from "react-html-parser";
 import BoardImg from "../assets/images/Board-lg.png";
 import CILabel from "../shared/CILabel";
 import CIButton from "../shared/CIButton";
-import anime from "animejs";
 import clsx from "clsx";
 
 const useStyles = makeStyles((theme) => ({

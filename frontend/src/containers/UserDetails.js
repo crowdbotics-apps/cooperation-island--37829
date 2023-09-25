@@ -4,7 +4,7 @@ import { DatePicker } from "@material-ui/pickers";
 import { makeStyles } from "@material-ui/core";
 import { useHistory } from "react-router-dom";
 import { mapUserData, mapUserDetails } from "../funnels/v1";
-import { formatText, formatZipCode, parseToken, userState } from "../libs/utils";
+import { anime, formatText, formatZipCode, parseToken, userState } from "../libs/utils";
 import { details as handleDetailsAPI } from "../services/v1";
 import { showAvatarPage, showLoginBoard } from "../libs/animations";
 import BoardImg from "../assets/images/Board.png";
@@ -15,7 +15,6 @@ import CILogout from "../shared/CILogout";
 import CIMusic from "../shared/CIMusic";
 import { AppContext } from "../App";
 import { toast } from "react-toastify";
-import anime from "animejs";
 import clsx from "clsx";
 
 const useStyles = makeStyles((theme) => ({

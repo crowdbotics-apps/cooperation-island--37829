@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { Backdrop, makeStyles } from "@material-ui/core";
+import { anime } from "../libs/utils";
 import BoardImg from "../assets/images/Board-sm.png";
 import CILabel from "../shared/CILabel";
-import anime from "animejs";
 
 const useStyles = makeStyles({
     backdrop: {

@@ -1,8 +1,8 @@
 import { useContext, useEffect } from "react";
 import { makeStyles } from "@material-ui/core";
+import { anime } from "../libs/utils";
 import { AppContext } from "../App";
 import { Howl } from "howler";
-import anime from "animejs";
 import clsx from "clsx";
 
 const useStyles = makeStyles({

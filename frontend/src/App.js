@@ -123,7 +123,7 @@ const App = () => {
         return <Switch>
           <Route path="/details" component={UserDetails} />
           <Route path="/avatar" render={() => <AvatarPage ref={avatarRef} />} />
-          <Route path="/shop" component={ShopPage} />
+          <Route path={["/poster", "/shop"]} component={ShopPage} />
           <Route path="/home" component={Dashboard} />
           <Route path="/fish-mind-reading" render={handleModule} />
           <Route path="/tree-shaking" render={handleModule} />

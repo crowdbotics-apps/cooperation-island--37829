@@ -2,7 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import { Backdrop, makeStyles } from "@material-ui/core";
 import { useHistory } from "react-router-dom";
 import update from "immutability-helper";
-import { rankedQualities } from "../libs/utils";
+import { anime, rankedQualities } from "../libs/utils";
 import { qualities } from "../services/v1";
 import { showHomePage } from "../libs/animations";
 import BoardImg from "../assets/images/Board.png";
@@ -24,7 +24,6 @@ import CIMusic from "../shared/CIMusic";
 import CIShell from "../shared/CIShell";
 import { AppContext } from "../App";
 import { Howl } from "howler";
-import anime from "animejs";
 import clsx from "clsx";
 import $ from "jquery";
 
@@ -523,7 +522,7 @@ const Module_3 = () => {
                 hideBackdrop(false);
                 handleBack();
             }
-        })
+        });
     }
 
     const handlePopIn = () => {

@@ -2,7 +2,7 @@ import { useContext, useEffect } from "react";
 import { makeStyles } from "@material-ui/core";
 import { useHistory } from "react-router-dom";
 import { mapFeedback, mapPrompt } from "../funnels/v1";
-import { userState } from "../libs/utils";
+import { anime, userState } from "../libs/utils";
 import { feedback, moduleData, prompt } from "../services/v1";
 import { showAvatarPage, showLoginBoard, showShopPage } from "../libs/animations";
 import CIAvatar from "../shared/CIAvatar";
@@ -13,7 +13,6 @@ import CIShell from "../shared/CIShell";
 import CIShop from "../shared/CIShop";
 import { AppContext } from "../App";
 import { Howl } from "howler";
-import anime from "animejs";
 import clsx from "clsx";
 
 const useStyles = makeStyles({

@@ -1,4 +1,4 @@
-import anime from "animejs";
+import { anime } from "../libs/utils";
 import $ from "jquery";
 
 export const showLoginBoard = (alt) => {
@@ -211,7 +211,19 @@ export const showShopPage = () => {
             top: "4vh",
             easing: "easeOutQuint",
             duration: 2000
-        }, "-=2000");
+        }, "-=2000")
+        .add({
+            targets: "[data-name=posters]",
+            scale: [0, 1],
+            delay: anime.stagger(400),
+            duration: 2000,
+        }, "-=1200")
+        .add({
+            targets: "#posters-container",
+            height: "72vh",
+            easing: "linear",
+            duration: 1200
+        }, "-=4000");
 }
 
 export const showHomePage = () => {

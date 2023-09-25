@@ -1,6 +1,6 @@
 import { memo, useEffect } from "react";
 import { makeStyles } from "@material-ui/core";
-import anime from "animejs";
+import { anime } from "../libs/utils";
 
 const useStyles = makeStyles({
     variant1: {

@@ -8,7 +8,8 @@ export const mapUserData = (data) => ({
     avatar: data.avatar_id,
     details: data.detail_status,
     email: data.consent_email,
-    shells: data.shells
+    shells: data.shells,
+    posters: [3]
 });
 
 export const mapUserDetails = (data) => ({
