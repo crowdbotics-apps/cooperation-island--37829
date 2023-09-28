@@ -260,7 +260,7 @@ const Feedback = ({ alt, module, onClose, onStart }) => {
     }
 
     const handleInput = (event) => {
-        setAnswer(event.target.value.trim());
+        setAnswer(event.target.value);
     }
 
     const handleSelect = (id) => () => {
