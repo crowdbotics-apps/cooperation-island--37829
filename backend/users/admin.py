@@ -9,8 +9,6 @@ from django.forms import BaseInlineFormSet
 from users.forms import UserChangeForm, UserCreationForm
 from .models import (ConsentAccessCode, 
                      Profile, 
-                     EmailVerification, 
-                     PasswordResetSession, 
                      PrivacyPolicy, 
                      TermAndCondition, 
                      FishGameTrial,
@@ -28,6 +26,8 @@ from .models import (ConsentAccessCode,
                      FishGameDistribution,
                      DynamicPrompt,
                      DynamicPromptResponse,
+                     ThemeImage,
+                     PurchaseHistory,
                     )
 
 from .utils import (
@@ -55,20 +55,26 @@ class UserAdmin(auth_admin.UserAdmin):
 
     ]
 
-
-admin.site.register(ConsentAccessCode)
-
-# admin.site.register(EmailVerification)
-
-# admin.site.register(PasswordResetSession)
-
-admin.site.register(PrivacyPolicy)
-
-admin.site.register(TermAndCondition)
+@admin.register(ConsentAccessCode)
+class ConsentAccessCodeAdmin(admin.ModelAdmin):
+    list_display=['access_code', 'created_at', 'is_expired']
+    list_filter=['is_expired', 'created_at']
 
 
+@admin.register(PrivacyPolicy)
+class PrivacyPolicyAdmin(admin.ModelAdmin):
+    list_display=['body', 'author','is_active', 'created_at']
+    list_filter = ['is_active','created_at']
+
+@admin.register(TermAndCondition)
+class TermAndConditionAdmin(admin.ModelAdmin):
+    list_display=['body', 'author','is_active', 'created_at']
+    list_filter = ['is_active','created_at']
+
+
+@admin.register(FishGameTrial)
 class FishGameTrialAdmin(admin.ModelAdmin):
-    list_display = ['participant','session_id', 'trial_number', 'match', 'trial_response_time', 'shell', 'number']
+    list_display = ['participant','stakes_type', 'trial_number', 'match', 'trial_response_time', 'shell', 'number', 'participant_shell','created_at']
     list_filter = [
         ('created_at'),
     ]
@@ -87,8 +93,6 @@ class FishGameTrialAdmin(admin.ModelAdmin):
             extra_context['export_csv_url'] = reverse('users:export-fish-trial-csv')
 
         return super().changelist_view(request, extra_context=extra_context)
-
-admin.site.register(FishGameTrial, FishGameTrialAdmin)
 
 
 class AnswerOptionInlineForm(forms.ModelForm):
@@ -144,10 +148,15 @@ class ActivityFeedbackAdmin(admin.ModelAdmin):
     inlines = [QuestionOrderInline]
     list_display = ['activity_type']
 
+    def has_delete_permission(self, request, obj=None):
+        return False
+
 
 @admin.register(Question)
 class QuestionAdmin(admin.ModelAdmin):
     list_display = ['question_text', 'question_type']
+    list_filter = ['activity_feedback', 'question_type']
+    search_fields = ['question_text']
     inlines = [AnswerOptionInline]
 
 
@@ -158,19 +167,20 @@ class QuestionAdmin(admin.ModelAdmin):
 
 @admin.register(QuestionOrder)
 class QuestionOrderAdmin(admin.ModelAdmin):
-    list_display = ['activity_feedback', 'question', 'order']
+    list_display = [ 'question', 'order','activity_feedback', 'created_at']
+    list_filter = ['activity_feedback', 'created_at']
 
 
-
+@admin.register(ParticipantResponse)
 class ParticipantResponseAdmin(admin.ModelAdmin):
-    list_display = ['participant', 'session_id', 'activity_feedback', 'question', 'text_answer']
+    list_display = ['participant', 'activity_feedback', 'question', 'text_answer']
     list_filter = [
         ('created_at'),
     ]
-admin.site.register(ParticipantResponse, ParticipantResponseAdmin)
 
+@admin.register(RankedQualities)
 class RankedQualitiesAdmin(admin.ModelAdmin):
-    list_display = ['participant', 'session_id', 'quality', 'category', 'rank']
+    list_display = ['participant', 'quality', 'category', 'rank']
     actions = ['export_selected_rankedqualities_csv']
     list_filter = [
         ('created_at'),
@@ -190,11 +200,10 @@ class RankedQualitiesAdmin(admin.ModelAdmin):
 
         return super().changelist_view(request, extra_context=extra_context)
 
-admin.site.register(RankedQualities, RankedQualitiesAdmin)
 
-
+@admin.register(IndividualRankingQualitiesScore)
 class IndividualRankingQualitiesScoreAdmin(admin.ModelAdmin):
-    list_display = ['participant', 'session_id','question', 'score']
+    list_display = ['participant', 'question', 'score']
     actions = ['export_selected_scores_csv']
     list_filter = [
         ('created_at'),
@@ -214,11 +223,10 @@ class IndividualRankingQualitiesScoreAdmin(admin.ModelAdmin):
 
         return super().changelist_view(request, extra_context=extra_context)
 
-admin.site.register(IndividualRankingQualitiesScore, IndividualRankingQualitiesScoreAdmin)
 
-
+@admin.register(TreeShakingGameTrial)
 class TreeShakingGameTrialAdmin(admin.ModelAdmin):
-    list_display = ['participant', 'session_id', 'trial_number', 'shell', 'shared_shell', 'response', 'trial_response_time', 'created_at' ]
+    list_display = ['participant', 'trial_number', 'shell', 'shared_shell', 'response', 'trial_response_time', 'created_at' ]
     actions = ['export_selected_trials_csv']
     list_filter = [
         ('created_at'),
@@ -238,9 +246,8 @@ class TreeShakingGameTrialAdmin(admin.ModelAdmin):
 
         return super().changelist_view(request, extra_context=extra_context)
 
-admin.site.register(TreeShakingGameTrial, TreeShakingGameTrialAdmin)
 
-
+@admin.register(Profile)
 class ProfileAdmin(admin.ModelAdmin):
     list_display = ['participant', 'birth_month', 'birth_year', 'nationality', 'gender', 'zipcode']
     actions = ['export_selected_profiles_csv']
@@ -262,24 +269,35 @@ class ProfileAdmin(admin.ModelAdmin):
 
         return super().changelist_view(request, extra_context=extra_context)
 
-admin.site.register(Profile, ProfileAdmin)
-
-
 
 class TreeShakingDistributionTrialsInline(admin.TabularInline):
     model = TreeShakingDistributionTrials
     extra = 24
 
+
 @admin.register(TreeShakingDistribution)
 class TreeShakingDistributionAdmin(admin.ModelAdmin):
     list_display = ['stake_level']
     inlines = [TreeShakingDistributionTrialsInline]
+    def has_delete_permission(self, request, obj=None):
+        return False
+
 
 @admin.register(FishGameDistribution)
 class FishGameDistributionAdmin(admin.ModelAdmin):
-    list_display=['stake_level', 'min', 'max']
+    list_display=['stake_level', 'min', 'max', 'author', 'created_at']
 
-admin.site.register(IncentiveRangeSelection)
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+
+@admin.register(IncentiveRangeSelection)
+class IncentiveRangeSelectionAdmin(admin.ModelAdmin):
+    list_display=['stake_level_selected', 'author', 'is_active']
+    list_filter =['is_active', 'created_at']
+
+    def has_delete_permission(self, request, obj=None):
+        return False
 
 
 @admin.register(DynamicPrompt)
@@ -290,5 +308,28 @@ class DynamicPromptAdmin(admin.ModelAdmin):
         ('is_active'),
     ]
 
-admin.site.register(DynamicPromptResponse)
 
+@admin.register(DynamicPromptResponse)
+class DynamicPromptResponseAdmin(admin.ModelAdmin):
+    list_display = ['dynamic_prompt', 'created_at']
+    search_fields= ['dynamic_prompt']
+
+
+@admin.register(ThemeImage)
+class ThemeImageAdmin(admin.ModelAdmin):
+    list_display=['title','price','description']
+    readonly_fields = ['name']
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+    
+    def get_exclude(self, request, obj=None):
+        if obj is None:
+            return ['name']
+        return []
+
+
+@admin.register(PurchaseHistory)
+class PurchaseHistoryAdmin(admin.ModelAdmin):
+    list_display=['participant','theme_purchased','purchase_cost','participant_shell_at_purchase','purchased_at']
+    list_filter=['theme_purchased','purchased_at']

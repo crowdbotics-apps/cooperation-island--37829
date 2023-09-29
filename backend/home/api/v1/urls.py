@@ -19,6 +19,9 @@ from home.api.v1.viewsets import (
     TreeShakingGameTrialView,
     DataGenerateView,
     DynamicPromptAPIView,
+    BuyThemeView,
+    ThemeDetailsAPIView,
+    SendThemeAsPdfView
 )
 
 
@@ -45,4 +48,8 @@ urlpatterns = [
     path('score/tree-shaking/', TreeShakingGameTrialView.as_view(), name='fish-trial-list'),
     path('data/<str:activity_name>/', DataGenerateView.as_view(), name='activity-data'),
     path('prompt/<str:activity_name>/', DynamicPromptAPIView.as_view(), name='prompt'),
+    path('theme/buy/', BuyThemeView.as_view(), name='theme-purchase'),
+    path('theme/details/', ThemeDetailsAPIView.as_view(), name='theme-details'),
+    path('print/<int:theme_id>/', SendThemeAsPdfView.as_view(), name='send-theme-email'),
+    
 ]

@@ -6,6 +6,8 @@ from django.utils.encoding import force_text
 from django.shortcuts import render
 from django.db import IntegrityError
 from django.core.exceptions import ObjectDoesNotExist
+from django.conf import settings
+from django.core.mail import EmailMessage
 from rest_framework.viewsets import ModelViewSet, ViewSet, ReadOnlyModelViewSet
 from rest_framework.response import Response
 from rest_framework import status, generics
@@ -16,7 +18,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError
-from home.utils import encrypt_payload
+from home.utils import encrypt_payload, generate_signed_url, convert_image_to_pdf
 from users.models import (  Profile, 
                             EmailVerification, 
                             PasswordResetSession, 
@@ -32,7 +34,9 @@ from users.models import (  Profile,
                             FishGameDistribution,
                             TreeShakingDistributionTrials,
                             DynamicPrompt,
-                            DynamicPromptResponse
+                            DynamicPromptResponse,
+                            PurchaseHistory,
+                            ThemeImage,
                         )
 
 
@@ -49,6 +53,8 @@ from home.api.v1.serializers import (
     QuestionSerializer,
     QuestionAnswerSerializer,
     TreeShakingGameTrialSerializer,
+    ThemeSerializer,
+    BuyThemeSerializer,
 )
 
 
@@ -471,14 +477,20 @@ class FishGameTrialAPIView(APIView):
 
     def post(self, request):
         participant = request.user
+        stakes_type = IncentiveRangeSelection.objects.latest('id').stake_level_selected
+        fish_distribution = FishGameDistribution.objects.get(stake_level=stakes_type)
+        stakes_min = fish_distribution.min
+        stakes_max = fish_distribution.max
+        participant_shell = participant.shells
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
-            serializer.save(participant=participant)
+            serializer.save(participant=participant, stakes_type=stakes_type,stakes_min=stakes_min, stakes_max= stakes_max, participant_shell=participant_shell )
             user = request.user
             data = serializer.validated_data
             if data['match'] == True:
                 user.shells += data['shell']
                 user.save()
+            
             user_detail_serializer = UserDetailsSerializer(user)
             payload=encrypt_payload(user_detail_serializer.data)
             response_data = {
@@ -496,9 +508,11 @@ class TreeShakingGameTrialView(APIView):
 
     def post(self, request):
         participant = request.user
+        stakes_type = IncentiveRangeSelection.objects.latest('id').stake_level_selected
+        tree_shaking_distribution = tree_shaking_distributions = TreeShakingDistributionTrials.objects.filter(tree_game_level__stake_level=stakes_type)
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
-            serializer.save(participant=participant)
+            serializer.save(participant=participant, stakes_type=stakes_type)
             user = request.user
             data = serializer.validated_data
             if data['response'] == True:
@@ -519,11 +533,19 @@ class DataGenerateView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, activity_name):
-        response_data = {'session_id': str(uuid.uuid4())}  
+        response_data = {'session_id': str(uuid.uuid4())}
 
-        try:
-            latest_stake_selection = IncentiveRangeSelection.objects.latest('id')
-            stake_level = latest_stake_selection.stake_level_selected
+        if activity_name == 'theme':
+            themes = ThemeImage.objects.all()
+            serializer = ThemeSerializer(themes, many=True)
+            response_data['themes'] = serializer.data
+
+        else:
+            try:
+                latest_stake_selection = IncentiveRangeSelection.objects.latest('id')
+                stake_level = latest_stake_selection.stake_level_selected
+            except IncentiveRangeSelection.DoesNotExist:
+                return Response({'error': 'Incentive range doesn\'t exist'}, status=status.HTTP_400_BAD_REQUEST)
 
             if activity_name == 'fish-mind-reading':
                 try:
@@ -536,13 +558,11 @@ class DataGenerateView(APIView):
 
             elif activity_name == 'tree-shaking':
                 tree_shaking_distributions = TreeShakingDistributionTrials.objects.filter(tree_game_level__stake_level=stake_level)
-                
                 trials = [{'self': entry.self_distribution, 'partner': entry.partner_distribution} for entry in tree_shaking_distributions]
 
-                while len(trials) < 24:
-                    trials.append({'self': 0, 'partner': 0})
+                # Ensure exactly 24 trials or pad with zeros
+                trials += [{'self': 0, 'partner': 0}] * (24 - len(trials))
                 trials = trials[:24]
-
                 response_data['trials'] = trials
 
             elif activity_name == 'voice-your-values':
@@ -551,13 +571,11 @@ class DataGenerateView(APIView):
             else:
                 return Response({'error': 'Invalid activity name'}, status=status.HTTP_400_BAD_REQUEST)
 
-        except IncentiveRangeSelection.DoesNotExist:
-            pass
-
         return Response(response_data)
     
 
 class DynamicPromptAPIView(APIView):
+    permission_classes = [IsAuthenticated]
     def get(self, request, activity_name):
         try:
             activity = ActivityFeedback.objects.get(activity_type=activity_name)
@@ -587,3 +605,135 @@ class DynamicPromptAPIView(APIView):
             return Response(status=status.HTTP_200_OK)
         except ActivityFeedback.DoesNotExist:
             return Response(status=status.HTTP_400_BAD_REQUEST) 
+        
+
+
+class BuyThemeView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        serializer = BuyThemeSerializer(data=request.data)
+        if serializer.is_valid():
+            session_id = serializer.validated_data['session_id']
+            theme_image_id = serializer.validated_data['theme_id']
+            theme_image = ThemeImage.objects.get(title=theme_image_id)
+
+            try:
+                theme_image = ThemeImage.objects.get(title=theme_image_id)
+            except ThemeImage.DoesNotExist:
+                return Response({'error': 'Theme not found'}, status=status.HTTP_400_BAD_REQUEST)    
+
+            user = request.user
+            if PurchaseHistory.objects.filter(participant=user, theme_purchased=theme_image).exists():
+                return Response({'detail': 'You have already purchased this theme.'}, status=status.HTTP_400_BAD_REQUEST)
+
+            if user.shells < theme_image.price:
+                return Response({'detail': 'You do not have enough shells to purchase this theme.'}, status=status.HTTP_400_BAD_REQUEST)
+
+            purchase_record = PurchaseHistory(
+                session_id=uuid.uuid4(),
+                participant=user,
+                theme_purchased=theme_image,
+                purchase_cost=theme_image.price,
+                participant_shell_at_purchase=user.shells,
+            )
+            purchase_record.save()
+
+            user.shells -= theme_image.price
+            user.save()
+
+            user.purchased_themes.add(theme_image)
+            user.save()
+
+            signed_url = generate_signed_url(user.avatar_id, theme_image_id, image_type='color')
+
+            user_detail_serializer = UserDetailsSerializer(user)
+            payload=encrypt_payload(user_detail_serializer.data)
+
+            if signed_url:
+                return Response({'url': signed_url, 'user': payload}, status=status.HTTP_200_OK)
+            else:
+                Response({"error":"Object not found"}, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+
+class ThemeDetailsAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def user_has_purchased_theme(self, user, theme):
+        return user.purchased_themes.filter(title=theme.title).exists()
+
+    def get(self, request):
+        theme_id = request.query_params.get('theme_id')
+
+        try:
+            theme_image = ThemeImage.objects.get(title=theme_id)
+        except ThemeImage.DoesNotExist:
+            return Response({'error': 'Theme not found'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        user = request.user
+        if not self.user_has_purchased_theme(user, theme_image):
+            return Response({'error': 'You have not purchased this theme'}, status=status.HTTP_400_BAD_REQUEST)
+
+        signed_url = generate_signed_url(request.user.avatar_id, theme_id, image_type='color')
+
+        if signed_url:
+            return Response({'signed_url': signed_url}, status=status.HTTP_200_OK)
+        else:
+            return Response({'error': 'Failed to generate signed URL'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+class SendThemeAsPdfView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get_theme(self, theme_id):
+        return ThemeImage.objects.filter(title=theme_id).first()
+    
+    def user_has_purchased_theme(self, user, theme):
+        return user.purchased_themes.filter(title=theme.title).exists()
+
+    def convert_and_attach_pdf(self, user, theme, image_type):
+        image_url = generate_signed_url(user.avatar_id, theme.title, image_type=image_type)
+        pdf_data = convert_image_to_pdf(image_url)
+        return pdf_data
+
+    def send_pdf_email(self, request, user, theme, color_pdf_data, outline_pdf_data):
+        subject = 'Your Theme Images as PDFs'
+        message = 'Here are your theme images as PDF attachments.'
+
+        email = EmailMessage(
+            subject=subject,
+            body=message,
+            from_email=settings.DEFAULT_FROM_EMAIL,  
+            to=[user.email],  
+        )
+
+        email.attach(f'theme_{theme.get_title_display()}_colored.pdf', color_pdf_data, 'application/pdf')
+        email.attach(f'theme_{theme.get_title_display()}_outline.pdf', outline_pdf_data, 'application/pdf')
+
+        email.send()
+
+    def post(self, request, theme_id):
+        try:
+            theme = self.get_theme(theme_id)
+            if not theme:
+                return Response({'error': 'Theme not found'}, status=status.HTTP_404_NOT_FOUND)
+            
+            user = request.user
+            if not self.user_has_purchased_theme(user, theme):
+                return Response({'error': 'You have not purchased this theme'}, status=status.HTTP_400_BAD_REQUEST)
+
+            # color_pdf_data = self.convert_and_attach_pdf(request.user, theme, 'color')
+            # outline_pdf_data = self.convert_and_attach_pdf(request.user, theme, 'outline')
+
+            # self.send_pdf_email(request, request.user, theme, color_pdf_data, outline_pdf_data)
+
+            return Response({'message': 'Email sent successfully'}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+
+
+

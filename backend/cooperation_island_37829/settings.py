@@ -262,8 +262,14 @@ EMAIL_HOST_PASSWORD = env.str("SENDGRID_API_KEY", "")
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 
-# if DEBUG:
-#     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+if DEBUG:
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+    EMAIL_HOST = 'smtp.gmail.com'
+    EMAIL_HOST_USER = env.str("EMAIL_HOST_USER", "")
+    EMAIL_HOST_PASSWORD = env.str("APP_PASSWORD", "")
+    EMAIL_PORT = 587
+    EMAIL_USE_TLS = True
+    DEFAULT_FROM_EMAIL = env.str("DEFAULT_FROM_EMAIL", "")
 
 DEFAULT_FROM_EMAIL = env.str("DEFAULT_FROM_EMAIL", "")
 

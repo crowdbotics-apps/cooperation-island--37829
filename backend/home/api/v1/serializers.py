@@ -13,6 +13,7 @@ from users.models import (  ConsentAccessCode,
                             AnswerOption,
                             RankedQualities,
                             TreeShakingGameTrial,
+                            ThemeImage,
                         )
 
 
@@ -83,10 +84,16 @@ class UserSerializer(serializers.ModelSerializer):
         return user
 
 
+
 class UserDetailsSerializer(serializers.ModelSerializer):
+    theme = serializers.SerializerMethodField()
     class Meta:
         model = User
-        fields = ['username','age', 'avatar_id', 'consent_email',  'consent_status', 'detail_status', 'shells']
+        fields = ['username','age', 'avatar_id', 'consent_email',  'consent_status', 'detail_status', 'shells', 'theme' ]
+
+    def get_theme(self, obj):
+        purchased_themes_titles = list(obj.purchased_themes.values_list('title', flat=True))
+        return purchased_themes_titles
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
@@ -149,14 +156,6 @@ class TermAndConditionSerializer(serializers.ModelSerializer):
         fields = ('body', 'author', 'created_at', 'updated_at')
 
 
-class FishGameTrialSerializer(serializers.ModelSerializer):
-    participant = serializers.PrimaryKeyRelatedField(read_only=True)
-    class Meta:
-        model = FishGameTrial
-        fields = ['id','participant', 'trial_number', 'match', 'trial_response_time', 'number', 'session_id', 'shell']
-
-    def validate_trial_response_time(self, value):
-        return round(value / 1000, 2)
 
 
 class AnswerOptionSerializer(serializers.ModelSerializer):
@@ -244,14 +243,40 @@ class RankedQualitiesSerializer(serializers.ModelSerializer):
         model = RankedQualities
         fields = ['id', 'category', 'rank', 'session_id']
 
+class FishGameTrialSerializer(serializers.ModelSerializer):
+    participant = serializers.PrimaryKeyRelatedField(read_only=True)
+    class Meta:
+        model = FishGameTrial
+        fields = ['id','participant', 'trial_number', 'match', 'trial_response_time', 'shell', 'number', 'session_id']
+
+    def validate_trial_response_time(self, value):
+        return round(value / 1000, 2)
 
 class TreeShakingGameTrialSerializer(serializers.ModelSerializer):
+    
     class Meta:
         model = TreeShakingGameTrial
         fields = ['trial_number', 'shell', 'shared_shell', 'response', 'trial_response_time', 'session_id']
 
     def validate_trial_response_time(self, value):
         return round(value / 1000, 2)
+    
 
 
+class BuyThemeSerializer(serializers.Serializer):
+    theme_id = serializers.IntegerField()
+    session_id = serializers.CharField()
 
+
+class ThemeDetailsSerializer(serializers.Serializer):
+    theme_id = serializers.IntegerField()
+
+
+class ThemeSerializer(serializers.ModelSerializer):
+    id = serializers.SerializerMethodField()
+
+    def get_id(self, obj):
+        return obj.title 
+    class Meta:
+        model = ThemeImage
+        fields = ['id', 'name', 'price', 'description']
