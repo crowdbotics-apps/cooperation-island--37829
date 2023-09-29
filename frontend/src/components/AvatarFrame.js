@@ -1,8 +1,8 @@
 import { useEffect } from "react";
 import { makeStyles } from "@material-ui/core";
+import { anime } from "../libs/utils";
 import FrameImg from "../assets/images/Frame.png";
 import FrameAltImg from "../assets/images/Frame-alt.png";
-import anime from "animejs";
 import clsx from "clsx";
 
 const useStyles = makeStyles({
@@ -88,7 +88,7 @@ const useStyles = makeStyles({
         top: "-0.6vh",
         left: "11vw",
         rotate: "20deg"
-    },
+    }
 });
 
 const AvatarFrame = (props) => {

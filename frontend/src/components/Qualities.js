@@ -1,10 +1,10 @@
 import { useContext, useEffect, useRef } from "react";
 import { makeStyles } from "@material-ui/core";
 import { useDrag, useDrop } from "react-dnd";
+import { anime } from "../libs/utils";
 import CILabel from "../shared/CILabel";
 import { AppContext } from "../App";
 import { Howl } from "howler";
-import anime from "animejs";
 import clsx from "clsx";
 
 const useStyles = makeStyles((theme) => ({

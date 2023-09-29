@@ -1,7 +1,8 @@
 import { Fragment, useContext, useEffect, useState } from "react";
 import { Backdrop, makeStyles } from "@material-ui/core";
 import { useHistory } from "react-router-dom";
-import { shuffleArray } from "../libs/utils";
+import { mapUserData } from "../funnels/v1";
+import { anime, parseToken, shuffleArray } from "../libs/utils";
 import { score } from "../services/v1";
 import { showHomePage } from "../libs/animations";
 import BoardImg from "../assets/images/Board.png";
@@ -20,7 +21,6 @@ import CIShell from "../shared/CIShell";
 import { AppContext } from "../App";
 import { useTimer } from "react-use-precision-timer";
 import { Howl } from "howler";
-import anime from "animejs";
 import clsx from "clsx";
 import $ from "jquery";
 
@@ -68,7 +68,7 @@ const useStyles = makeStyles((theme) => ({
         "& > button": {
             backgroundSize: "17vw 7vh",
             width: "17vw",
-            marginTop: "6.5vh",
+            marginTop: "7vh",
             marginLeft: "9vw"
         },
         "& > div": {
@@ -88,12 +88,12 @@ const useStyles = makeStyles((theme) => ({
             width: "25vw"
         },
         "& label:nth-child(2)": {
-            fontSize: "4vh",
+            fontSize: "3.5vh",
             marginTop: "16vh"
         },
         "& label:nth-child(3)": {
-            fontSize: "4vh",
-            marginTop: "2vh"
+            fontSize: "3.5vh",
+            marginTop: "1.5vh"
         },
         position: "absolute",
         filter: "drop-shadow(0.33vh 0.66vh 1.2vh black)",
@@ -130,10 +130,39 @@ const useStyles = makeStyles((theme) => ({
         position: "absolute",
         filter: "drop-shadow(0.33vh 0.66vh 1.2vh black)",
         transform: "scaleX(-1)",
-        top: "33.5vh",
         left: "-30vw",
-        height: "70vh",
-        width: "24vw"
+        height: "66.2vh",
+        width: "22vw"
+    },
+    guide1: {
+        top: "36.5vh"
+    },
+    guide2: {
+        top: "36vh"
+    },
+    guide3: {
+        top: "35vh"
+    },
+    guide4: {
+        top: "34.5vh"
+    },
+    guide5: {
+        top: "35.75vh"
+    },
+    guide6: {
+        top: "37vh"
+    },
+    guide7: {
+        top: "34vh"
+    },
+    guide8: {
+        top: "35.75vh"
+    },
+    guide9: {
+        top: "34.25vh"
+    },
+    guide10: {
+        top: "34.25vh"
     },
     fish: {
         position: "absolute",
@@ -356,6 +385,8 @@ const Module_1 = () => {
 
     const [feedback, setFeedback] = useState(false);
 
+    const [flag, setFlag] = useState(true);
+
     const [shells, setShells] = useState(0);
 
     const [number, setNumber] = useState(0);
@@ -366,7 +397,7 @@ const Module_1 = () => {
 
     const [isStarted, setStarted] = useState(false);
 
-    const { BGM, data, howler, user } = useContext(AppContext);
+    const { BGM, data, howler, user, setUser } = useContext(AppContext);
 
     useEffect(() => {
         anime
@@ -455,6 +486,7 @@ const Module_1 = () => {
                 easing: "easeInQuint",
                 duration: 500,
                 complete: () => {
+                    setFeedback(true);
                     setShells(anime.random(data.min, data.max));
                     hideBackdrop(false);
                     setStarted(true);
@@ -470,30 +502,6 @@ const Module_1 = () => {
                 targets: "#board",
                 rotateY: ["0deg", "90deg"],
                 easing: "linear",
-                duration: 2000
-            }, "-=2000")
-            .add({
-                targets: "#guide",
-                left: "3vw",
-                easing: "easeOutQuint",
-                duration: 2000
-            })
-            .add({
-                targets: "#dialog",
-                scale: [0, 1],
-                easing: "easeOutQuint",
-                duration: 2000
-            }, "-=2000")
-            .add({
-                targets: "#fish2",
-                marginLeft: "0vw",
-                easing: "easeOutQuint",
-                duration: 2000
-            }, "-=2000")
-            .add({
-                targets: "#close, #music, #shell",
-                top: "4vh",
-                easing: "easeOutQuint",
                 duration: 2000
             }, "-=2000");
     }
@@ -586,7 +594,7 @@ const Module_1 = () => {
                 hideBackdrop(false);
                 handleBack();
             }
-        })
+        });
     }
 
     const handlePopIn = () => {
@@ -622,6 +630,36 @@ const Module_1 = () => {
         setNumber(anime.random(1, 6));
     }
 
+    const handleStart = () => {
+        setFeedback(false);
+        setFlag(false);
+
+        anime({
+            targets: "#guide",
+            left: "5vw",
+            easing: "easeOutQuint",
+            duration: 2000
+        });
+        anime({
+            targets: "#dialog",
+            scale: [0, 1],
+            easing: "easeOutQuint",
+            duration: 2000
+        });
+        anime({
+            targets: "#fish2",
+            marginLeft: "0vw",
+            easing: "easeOutQuint",
+            duration: 2000
+        });
+        anime({
+            targets: "#close, #music, #shell",
+            top: "4vh",
+            easing: "easeOutQuint",
+            duration: 2000
+        });
+    }
+
     const handleRestart = (flag) => () => {
         score("fish-mind-reading", {
             session_id: data.session_id,
@@ -630,7 +668,14 @@ const Module_1 = () => {
             shell: shells,
             number,
             trial_response_time: timer.getElapsedRunningTime()
-        });
+        })
+            .then(({ data }) => {
+                const userData = parseToken(data.user);
+
+                if (userData) {
+                    localStorage["UserState"] = data.user;
+                }
+            });
         timer.stop();
 
         setResponse(false);
@@ -709,7 +754,10 @@ const Module_1 = () => {
                     anime({
                         targets: "#shell",
                         scale: [0.9, 1],
-                        duration: 1000
+                        duration: 1000,
+                        begin: () => {
+                            setUser(mapUserData(parseToken(localStorage["UserState"])));
+                        }
                     });
                 }
             },
@@ -808,7 +856,7 @@ const Module_1 = () => {
         </div>}
         <img className={cls.logo} id="logo2" src={require("../assets/modules/Module_1_Text.png")} />
         <img className={cls.fish} id="fish" src={require("../assets/fishes/Fish_25.png")} />
-        <img className={cls.guide} id="guide" src={require(`../assets/avatars/aqua/Avatar_${user.avatar}.png`)} />
+        <img className={clsx(cls.guide, cls["guide" + user.avatar])} id="guide" src={require(`../assets/avatars/aqua/Avatar_${user.avatar}.png`)} />
         <img className={clsx(cls.fishId, cls["fishId" + fishArray[fishID]])} id="fish2" src={require(`../assets/fishes/Fish_${fishArray[fishID]}.png`)} />
         <CIClose className={cls.close} id="close" onClick={handleClose} />
         <CIMusic className={cls.music} id="music" />
@@ -837,12 +885,12 @@ const Module_1 = () => {
                     I’m thinking of a number between 1-6.
                 </CILabel>
                 <CILabel>
-                        Can you guess what it is?
+                    If you guess right, you'll get {shells > 1 ? shells + " shells" : "one shell"}.
                 </CILabel>
-                    <CILabel>
-                        Guess now!
-                    </CILabel>
-                    <CIButton onClick={handleShow}>Show me the number</CIButton>
+                <CILabel>
+                    Guess now!
+                </CILabel>
+                <CIButton onClick={handleShow}>Show me the number</CIButton>
             </Fragment>}
         </div>
         <div className={cls.board} id="board">
@@ -854,9 +902,9 @@ const Module_1 = () => {
                     In this activity, fishes like me will think of a number between 1-6, and you will try to guess that number.
                 </CILabel>
                 <CILabel>
-                    If you guess the number correctly, then you will get a shell. If you do not guess the number correctly, then you will not get a shell.
+                    If you guess the number correctly, then you will get some amount of shells. If you do not guess the number correctly, then you will not get any shells.
                 </CILabel>
-                <img src={require("../assets/modules/Shell-alt.png")} />
+                <img src={require("../assets/modules/Shell.png")} />
                 <CILabel>
                     Are you ready?
                 </CILabel>
@@ -874,7 +922,7 @@ const Module_1 = () => {
             </div>
         </Backdrop>
         <IdlePrompt handleClose={isStarted ? handleClose : showBackdrop ? handleLeave : handleBack} />
-        {feedback && <Feedback module="fish-mind-reading" onClose={handleExit} />}
+        {feedback && <Feedback alt={flag} module="fish-mind-reading" onClose={handleExit} onStart={handleStart} />}
     </div>
 }
 

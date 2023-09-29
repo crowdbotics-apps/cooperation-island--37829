@@ -1,4 +1,4 @@
-import anime from "animejs";
+import { anime } from "../libs/utils";
 import $ from "jquery";
 
 export const showLoginBoard = (alt) => {
@@ -14,7 +14,7 @@ export const showLoginBoard = (alt) => {
     });
     anime({
         targets: "#guide",
-        left: "6vw",
+        left: "7vw",
         easing: "easeOutQuint",
         duration: 2000
     });
@@ -39,7 +39,7 @@ export const showResetPassword = () => {
     });
     anime({
         targets: "#guide",
-        left: "5vw",
+        left: "7vw",
         easing: "easeOutQuint",
         duration: 2000
     });
@@ -64,7 +64,7 @@ export const showReadingPane = (alt) => {
     });
     anime({
         targets: "#guide",
-        left: "5vw",
+        left: "7vw",
         easing: "easeOutQuint",
         duration: 2000
     });
@@ -79,7 +79,7 @@ export const showReadingPane = (alt) => {
 export const showLandingPage = () => {
     anime({
         targets: "#guide2",
-        left: "6vw",
+        left: "7vw",
         easing: "easeOutQuint",
         duration: 2000
     });
@@ -108,7 +108,7 @@ export const showLandingPage = () => {
 export const showDetailsPage = () => {
     anime({
         targets: "#guide",
-        left: "6vw",
+        left: "7vw",
         easing: "easeOutQuint",
         duration: 2000
     });
@@ -176,10 +176,60 @@ export const showAvatarPage = (callbackFn) => {
         }, "-=4000");
 }
 
+export const showShopPage = () => {
+    anime
+        .timeline()
+        .add({
+            targets: "#background",
+            opacity: 0,
+            easing: "linear",
+            duration: 2000,
+            complete: () => {
+                $("#background").attr("src", require("../assets/images/Shop_BG.jpg"));
+            }
+        })
+        .add({
+            targets: "#background",
+            opacity: 1,
+            easing: "linear",
+            duration: 2000
+        })
+        .add({
+            targets: "#guide",
+            left: "2vw",
+            easing: "easeOutQuint",
+            duration: 2000
+        }, "-=2000")
+        .add({
+            targets: "#logo2",
+            top: "2vh",
+            easing: "easeOutQuint",
+            duration: 2000
+        }, "-=2000")
+        .add({
+            targets: "#close, #music, #shell",
+            top: "4vh",
+            easing: "easeOutQuint",
+            duration: 2000
+        }, "-=2000")
+        .add({
+            targets: "[data-name=posters]",
+            scale: [0, 1],
+            delay: anime.stagger(400),
+            duration: 2000,
+        }, "-=1200")
+        .add({
+            targets: "#posters-container",
+            height: "72vh",
+            easing: "linear",
+            duration: 1200
+        }, "-=4000");
+}
+
 export const showHomePage = () => {
     anime({
         targets: "#guide",
-        left: "6vw",
+        left: "7vw",
         easing: "easeOutQuint",
         duration: 2000
     });
@@ -190,7 +240,7 @@ export const showHomePage = () => {
         duration: 2000
     });
     anime({
-        targets: "#shell, #avatar, #music, #logout",
+        targets: "#shell, #shop, #avatar, #music, #logout",
         top: "1.75vh",
         easing: "easeOutQuint",
         duration: 2000

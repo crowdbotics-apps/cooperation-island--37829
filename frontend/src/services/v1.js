@@ -82,6 +82,22 @@ export const saveFeedback = (module, data) => {
     });
 }
 
+export const prompt = (module) => {
+    return API.get(base + `/prompt/${module}/`, {
+        env: {
+            noLoader: true
+        }
+    });
+}
+
+export const sendPrompt = (module, data) => {
+    return API.post(base + `/prompt/${module}/`, data, {
+        env: {
+            noLoader: true
+        }
+    });
+}
+
 export const score = (module, data) => {
     return API.post(base + `/score/${module}/`, data, {
         env: {

@@ -7,7 +7,9 @@ export const mapUserData = (data) => ({
     age: data.age,
     avatar: data.avatar_id,
     details: data.detail_status,
-    email: data.consent_email
+    email: data.consent_email,
+    shells: data.shells,
+    posters: [3]
 });
 
 export const mapUserDetails = (data) => ({
@@ -26,5 +28,13 @@ export const mapFeedback = (data) => {
             question: x.question_text,
             question_type: parseInt(x.question_type),
             options: x.options
+        }));
+}
+
+export const mapPrompt = (data) => {
+    return data
+        .map(x => ({
+            id: x.id,
+            prompt: x.prompt_text
         }));
 }

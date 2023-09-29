@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { makeStyles } from "@material-ui/core";
 import { useHistory } from "react-router-dom";
+import { anime } from "../libs/utils";
 import { showLoginBoard } from "../libs/animations";
 import { getUsername, savePassword } from "../services/v1";
 import BoardImg from "../assets/images/Board.png";
@@ -8,16 +9,15 @@ import CILabel from "../shared/CILabel";
 import CIInput from "../shared/CIInput";
 import CIButton from "../shared/CIButton";
 import { toast } from "react-toastify";
-import anime from "animejs";
 
 const useStyles = makeStyles({
     guide: {
         position: "absolute",
         filter: "drop-shadow(0.33vh 0.66vh 1.2vh black)",
-        top: "33.5vh",
+        top: "35.25vh",
         left: "-30vw",
-        height: "70vh",
-        width: "24vw",
+        height: "66.2vh",
+        width: "22vw",
         transform: "scaleX(-1)"
     },
     board: {

@@ -1,11 +1,13 @@
 import { Fragment, useContext, useEffect, useState } from "react";
 import { makeStyles } from "@material-ui/core";
 import { useHistory } from "react-router-dom";
-import { showAvatarPage, showDetailsPage, showHomePage, showLandingPage, showLoginBoard, showReadingPane, showResetPassword } from "../libs/animations";
+import { mapUserData } from "../funnels/v1";
+import { anime, parseToken } from "../libs/utils";
+import { refresh as handleRefresh } from "../services/v1";
+import { showAvatarPage, showDetailsPage, showHomePage, showLandingPage, showLoginBoard, showReadingPane, showResetPassword, showShopPage } from "../libs/animations";
 import LoadAssets from "../components/LoadAssets";
 import { AppContext } from "../App";
 import { Howl } from "howler";
-import anime from "animejs";
 
 const useStyles = makeStyles((theme) => ({
     BG: {
@@ -34,7 +36,7 @@ const HomePage = () => {
 
     const history = useHistory();
 
-    const { avatarRef, user, setHowler } = useContext(AppContext);
+    const { avatarRef, user, setHowler, setUser } = useContext(AppContext);
 
     const [loadedItems, setLoaded] = useState(0);
 
@@ -75,6 +77,7 @@ const HomePage = () => {
                         easing: "linear",
                         duration: 2000
                     });
+
                     if (!user.active) {
                         if (window.location.pathname.includes("/reset-password"))
                             showResetPassword();
@@ -88,7 +91,23 @@ const HomePage = () => {
                             showLoginBoard(true);
                     }
                     else {
+                        handleRefresh()
+                            .then(({ data }) => {
+                                const userData = parseToken(data.user);
+
+                                if (userData) {
+                                    localStorage["UserState"] = data.user;
+                                }
+                                setUser(mapUserData((userData)));
+                            });
+
                         setHowler({
+                            shop: new Howl({
+                                src: [require("../assets/sounds/Shop.mp3")],
+                                autoplay: true,
+                                volume: 0,
+                                loop: true
+                            }),
                             welcome: new Howl({
                                 src: [require("../assets/sounds/Welcome.mp3")],
                                 autoplay: true,
@@ -96,6 +115,7 @@ const HomePage = () => {
                                 loop: true
                             })
                         }, 1000);
+
                         if (window.location.pathname.includes("/access")) {
                             anime({
                                 targets: "#logo",
@@ -130,6 +150,15 @@ const HomePage = () => {
                                 duration: 2000
                             });
                             showAvatarPage(avatarRef.current.setUser);
+                        }
+                        else if (window.location.pathname.includes("/shop")) {
+                            anime({
+                                targets: "#logo",
+                                top: "150vh",
+                                easing: "easeInElastic",
+                                duration: 2000
+                            });
+                            showShopPage();
                         }
                         else if (window.location.pathname.includes("/home")) {
                             anime({

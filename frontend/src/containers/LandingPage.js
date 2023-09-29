@@ -2,7 +2,7 @@ import { Fragment, useContext, useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { Backdrop, makeStyles } from "@material-ui/core";
 import { mapUserData } from "../funnels/v1";
-import { formatCode, parseToken, userState } from "../libs/utils";
+import { anime, formatCode, parseToken, userState } from "../libs/utils";
 import { email, access as handleAccess, refresh as handleRefresh } from "../services/v1";
 import { showDetailsPage, showLoginBoard } from "../libs/animations";
 import BoardImg from "../assets/images/Board.png";
@@ -16,7 +16,6 @@ import CIMusic from "../shared/CIMusic";
 import { AppContext } from "../App";
 import { toast } from "react-toastify";
 import { Howl } from "howler";
-import anime from "animejs";
 
 const useStyles = makeStyles((theme) => ({
     animal: {
@@ -49,10 +48,10 @@ const useStyles = makeStyles((theme) => ({
     guide2: {
         position: "absolute",
         filter: "drop-shadow(0.33vh 0.66vh 1.2vh black)",
-        top: "33.5vh",
+        top: "34.5vh",
         left: "-30vw",
-        height: "70vh",
-        width: "24vw",
+        height: "66.2vh",
+        width: "22vw",
         transform: "scaleX(-1)"
     },
     board: {

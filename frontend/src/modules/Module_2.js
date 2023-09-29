@@ -1,7 +1,8 @@
 import { useContext, useEffect, useRef, useState } from "react";
 import { Backdrop, makeStyles } from "@material-ui/core";
 import { useHistory } from "react-router-dom";
-import { shuffleArray } from "../libs/utils";
+import { mapUserData } from "../funnels/v1";
+import { anime, parseToken, shuffleArray } from "../libs/utils";
 import { score } from "../services/v1";
 import { showHomePage } from "../libs/animations";
 import BoardImg from "../assets/images/Board.png";
@@ -19,7 +20,6 @@ import CIShell from "../shared/CIShell";
 import { AppContext } from "../App";
 import { useTimer } from "react-use-precision-timer";
 import { Howl } from "howler";
-import anime from "animejs";
 import clsx from "clsx";
 import $ from "jquery";
 
@@ -98,27 +98,56 @@ const useStyles = makeStyles({
         position: "absolute",
         filter: "drop-shadow(0.33vh 0.66vh 1.2vh black)",
         transform: "scaleX(-1)",
-        top: "33.5vh",
+        top: "36.5vh",
         left: "-30vw",
-        height: "70vh",
-        width: "24vw"
+        height: "66.2vh",
+        width: "22vw"
     },
     guide: {
         position: "absolute",
         filter: "drop-shadow(0.33vh 0.66vh 1.2vh black)",
         transform: "scaleX(-1)",
-        top: "33.5vh",
         left: "-30vw",
-        height: "70vh",
-        width: "24vw"
+        height: "66.2vh",
+        width: "22vw"
+    },
+    guide1: {
+        top: "36.5vh"
     },
     guide2: {
+        top: "36vh"
+    },
+    guide3: {
+        top: "35vh"
+    },
+    guide4: {
+        top: "34.5vh"
+    },
+    guide5: {
+        top: "35.75vh"
+    },
+    guide6: {
+        top: "37vh"
+    },
+    guide7: {
+        top: "34vh"
+    },
+    guide8: {
+        top: "35.75vh"
+    },
+    guide9: {
+        top: "34.25vh"
+    },
+    guide10: {
+        top: "34.25vh"
+    },
+    partner: {
         position: "absolute",
         filter: "drop-shadow(0.33vh 0.66vh 1.2vh black)",
-        top: "33.5vh",
+        top: "35.5vh",
         left: "108vw",
-        height: "70vh",
-        width: "24vw"
+        height: "66.2vh",
+        width: "22vw"
     },
     header: {
         fontSize: "4vh",
@@ -247,9 +276,15 @@ const Module_2 = () => {
 
     const [showBGAnimations, setBGAnimation] = useState(false);
 
+    const [avatarsArray] = useState(shuffleArray(Array(24).fill().map((_, i) => i + 1)));
+
+    const [avatarID, setAvatar] = useState(0);
+
     const [isAnimating, setAnimation] = useState(false);
 
     const [feedback, setFeedback] = useState(false);
+
+    const [flag, setFlag] = useState(true);
 
     const [shellsArray] = useState(shuffleArray(Array(24).fill().map((_, i) => i)));
 
@@ -264,7 +299,7 @@ const Module_2 = () => {
 
     const [isStarted, setStarted] = useState(false);
 
-    const { BGM, data, howler, user } = useContext(AppContext);
+    const { BGM, data, howler, user, setUser } = useContext(AppContext);
 
     useEffect(() => {
         anime
@@ -293,7 +328,7 @@ const Module_2 = () => {
             }, "-=1000")
             .add({
                 targets: "#instructor",
-                left: "0vw",
+                left: "1vw",
                 easing: "easeOutQuint",
                 duration: 2000
             }, "-=2000")
@@ -357,6 +392,7 @@ const Module_2 = () => {
                 easing: "easeInQuint",
                 duration: 500,
                 complete: () => {
+                    setFeedback(true);
                     hideBackdrop(false);
                     setStarted(true);
                 }
@@ -372,44 +408,6 @@ const Module_2 = () => {
                 rotateY: ["0deg", "90deg"],
                 easing: "linear",
                 duration: 2000
-            }, "-=2000")
-            .add({
-                targets: "#guide",
-                left: "1vw",
-                easing: "easeOutQuint",
-                duration: 2000
-            })
-            .add({
-                targets: "#background",
-                width: "180vw",
-                height: "180vh",
-                marginTop: "-66vh",
-                marginLeft: "-76vw",
-                easing: "easeOutQuint",
-                duration: 2000
-            }, "-=2000")
-            .add({
-                targets: "#palmAlt",
-                scale: [0, 1],
-                top: "-9vh",
-                easing: "easeOutQuint",
-                duration: 2000
-            }, "-=2000")
-            .add({
-                targets: "#guide2",
-                left: "76vw",
-                easing: "easeOutQuint",
-                duration: 2000
-            }, "-=2000")
-            .add({
-                targets: "#close, #music, #shell",
-                top: "4vh",
-                easing: "easeOutQuint",
-                duration: 2000,
-                complete: () => {
-                    $("#palmAlt, #palmWrapper").toggle();
-                    setTimeout(handleRestart, 400);
-                }
             }, "-=2000");
     }
 
@@ -472,7 +470,7 @@ const Module_2 = () => {
                 duration: 2000
             }, "-=4000")
             .add({
-                targets: "#guide2",
+                targets: "#partner",
                 left: "130vw",
                 easing: "easeInQuint",
                 duration: 2000
@@ -534,7 +532,7 @@ const Module_2 = () => {
                 hideBackdrop(false);
                 handleBack();
             }
-        })
+        });
     }
 
     const handlePopIn = () => {
@@ -560,6 +558,50 @@ const Module_2 = () => {
         });
     }
 
+    const handleStart = () => {
+        setFeedback(false);
+        setFlag(false);
+
+        anime({
+            targets: "#guide",
+            left: "2vw",
+            easing: "easeOutQuint",
+            duration: 2000
+        });
+        anime({
+            targets: "#background",
+            width: "180vw",
+            height: "180vh",
+            marginTop: "-66vh",
+            marginLeft: "-76vw",
+            easing: "easeOutQuint",
+            duration: 2000
+        });
+        anime({
+            targets: "#palmAlt",
+            scale: [0, 1],
+            top: "-9vh",
+            easing: "easeOutQuint",
+            duration: 2000
+        });
+        anime({
+            targets: "#partner",
+            left: "77vw",
+            easing: "easeOutQuint",
+            duration: 2000
+        });
+        anime({
+            targets: "#close, #music, #shell",
+            top: "4vh",
+            easing: "easeOutQuint",
+            duration: 2000,
+            complete: () => {
+                $("#palmAlt, #palmWrapper").toggle();
+                setTimeout(handleRestart, 400);
+            }
+        });
+    }
+
     const handleResponse = (flag) => () => {
         score("tree-shaking", {
             session_id: data.session_id,
@@ -568,7 +610,14 @@ const Module_2 = () => {
             shared_shell: shells.partner,
             response: flag,
             trial_response_time: timer.getElapsedRunningTime()
-        });
+        })
+            .then(({ data }) => {
+                const userData = parseToken(data.user);
+
+                if (userData) {
+                    localStorage["UserState"] = data.user;
+                }
+            });
         timer.stop();
 
         new Howl({
@@ -604,7 +653,10 @@ const Module_2 = () => {
                         targets: "#shell",
                         scale: [0.9, 1],
                         delay: 100,
-                        duration: 1000
+                        duration: 1000,
+                        begin: () => {
+                            setUser(mapUserData(parseToken(localStorage["UserState"])));
+                        }
                     });
                 }
             });
@@ -710,7 +762,7 @@ const Module_2 = () => {
                     duration: 2000
                 });
                 anime({
-                    targets: "#guide2",
+                    targets: "#partner",
                     left: "130vw",
                     easing: "easeInQuint",
                     duration: 2000
@@ -730,8 +782,27 @@ const Module_2 = () => {
                 });
             }, 1000);
         }
-        else
+        else {
             setTimeout(handleRestart, 2500);
+
+            anime
+                .timeline()
+                .add({
+                    targets: "#partner",
+                    left: "130vw",
+                    easing: "easeInQuint",
+                    duration: 1500,
+                    complete: () => {
+                        setAvatar(avatarID + 1);
+                    }
+                })
+                .add({
+                    targets: "#partner",
+                    left: "77vw",
+                    easing: "easeOutQuint",
+                    duration: 1500
+                });
+        }
     }
 
     const handleRestart = () => {
@@ -800,9 +871,9 @@ const Module_2 = () => {
         </div>}
         <img className={cls.logo} id="logo2" src={require("../assets/modules/Module_2_Text.png")} />
         <img className={cls.palmAlt} id="palmAlt" src={require("../assets/modules/Palm-alt.png")} />
-        <img className={cls.instructor} id="instructor" src={require("../assets/avatars/xtras/Avatar_11.png")} />
-        <img className={cls.guide} id="guide" src={require(`../assets/avatars/Avatar_${user.avatar}.png`)} />
-        <img className={cls.guide2} id="guide2" src={require("../assets/avatars/xtras/Avatar_12.png")} />
+        <img className={cls.instructor} id="instructor" src={require("../assets/avatars/xtras/Avatar_1.png")} />
+        <img className={clsx(cls.guide, cls["guide" + user.avatar])} id="guide" src={require(`../assets/avatars/Avatar_${user.avatar}.png`)} />
+        <img className={cls.partner} id="partner" src={require(`../assets/avatars/partners/Avatar_${avatarsArray[avatarID]}.png`)} />
         <CIClose className={cls.close} id="close" onClick={handleClose} />
         <CIMusic className={cls.music} id="music" />
         <CIShell className={cls.shell} id="shell" />
@@ -849,7 +920,7 @@ const Module_2 = () => {
                 <CILabel>
                     If you reject, then you and your partner will not get to keep the shells that have fallen.
                 </CILabel>
-                <img src={require("../assets/modules/Shell-alt.png")} />
+                <img src={require("../assets/modules/Shell.png")} />
                 <CILabel>
                     Are you ready?
                 </CILabel>
@@ -867,7 +938,7 @@ const Module_2 = () => {
             </div>
         </Backdrop>
         <IdlePrompt handleClose={isStarted ? handleClose : showBackdrop ? handleLeave : handleBack} />
-        {feedback && <Feedback module="tree-shaking" onClose={handleExit} />}
+        {feedback && <Feedback alt={flag} module="tree-shaking" onClose={handleExit} onStart={handleStart} />}
     </div>
 }
 

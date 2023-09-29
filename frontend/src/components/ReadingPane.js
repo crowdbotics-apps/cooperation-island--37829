@@ -1,24 +1,27 @@
 import { useEffect, useState } from "react";
 import { makeStyles } from "@material-ui/core";
 import { useHistory } from "react-router-dom";
+import { anime } from "../libs/utils";
 import { privacy, terms } from "../services/v1";
 import { showLoginBoard } from "../libs/animations";
 import ReactHtmlParser from "react-html-parser";
 import BoardImg from "../assets/images/Board-lg.png";
 import CILabel from "../shared/CILabel";
 import CIButton from "../shared/CIButton";
-import anime from "animejs";
 import clsx from "clsx";
 
 const useStyles = makeStyles((theme) => ({
     guide: {
         position: "absolute",
         filter: "drop-shadow(0.33vh 0.66vh 1.2vh black)",
-        top: "33.5vh",
+        top: "34.5vh",
         left: "-30vw",
-        height: "70vh",
-        width: "24vw",
+        height: "66.2vh",
+        width: "22vw",
         transform: "scaleX(-1)"
+    },
+    guide2: {
+        top: "35.75vh",
     },
     board: {
         position: "absolute",
@@ -101,7 +104,7 @@ const ReadingPane = () => {
     }
 
     return <div>
-        <img className={cls.guide} id="guide" src={require(`../assets/avatars/Avatar_${pageType ? 4 : 5}.png`)} />
+        <img className={clsx(cls.guide, !pageType && cls.guide2)} id="guide" src={require(`../assets/avatars/Avatar_${pageType ? 4 : 5}.png`)} />
         <div className={cls.board} id="board3">
             <CILabel className={cls.title}>
                 {pageType ? "Terms & Conditions" : "Privacy Policy"}

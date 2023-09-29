@@ -2,7 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import { Backdrop, makeStyles } from "@material-ui/core";
 import { useHistory } from "react-router-dom";
 import update from "immutability-helper";
-import { rankedQualities } from "../libs/utils";
+import { anime, rankedQualities } from "../libs/utils";
 import { qualities } from "../services/v1";
 import { showHomePage } from "../libs/animations";
 import BoardImg from "../assets/images/Board.png";
@@ -24,7 +24,7 @@ import CIMusic from "../shared/CIMusic";
 import CIShell from "../shared/CIShell";
 import { AppContext } from "../App";
 import { Howl } from "howler";
-import anime from "animejs";
+import clsx from "clsx";
 import $ from "jquery";
 
 const useStyles = makeStyles((theme) => ({
@@ -90,10 +90,10 @@ const useStyles = makeStyles((theme) => ({
         position: "absolute",
         filter: "drop-shadow(0.33vh 0.66vh 1.2vh black)",
         transform: "scaleX(-1)",
-        top: "33.5vh",
+        top: "36vh",
         left: "-30vw",
-        height: "70vh",
-        width: "24vw"
+        height: "66.2vh",
+        width: "22vw"
     },
     block: {
         position: "absolute",
@@ -159,10 +159,39 @@ const useStyles = makeStyles((theme) => ({
         position: "absolute",
         filter: "drop-shadow(0.33vh 0.66vh 1.2vh black)",
         transform: "scaleX(-1)",
-        top: "33.5vh",
         left: "-30vw",
-        height: "70vh",
-        width: "24vw"
+        height: "66.2vh",
+        width: "22vw"
+    },
+    guide1: {
+        top: "36.5vh"
+    },
+    guide2: {
+        top: "36vh"
+    },
+    guide3: {
+        top: "35vh"
+    },
+    guide4: {
+        top: "34.5vh"
+    },
+    guide5: {
+        top: "35.75vh"
+    },
+    guide6: {
+        top: "37vh"
+    },
+    guide7: {
+        top: "34vh"
+    },
+    guide8: {
+        top: "35.75vh"
+    },
+    guide9: {
+        top: "34.25vh"
+    },
+    guide10: {
+        top: "34.25vh"
     },
     header: {
         fontSize: "4vh",
@@ -232,6 +261,8 @@ const Module_3 = () => {
 
     const [feedback, setFeedback] = useState(false);
 
+    const [flag, setFlag] = useState(true);
+
     const [disabled, setDisabled] = useState(false);
 
     const [draggingId, setDragging] = useState(0);
@@ -268,7 +299,7 @@ const Module_3 = () => {
             }, "-=1000")
             .add({
                 targets: "#instructor",
-                left: "-0.5vw",
+                left: "1.5vw",
                 easing: "easeOutQuint",
                 duration: 2000
             }, "-=2000")
@@ -384,6 +415,7 @@ const Module_3 = () => {
                 easing: "easeInQuint",
                 duration: 500,
                 complete: () => {
+                    setFeedback(true);
                     hideBackdrop(false);
                     setStarted(true);
                 }
@@ -398,30 +430,6 @@ const Module_3 = () => {
                 targets: "#board",
                 rotateY: ["0deg", "90deg"],
                 easing: "linear",
-                duration: 2000
-            }, "-=2000")
-            .add({
-                targets: "#guide",
-                left: "1vw",
-                easing: "easeOutQuint",
-                duration: 2000
-            })
-            .add({
-                targets: "#block",
-                top: "24vh",
-                easing: "easeOutQuint",
-                duration: 2000
-            }, "-=2000")
-            .add({
-                targets: "#sections",
-                top: "23vh",
-                easing: "easeOutQuint",
-                duration: 2000
-            }, "-=2000")
-            .add({
-                targets: "#close, #music, #shell",
-                top: "4vh",
-                easing: "easeOutQuint",
                 duration: 2000
             }, "-=2000");
     }
@@ -514,7 +522,7 @@ const Module_3 = () => {
                 hideBackdrop(false);
                 handleBack();
             }
-        })
+        });
     }
 
     const handlePopIn = () => {
@@ -605,6 +613,36 @@ const Module_3 = () => {
         });
     }
 
+    const handleStart = () => {
+        setFeedback(false);
+        setFlag(false);
+
+        anime({
+            targets: "#guide",
+            left: "2.75vw",
+            easing: "easeOutQuint",
+            duration: 2000
+        });
+        anime({
+            targets: "#block",
+            top: "24vh",
+            easing: "easeOutQuint",
+            duration: 2000
+        });
+        anime({
+            targets: "#sections",
+            top: "23vh",
+            easing: "easeOutQuint",
+            duration: 2000
+        });
+        anime({
+            targets: "#close, #music, #shell",
+            top: "4vh",
+            easing: "easeOutQuint",
+            duration: 2000
+        });
+    }
+
     const goHome = () => {
         howler.module_3.fade(howler.module_3.volume(), 0, 1000);
         if (BGM)
@@ -626,8 +664,8 @@ const Module_3 = () => {
 
     return <div>
         <img className={cls.logo} id="logo2" src={require("../assets/modules/Module_3_Text.png")} />
-        <img className={cls.instructor} id="instructor" src={require("../assets/avatars/xtras/Avatar_13.png")} />
-        <img className={cls.guide} id="guide" src={require(`../assets/avatars/Avatar_${user.avatar}.png`)} />
+        <img className={cls.instructor} id="instructor" src={require("../assets/avatars/xtras/Avatar_2.png")} />
+        <img className={clsx(cls.guide, cls["guide" + user.avatar])} id="guide" src={require(`../assets/avatars/Avatar_${user.avatar}.png`)} />
         <CIClose className={cls.close} id="close" onClick={handleClose} />
         <CIMusic className={cls.music} id="music" />
         <CIShell className={cls.shell} id="shell" />
@@ -719,7 +757,7 @@ const Module_3 = () => {
             </div>
         </Backdrop>
         <IdlePrompt handleClose={isStarted ? handleClose : showBackdrop ? handleLeave : handleBack} />
-        {feedback && <Feedback module="voice-your-values" onClose={handleExit} />}
+        {feedback && <Feedback alt={flag} module="voice-your-values" onClose={handleExit} onStart={handleStart} />}
     </div>
 }
 

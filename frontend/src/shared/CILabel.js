@@ -10,7 +10,7 @@ const useStyles = makeStyles((theme) => ({
         fontWeight: "400",
         height: "3.3vh"
     }
-}))
+}));
 
 const CILabel = (props) => {
     const cls = useStyles();

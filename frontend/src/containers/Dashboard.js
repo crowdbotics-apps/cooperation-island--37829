@@ -1,18 +1,18 @@
 import { useContext, useEffect } from "react";
 import { makeStyles } from "@material-ui/core";
 import { useHistory } from "react-router-dom";
-import { mapFeedback } from "../funnels/v1";
-import { userState } from "../libs/utils";
-import { feedback, moduleData } from "../services/v1";
-import { showAvatarPage, showLoginBoard } from "../libs/animations";
+import { mapFeedback, mapPrompt } from "../funnels/v1";
+import { anime, userState } from "../libs/utils";
+import { feedback, moduleData, prompt } from "../services/v1";
+import { showAvatarPage, showLoginBoard, showShopPage } from "../libs/animations";
 import CIAvatar from "../shared/CIAvatar";
 import CILabel from "../shared/CILabel";
 import CILogout from "../shared/CILogout";
 import CIMusic from "../shared/CIMusic";
 import CIShell from "../shared/CIShell";
+import CIShop from "../shared/CIShop";
 import { AppContext } from "../App";
 import { Howl } from "howler";
-import anime from "animejs";
 import clsx from "clsx";
 
 const useStyles = makeStyles({
@@ -24,16 +24,45 @@ const useStyles = makeStyles({
     guide: {
         position: "absolute",
         filter: "drop-shadow(0.33vh 0.66vh 1.2vh black)",
-        top: "33.5vh",
         left: "-30vw",
-        height: "70vh",
-        width: "24vw",
+        height: "66.2vh",
+        width: "22vw",
         transform: "scaleX(-1)"
+    },
+    guide1: {
+        top: "36.5vh"
+    },
+    guide2: {
+        top: "36vh"
+    },
+    guide3: {
+        top: "35vh"
+    },
+    guide4: {
+        top: "34.5vh"
+    },
+    guide5: {
+        top: "35.75vh"
+    },
+    guide6: {
+        top: "37vh"
+    },
+    guide7: {
+        top: "34vh"
+    },
+    guide8: {
+        top: "35.75vh"
+    },
+    guide9: {
+        top: "34.25vh"
+    },
+    guide10: {
+        top: "34.25vh"
     },
     header: {
         position: "absolute",
         top: "-13.5vh",
-        left: "51.5vw"
+        left: "45vw"
     },
     label: {
         position: "absolute",
@@ -48,22 +77,28 @@ const useStyles = makeStyles({
         left: "22.6vw",
         width: "4vw"
     },
-    avatar: {
+    shop: {
         position: "absolute",
         top: "0vh",
         left: "29vw",
         width: "4vw"
     },
+    avatar: {
+        position: "absolute",
+        top: "0vh",
+        left: "35.5vw",
+        width: "4vw"
+    },
     music: {
         position: "absolute",
         top: "0vh",
-        left: "35.4vw",
+        left: "42.1vw",
         width: "4vw"
     },
     logout: {
         position: "absolute",
         top: "0vh",
-        left: "42vw",
+        left: "48.6vw",
         width: "4vw"
     },
     module: {
@@ -115,7 +150,7 @@ const Dashboard = () => {
         localStorage.removeItem("LastActivity");
     }, []);
 
-    const handleAvatar = () => {
+    const handleRoute = (alt) => () => {
         anime({
             targets: "#background",
             width: "100vw",
@@ -150,8 +185,24 @@ const Dashboard = () => {
             easing: "easeInQuint",
             duration: 2000,
             complete: () => {
-                history.push("/avatar");
-                showAvatarPage(avatarRef.current.setUser);
+                if (alt) {
+                    history.push("/avatar");
+                    showAvatarPage(avatarRef.current.setUser);
+                }
+                else {
+                    howler.welcome.fade(howler.welcome.volume(), 0, 1000);
+                    setHowler({
+                        shop: new Howl({
+                            src: [require("../assets/sounds/Shop.mp3")],
+                            autoplay: true,
+                            volume: BGM ? 1 : 0,
+                            loop: true
+                        })
+                    });
+
+                    history.push("/shop");
+                    showShopPage();
+                }
             }
         });
     }
@@ -216,11 +267,13 @@ const Dashboard = () => {
 
                                 Promise.all([
                                     moduleData("fish-mind-reading"),
-                                    feedback("fish-mind-reading")
+                                    feedback("fish-mind-reading"),
+                                    prompt("fish-mind-reading")
                                 ])
-                                    .then(([{ data: { max, min, session_id } }, { data }]) => {
+                                    .then(([{ data: { max, min, session_id } }, { data: feedback }, { data: prompt }]) => {
                                         setData({
-                                            feedback: mapFeedback(data),
+                                            feedback: mapFeedback(feedback),
+                                            prompt: mapPrompt(prompt),
                                             session_id,
                                             min,
                                             max
@@ -245,11 +298,13 @@ const Dashboard = () => {
 
                                 Promise.all([
                                     moduleData("tree-shaking"),
-                                    feedback("tree-shaking")
+                                    feedback("tree-shaking"),
+                                    prompt("tree-shaking")
                                 ])
-                                    .then(([{ data: { session_id, trials } }, { data }]) => {
+                                    .then(([{ data: { session_id, trials } }, { data: feedback }, { data: prompt }]) => {
                                         setData({
-                                            feedback: mapFeedback(data),
+                                            feedback: mapFeedback(feedback),
+                                            prompt: mapPrompt(prompt),
                                             session_id,
                                             trials
                                         });
@@ -273,11 +328,13 @@ const Dashboard = () => {
 
                                 Promise.all([
                                     moduleData("voice-your-values"),
-                                    feedback("voice-your-values")
+                                    feedback("voice-your-values"),
+                                    prompt("voice-your-values")
                                 ])
-                                    .then(([{ data: { session_id } }, { data }]) => {
+                                    .then(([{ data: { session_id } }, { data: feedback }, { data: prompt }]) => {
                                         setData({
-                                            feedback: mapFeedback(data),
+                                            feedback: mapFeedback(feedback),
+                                            prompt: mapPrompt(prompt),
                                             session_id
                                         });
                                     });
@@ -325,12 +382,13 @@ const Dashboard = () => {
     }
 
     return <div>
-        <img className={cls.guide} id="guide" src={user.avatar && require(`../assets/avatars/Avatar_${user.avatar}.png`)} />
+        <img className={clsx(cls.guide, cls["guide" + user.avatar])} id="guide" src={user.avatar && require(`../assets/avatars/Avatar_${user.avatar}.png`)} />
         <div className={cls.header} id="header">
             <img className={cls.board} src={require("../assets/images/Name_Plate.png")} />
             <CILabel className={cls.label}>{user.id}</CILabel>
             <CIShell className={cls.shell} id="shell" />
-            <CIAvatar className={cls.avatar} id="avatar" onClick={handleAvatar} />
+            <CIShop className={cls.shop} id="shop" onClick={handleRoute(false)} />
+            <CIAvatar className={cls.avatar} id="avatar" onClick={handleRoute(true)} />
             <CIMusic className={cls.music} id="music" />
             <CILogout className={cls.logout} id="logout" onClick={handleLogout} />
         </div>
