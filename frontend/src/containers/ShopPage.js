@@ -1,7 +1,9 @@
 import { useContext, useEffect, useState } from "react";
 import { Backdrop, makeStyles } from "@material-ui/core";
 import { useHistory } from "react-router-dom";
-import { anime, postersData } from "../libs/utils";
+import { mapPosters, mapUserData } from "../funnels/v1";
+import { anime, parseToken, postersData } from "../libs/utils";
+import { buyPoster, moduleData, openPoster, sendPoster } from "../services/v1";
 import { showHomePage, showShopPage } from "../libs/animations";
 import BoardImg from "../assets/images/Board-sm.png";
 import PosterFrame from "../components/PosterFrame";
@@ -12,6 +14,7 @@ import CILabel from "../shared/CILabel";
 import CIMusic from "../shared/CIMusic";
 import CIShell from "../shared/CIShell";
 import { AppContext } from "../App";
+import { toast } from "react-toastify";
 import { Howl } from "howler";
 import clsx from "clsx";
 import $ from "jquery";
@@ -129,8 +132,8 @@ const useStyles = makeStyles((theme) => ({
     save: {
         position: "absolute",
         filter: "drop-shadow(0.33vh 0.66vh 1.2vh black)",
-        top: "80vh",
-        left: "80vw",
+        top: "86vh",
+        left: "86vw",
         height: "8.88vh",
         width: "12vw",
         transform: "scale(0)"
@@ -163,16 +166,22 @@ const ShopPage = () => {
 
     const [posters, setPosters] = useState(postersData);
 
+    const [sessionId, setSession] = useState();
+
     const [showBackdrop, hideBackdrop] = useState(false);
 
     const [showPoster, hidePoster] = useState(false);
 
     const [poster, setPoster] = useState();
 
-    const { BGM, howler, user } = useContext(AppContext);
+    const { BGM, howler, user, setUser } = useContext(AppContext);
 
     useEffect(() => {
-        setPosters([]);
+        moduleData("theme")
+            .then(({ data: { session_id, themes } }) => {
+                setSession(session_id);
+                setPosters(mapPosters(themes));
+            });
     }, []);
 
     const handleBack = () => {
@@ -182,20 +191,20 @@ const ShopPage = () => {
             easing: "easeInQuint",
             duration: 500,
             complete: () => {
-                setPoster();
                 hideBackdrop(false);
             }
         })
     }
 
     const handleClick = (poster) => () => {
+        setPoster(poster);
+
         if (!user.posters.includes(poster.id)) {
             anime({
                 targets: "#board9",
                 scale: [0, 1],
                 duration: 1000,
                 begin: () => {
-                    setPoster(poster);
                     hideBackdrop(true);
                 }
             });
@@ -299,8 +308,34 @@ const ShopPage = () => {
     }
 
     const handleOpen = (poster) => () => {
-        if (!user.posters.includes(poster.id))
+        let posterURL;
+
+        if (!user.posters.includes(poster.id)) {
+            buyPoster({
+                session_id: sessionId,
+                theme_id: poster.id
+            })
+                .then(({ data }) => {
+                    const userData = parseToken(data.user);
+
+                    if (userData) {
+                        localStorage["UserState"] = data.user;
+                    }
+
+                    setUser(mapUserData((userData)));
+
+                    posterURL = data.url;
+                    $("#poster").attr("src", posterURL);
+                });
             handleBack();
+        }
+        else {
+            openPoster(poster.id)
+                .then(({ data }) => {
+                    posterURL = data.url;
+                    $("#poster").attr("src", posterURL);
+                });
+        }
 
         anime
             .timeline()
@@ -310,7 +345,7 @@ const ShopPage = () => {
                 easing: "linear",
                 duration: 2000,
                 complete: () => {
-                    $("#background").attr("src", "");
+                    $("#background").attr("src", posterURL);
                     hidePoster(true);
                     history.push("/poster");
                 }
@@ -382,12 +417,18 @@ const ShopPage = () => {
             scale: [0.9, 1],
             duration: 1000
         });
+
+        sendPoster(poster.id)
+            .then(() => {
+                toast.success("The poster has been sent to your Email.");
+            });
     }
 
     return <div>
         <img className={cls.logo} id="logo2" src={require("../assets/images/Shop_Text.png")} />
         <img className={clsx(cls.guide, cls["guide" + user.avatar])} id="guide" src={require(`../assets/avatars/Avatar_${user.avatar}.png`)} />
         <img className={clsx(cls.save, "pointer")} id="save" onClick={handleSave} src={require("../assets/images/Save.png")} />
+        <img id="poster" />
         <CIClose className={cls.close} id="close" onClick={handleClose} />
         <CIMusic className={cls.music} id="music" />
         <CIShell className={cls.shell} id="shell" />

@@ -117,3 +117,22 @@ export const moduleData = (module) => {
         }
     });
 }
+
+export const buyPoster = (data) => {
+    return API.post(base + "/theme/buy/", data);
+}
+
+export const openPoster = (id) => {
+    return API.get(base + "/theme/details/", {
+        env: {
+            noLoader: true
+        },
+        params: {
+            theme_id: id
+        }
+    });
+}
+
+export const sendPoster = (id) => {
+    return API.post(base + `/print/${id}/`);
+}
