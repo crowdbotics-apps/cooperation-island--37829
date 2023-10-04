@@ -1,17 +1,17 @@
 import { useContext, useEffect, useRef } from "react";
 import { makeStyles } from "@material-ui/core";
 import { useDrag, useDrop } from "react-dnd";
+import { anime } from "../libs/utils";
 import CILabel from "../shared/CILabel";
 import { AppContext } from "../App";
 import { Howl } from "howler";
-import anime from "animejs";
 import clsx from "clsx";
 
 const useStyles = makeStyles((theme) => ({
     index: {
         "& label": {
             color: "#3F8477",
-            paddingTop: "0vh"
+            paddingTop: "0.1vh"
         },
         position: "absolute",
         textAlign: "center",
@@ -38,7 +38,7 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const Qualities = ({ className, data, desc, draggingId, first, id, index, last, moveItems, setDragging, sm, text }) => {
+const Qualities = ({ className, data, desc, disabled, draggingId, first, id, index, last, moveItems, setDragging, sm, text }) => {
     const cls = useStyles();
 
     const qualityId = "quality" + id;
@@ -73,7 +73,7 @@ const Qualities = ({ className, data, desc, draggingId, first, id, index, last, 
         canDrop: ({ id }) => sm && data.includes(id),
         drop: () => ({ qualityId }),
         hover: (item, monitor) => {
-            if (item.index !== index && monitor.canDrop()) {
+            if (item.index !== index && monitor.canDrop() && qualityRef.current) {
                 const hoverBoundingRect = qualityRef.current.getBoundingClientRect();
                 const hoverMiddleY = (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2;
                 const clientOffset = monitor.getClientOffset();
@@ -108,13 +108,17 @@ const Qualities = ({ className, data, desc, draggingId, first, id, index, last, 
         }
     }, [isDragging]);
 
+    const handleSelection = () => {
+        window.getSelection().removeAllRanges();
+    }
+
     return <div
         className={clsx(className, "pointer")}
         data-tooltip-id="tooltip"
         data-tooltip-content={desc}
         id={qualityId}
-        // ref={qualityRef}
-        ref={sm ? () => { } : qualityRef}
+        ref={disabled ? () => { } : qualityRef}
+        unselectable="on"
         style={{
             marginTop: sm ? "0vh" : first ? "1vh" : "3vh",
             marginBottom: (!sm && last) ? "1vh" : "0vh",
@@ -123,11 +127,11 @@ const Qualities = ({ className, data, desc, draggingId, first, id, index, last, 
             opacity: draggingId === id ? 0 : 1
         }}>
         {sm && <div className={cls.index}>
-            <CILabel className="pointer">
+            <CILabel onMouseDown={handleSelection}>
                 {index + 1}
             </CILabel>
         </div>}
-        <CILabel className={clsx(cls.quality, sm ? cls.notCenter : cls.center, "pointer")}>
+        <CILabel className={clsx(cls.quality, sm ? cls.notCenter : cls.center, "pointer")} onMouseDown={handleSelection}>
             {text}
         </CILabel>
     </div>

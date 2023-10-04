@@ -1,10 +1,11 @@
 import { makeStyles } from "@material-ui/core";
+import { anime } from "../libs/utils";
 import { Howl } from "howler";
-import anime from "animejs";
 import clsx from "clsx";
 
 const useStyles = makeStyles({
     svg: {
+        filter: "drop-shadow(0.33vh 0.66vh 0.8vh black)",
         height: "10vh",
         outline: "none"
     }

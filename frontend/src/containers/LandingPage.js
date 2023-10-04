@@ -2,10 +2,10 @@ import { Fragment, useContext, useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { Backdrop, makeStyles } from "@material-ui/core";
 import { mapUserData } from "../funnels/v1";
-import { formatCode, parseToken, userState } from "../libs/utils";
+import { anime, formatCode, parseToken, userState } from "../libs/utils";
 import { email, access as handleAccess, refresh as handleRefresh } from "../services/v1";
 import { showDetailsPage, showLoginBoard } from "../libs/animations";
-import BoardImg from "../assets/images/Board-alt.png";
+import BoardImg from "../assets/images/Board.png";
 import BoardLgImg from "../assets/images/Board-lg.png";
 import CIButton from "../shared/CIButton";
 import CIInput from "../shared/CIInput";
@@ -15,11 +15,12 @@ import CILogout from "../shared/CILogout";
 import CIMusic from "../shared/CIMusic";
 import { AppContext } from "../App";
 import { toast } from "react-toastify";
-import anime from "animejs";
+import { Howl } from "howler";
 
-const useStyles = makeStyles({
+const useStyles = makeStyles((theme) => ({
     animal: {
         position: "absolute",
+        filter: "drop-shadow(0.33vh 0.66vh 1.2vh black)",
         zIndex: 2,
         top: "18vh",
         left: "48vw",
@@ -29,6 +30,7 @@ const useStyles = makeStyles({
     },
     animal2: {
         position: "absolute",
+        filter: "drop-shadow(0.33vh 0.66vh 1.2vh black)",
         top: "140vh",
         left: "51vw",
         height: "16.7vh",
@@ -36,6 +38,7 @@ const useStyles = makeStyles({
     },
     guide: {
         position: "absolute",
+        filter: "drop-shadow(0.33vh 0.66vh 1.2vh black)",
         top: "38vh",
         left: "71vw",
         height: "58vh",
@@ -44,14 +47,16 @@ const useStyles = makeStyles({
     },
     guide2: {
         position: "absolute",
-        top: "33.5vh",
+        filter: "drop-shadow(0.33vh 0.66vh 1.2vh black)",
+        top: "34.5vh",
         left: "-30vw",
-        height: "70vh",
-        width: "24vw",
+        height: "66.2vh",
+        width: "22vw",
         transform: "scaleX(-1)"
     },
     board: {
         position: "absolute",
+        filter: "drop-shadow(0.33vh 0.66vh 1.2vh black)",
         top: "110vh",
         left: "42vw",
         height: "60vh",
@@ -62,6 +67,7 @@ const useStyles = makeStyles({
     },
     board2: {
         position: "absolute",
+        filter: "drop-shadow(0.33vh 0.66vh 1.2vh black)",
         top: "110vh",
         left: "34vw",
         height: "80vh",
@@ -78,8 +84,11 @@ const useStyles = makeStyles({
         },
         "& label": {
             "&:first-child:has(+ label)": {
-                fontSize: "3.3vh",
+                color: theme.palette.primary.main,
+
+                fontSize: "4.5vh",
                 fontWeight: "bold",
+                letterSpacing: "0.1vw",
                 marginBottom: "12vh"
             },
             "&#first": {
@@ -93,10 +102,12 @@ const useStyles = makeStyles({
                 },
                 fontSize: "2vh",
                 letterSpacing: "0.05vw !important",
-                marginTop: "14vh"
+                marginTop: "14vh",
+                padding: "0vh 5vw"
             },
+            color: "black",
             display: "inline",
-            fontSize: "2.5vh",
+            fontSize: "2.6vh",
             letterSpacing: "0.1vw !important",
             marginTop: "1vh"
         },
@@ -121,14 +132,15 @@ const useStyles = makeStyles({
     },
     content: {
         fontFamily: "Summer Show",
+        fontSize: "2.6vh",
         textAlign: "left",
         margin: "10vh 5vw 1vh 7vw"
     },
     buttonDiv: {
         display: "flex",
         justifyContent: "space-evenly",
-        width: "70%",
-        margin: "8vh auto 0"
+        width: "37.8vw",
+        margin: "10vh auto 0vh"
     },
     logout: {
         position: "absolute",
@@ -142,14 +154,14 @@ const useStyles = makeStyles({
         left: "100vw",
         width: "4vw"
     }
-});
+}));
 
 const LandingPage = () => {
     const cls = useStyles();
 
     const history = useHistory();
 
-    const { BGM, howler, setUser } = useContext(AppContext);
+    const { BGM, howler, setBGM, setHowler, setUser } = useContext(AppContext);
 
     const [text, setText] = useState("");
 
@@ -193,6 +205,15 @@ const LandingPage = () => {
                 duration: 2000,
                 complete: () => {
                     hideBackdrop(false);
+                    setBGM(true);
+
+                    setHowler({
+                        welcome: new Howl({
+                            src: [require("../assets/sounds/Welcome.mp3")],
+                            autoplay: true,
+                            loop: true
+                        })
+                    });
                 }
             })
             .add({
@@ -337,14 +358,14 @@ const LandingPage = () => {
             <div className={cls.body}>
                 {showAccess ? <Fragment>
                     <CILabel id="first">Access Code</CILabel>
-                    <CIInput onChange={handleChange} onEnter={handleSubmit} value={text} />
+                    <CIInput autoFocus onChange={handleChange} onEnter={handleSubmit} value={text} />
                     <CIButton onClick={handleSubmit}>Submit</CIButton>
                 </Fragment> : <Fragment>
-                    <CILabel>Time to get Consent!</CILabel>
-                    <CILabel>Now, we need your parent to agree.</CILabel>
+                    <CILabel>Time To Get Consent!</CILabel>
+                    <CILabel>Now, we need your parent to give permission for you to play.</CILabel>
                     <CILabel>To send your parent an email, please <CILink onClick={handleLink(false)}>click here</CILink>.</CILabel>
                     <CILabel>Then ask your parent to respond to the email so you can get started as soon as possible.</CILabel>
-                    <CILabel id="last">If you have an access code, please <CILink onClick={handleInput}>click here</CILink>.</CILabel>
+                    <CILabel id="last">Your parent may need to check their junk folder for our email. If you have an access code, please <CILink onClick={handleInput}>click here</CILink>.</CILabel>
                 </Fragment>}
             </div>
         </div>

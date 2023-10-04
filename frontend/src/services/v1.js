@@ -82,6 +82,22 @@ export const saveFeedback = (module, data) => {
     });
 }
 
+export const prompt = (module) => {
+    return API.get(base + `/prompt/${module}/`, {
+        env: {
+            noLoader: true
+        }
+    });
+}
+
+export const sendPrompt = (module, data) => {
+    return API.post(base + `/prompt/${module}/`, data, {
+        env: {
+            noLoader: true
+        }
+    });
+}
+
 export const score = (module, data) => {
     return API.post(base + `/score/${module}/`, data, {
         env: {
@@ -91,5 +107,32 @@ export const score = (module, data) => {
 }
 
 export const qualities = (data) => {
-    return API.post(base + "/qualities/tell-us-about-you/", data);
+    return API.post(base + "/qualities/voice-your-values/", data);
+}
+
+export const moduleData = (module) => {
+    return API.get(base + `/data/${module}/`, {
+        env: {
+            noLoader: true
+        }
+    });
+}
+
+export const buyPoster = (data) => {
+    return API.post(base + "/theme/buy/", data);
+}
+
+export const openPoster = (id) => {
+    return API.get(base + "/theme/details/", {
+        env: {
+            noLoader: true
+        },
+        params: {
+            theme_id: id
+        }
+    });
+}
+
+export const sendPoster = (id) => {
+    return API.post(base + `/print/${id}/`);
 }

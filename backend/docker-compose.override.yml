@@ -21,6 +21,15 @@ services:
   redis:
     ports:
       - "6379:6379"
+  celery-worker:
+    build:
+      context: .
+      args:
+        SECRET_KEY: ${SECRET_KEY}
+        DJANGO_SETTINGS_MODULE: ${DJANGO_SETTINGS_MODULE}
+    command: celery -A cooperation_island_37829 worker --loglevel=info       
+    volumes:
+      - ./:/opt/webapp
 
 volumes: 
   postgres-data:

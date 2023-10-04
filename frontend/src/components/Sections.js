@@ -3,7 +3,7 @@ import { rankedQualities } from "../libs/utils";
 import Qualities from "./Qualities";
 import { Howl } from "howler";
 
-const Sections = ({ addItems, className, clsQuality, clsSection, data, moveItems, style, SectionImg, ...rest }) => {
+const Sections = ({ addItems, className, clsQuality, clsSection, data, disabled, moveItems, style, SectionImg, ...rest }) => {
     const [{ canDrop, isDropping }, sessionRef] = useDrop({
         accept: ["quality", "section"],
         canDrop: ({ id }) => !data.includes(id),
@@ -38,6 +38,7 @@ const Sections = ({ addItems, className, clsQuality, clsSection, data, moveItems
                     return <Qualities
                         className={clsQuality}
                         data={data}
+                        disabled={disabled}
                         key={i}
                         index={i}
                         first={i === 0}

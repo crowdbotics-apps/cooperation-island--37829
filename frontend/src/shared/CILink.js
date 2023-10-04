@@ -1,6 +1,6 @@
 import { makeStyles } from "@material-ui/core";
+import { anime } from "../libs/utils";
 import { Howl } from "howler";
-import anime from "animejs";
 import clsx from "clsx";
 
 const useStyles = makeStyles((theme) => ({
@@ -13,7 +13,7 @@ const useStyles = makeStyles((theme) => ({
         letterSpacing: 0,
         textDecoration: "underline"
     }
-}))
+}));
 
 const CILink = (props) => {
     const cls = useStyles();

@@ -4,10 +4,10 @@ import { DatePicker } from "@material-ui/pickers";
 import { makeStyles } from "@material-ui/core";
 import { useHistory } from "react-router-dom";
 import { mapUserData, mapUserDetails } from "../funnels/v1";
-import { formatText, formatZipCode, parseToken, userState } from "../libs/utils";
+import { anime, formatText, formatZipCode, parseToken, userState } from "../libs/utils";
 import { details as handleDetailsAPI } from "../services/v1";
 import { showAvatarPage, showLoginBoard } from "../libs/animations";
-import BoardImg from "../assets/images/Board-alt.png";
+import BoardImg from "../assets/images/Board.png";
 import CIButton from "../shared/CIButton";
 import CIInput from "../shared/CIInput";
 import CILabel from "../shared/CILabel";
@@ -15,12 +15,12 @@ import CILogout from "../shared/CILogout";
 import CIMusic from "../shared/CIMusic";
 import { AppContext } from "../App";
 import { toast } from "react-toastify";
-import anime from "animejs";
 import clsx from "clsx";
 
 const useStyles = makeStyles((theme) => ({
     board: {
         position: "absolute",
+        filter: "drop-shadow(0.33vh 0.66vh 1.2vh black)",
         top: "3vh",
         left: "110vw",
         height: "94vh",
@@ -69,14 +69,41 @@ const useStyles = makeStyles((theme) => ({
             cursor: "inherit",
             fontFamily: "Summer Show",
             fontSize: "4vh"
-        }
+        },
+        "& div.MuiPickersBasePicker-pickerView": {
+            maxWidth: "none",
+            minWidth: "auto",
+            minHeight: "auto"
+        },
+        "& div.MuiPickersMonthSelection-container": {
+            "& div": {
+                height: "12.5vh",
+                width: "10vw"
+            },
+            width: "24.22vw"
+        },
+        "& div.MuiPickersYearSelection-container": {
+            "& div": {
+                height: "6.66vh",
+                width: "23.75vw"
+            },
+            height: "50vh"
+        },
+        "& div.MuiPickersYear-yearSelected": {
+            margin: "0"
+        },
+        height: "50.8vh",
+        width: "24.22vw",
+        minWidth: "auto",
+        maxWidth: "none"
     },
     guide: {
         position: "absolute",
-        top: "33.5vh",
+        filter: "drop-shadow(0.33vh 0.66vh 1.2vh black)",
+        top: "34.5vh",
         left: "-30vw",
-        height: "70vh",
-        width: "24vw",
+        height: "66.2vh",
+        width: "22vw",
         transform: "scaleX(-1)"
     },
     logout: {
@@ -189,7 +216,7 @@ const UserDetails = () => {
                     left: "110vw",
                     easing: "easeInQuint",
                     duration: 2000
-                })
+                });
                 anime({
                     targets: "#logout, #music",
                     left: "100vw",
@@ -212,8 +239,8 @@ const UserDetails = () => {
         <img className={cls.guide} id="guide" src={require("../assets/avatars/Avatar_7.png")} />
         <div className={cls.board} id="board">
             <div className={cls.body}>
-                <CILabel>Tell us more about YOU</CILabel>
-                <CILabel>If you don't know the answers to these questions, please ask a parent if possible.</CILabel>
+                <CILabel>Tell Us More About YOU</CILabel>
+                <CILabel>If you don't know the answers to these questions, please ask a parent.</CILabel>
                 <CIInput className={cls.input} placeholder="Nationality" onChange={handleDetails("nationality")} onEnter={handleNext} value={details.nationality} />
                 <CIInput className={cls.input} placeholder="Gender" onChange={handleDetails("gender")} onEnter={handleNext} value={details.gender} />
                 <CIInput className={cls.input} placeholder="Zip Code" onChange={handleDetails("zipcode")} onEnter={handleNext} value={details.zipcode} />

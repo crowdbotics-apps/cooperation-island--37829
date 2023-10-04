@@ -1,25 +1,35 @@
 import { Fragment, useContext, useEffect, useState } from "react";
 import { makeStyles } from "@material-ui/core";
-import { saveFeedback } from "../services/v1";
-import BoardImg from "../assets/images/Board-alt.png";
+import { anime } from "../libs/utils";
+import { saveFeedback, sendPrompt } from "../services/v1";
+import BoardImg from "../assets/images/Board.png";
 import CIButton from "../shared/CIButton";
 import CIInput from "../shared/CIInput";
 import CILabel from "../shared/CILabel";
 import Option from "./Option";
 import Rating from "./Rating";
 import { AppContext } from "../App";
-import { toast } from "react-toastify";
-import anime from "animejs";
 import clsx from "clsx";
 
 const useStyles = makeStyles((theme) => ({
     animal: {
         position: "absolute",
+        filter: "drop-shadow(0.33vh 0.66vh 1.2vh black)",
         zIndex: 2,
         top: "8vh",
         left: "61vw",
         height: "16.27vh",
         width: "10vw",
+        transform: "scale(0)"
+    },
+    animal2: {
+        position: "absolute",
+        filter: "drop-shadow(0.33vh 0.66vh 1.2vh black)",
+        zIndex: 2,
+        top: "8vh",
+        left: "63vw",
+        height: "19.45vh",
+        width: "9vw",
         transform: "scale(0)"
     },
     board: {
@@ -41,7 +51,7 @@ const useStyles = makeStyles((theme) => ({
             width: "0.6vw",
             marginRight: "0.65vw"
         },
-        marginLeft: "2vw",
+        height: "2vh",
         marginTop: "12vh"
     },
     active: {
@@ -50,6 +60,13 @@ const useStyles = makeStyles((theme) => ({
     },
     feedback: {
         height: "49.75vh"
+    },
+    prompt: {
+        "& label": {
+            padding: "0 10vw",
+            marginTop: "6vh"
+        },
+        height: "43.75vh"
     },
     noFeedback: {
         "& label": {
@@ -110,12 +127,12 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const Feedback = ({ module, onClose }) => {
-    const isRated = module === "tell-us-about-you";
+const Feedback = ({ alt, module, onClose, onStart }) => {
+    const isRated = module === "voice-your-values";
 
     const cls = useStyles();
 
-    const { feedback } = useContext(AppContext);
+    const { data: { feedback, prompt, session_id } } = useContext(AppContext);
 
     const [active, setActive] = useState(0);
 
@@ -138,7 +155,7 @@ const Feedback = ({ module, onClose }) => {
             })
             .add({
                 targets: "#animal",
-                top: "2vh",
+                top: alt ? "0.6vh" : "2vh",
                 scale: [0, 1],
                 easing: "easeOutQuint",
                 duration: 2000
@@ -151,53 +168,88 @@ const Feedback = ({ module, onClose }) => {
     }, [active]);
 
     const handleClick = () => {
-        if (!feedback.length)
-            handleClose();
-        else if (feedback[active].question_type === 2 && !selected.length)
-            toast.error("You must select one option.");
-        else if (feedback[active].question_type === 3 && !selected.length)
-            toast.error("You must select one or multiple option.");
-        else if (feedback[active].question_type === 4 && !score)
-            toast.error("You must select a level.");
-        else {
-            saveFeedback(module, {
-                id: feedback[active].id,
-                answer: feedback[active].question_type === 1 ? [answer] : (feedback[active].question_type === 4 ? [score] : selected)
-            });
-
-            if (active === feedback.length - 1)
+        if (alt) {
+            if (!prompt.length)
                 handleClose();
             else {
-                anime
-                    .timeline()
-                    .add({
-                        targets: "#feedback",
-                        opacity: [1, 0],
-                        easing: "linear",
-                        duration: 250,
-                        complete: () => {
-                            setActive(active + 1);
-                            setAnswer("");
-                            setScore(0);
-                            setSelected([]);
-                        }
-                    })
-                    .add({
-                        targets: "#feedback",
-                        opacity: [0, 1],
-                        easing: "linear",
-                        duration: 250
-                    });
+                sendPrompt(module, {
+                    session_id,
+                    id: prompt[active].id
+                });
+
+                if (active === prompt.length - 1)
+                    handleClose();
+                else {
+                    anime
+                        .timeline()
+                        .add({
+                            targets: "#prompt",
+                            opacity: [1, 0],
+                            easing: "linear",
+                            duration: 250,
+                            complete: () => {
+                                setActive(active + 1);
+                            }
+                        })
+                        .add({
+                            targets: "#prompt",
+                            opacity: [0, 1],
+                            easing: "linear",
+                            duration: 250
+                        });
+                }
+            }
+        }
+        else {
+            if (!feedback.length)
+                handleClose(true);
+            else {
+                saveFeedback(module, {
+                    session_id,
+                    id: feedback[active].id,
+                    answer: feedback[active].question_type === 1 ? [answer] : (feedback[active].question_type === 4 ? [score] : selected)
+                });
+
+                if (active === feedback.length - 1)
+                    handleClose(true);
+                else {
+                    anime
+                        .timeline()
+                        .add({
+                            targets: "#feedback",
+                            opacity: [1, 0],
+                            easing: "linear",
+                            duration: 250,
+                            complete: () => {
+                                setActive(active + 1);
+                                setAnswer("");
+                                setScore(0);
+                                setSelected([]);
+                            }
+                        })
+                        .add({
+                            targets: "#feedback",
+                            opacity: [0, 1],
+                            easing: "linear",
+                            duration: 250
+                        });
+                }
             }
         }
     }
 
-    const handleClose = () => {
+    const handleClose = (flag) => {
         anime({
             targets: "#board6",
             top: "110vh",
             easing: "easeInQuint",
-            duration: 2000
+            duration: 2000,
+            begin: () => {
+                flag && onClose();
+            },
+            complete: () => {
+                !flag && onStart();
+            }
         });
         anime({
             targets: "#animal",
@@ -205,11 +257,10 @@ const Feedback = ({ module, onClose }) => {
             easing: "easeInQuint",
             duration: 2000
         });
-        onClose();
     }
 
     const handleInput = (event) => {
-        setAnswer(event.target.value.trim());
+        setAnswer(event.target.value);
     }
 
     const handleSelect = (id) => () => {
@@ -224,18 +275,20 @@ const Feedback = ({ module, onClose }) => {
     }
 
     return <div>
-        <img className={cls.animal} id="animal" src={require(`../assets/animals/Animal_${isRated ? 4 : 3}.png`)} />
+        <img className={alt ? cls.animal2 : cls.animal} id="animal" src={require(`../assets/animals/Animal_${alt ? 5 : isRated ? 4 : 3}.png`)} />
         <div className={cls.board} id="board6">
             <div className={cls.pagination}>
-                {Array(feedback.length).fill().map((_, i) => {
+                {Array(alt ? prompt.length : feedback.length).fill().map((_, i) => {
                     return <svg className={active === i ? cls.active : ""} key={i} viewBox="0 0 13 13">
                         <circle cx="6.5" cy="6.5" r="6.5" />
                     </svg>
                 })}
             </div>
-            {feedback.length ? (show ? <div id="feedback">
+            {alt ? <div className={cls.prompt} id="prompt">
+                <CILabel>{prompt.length ? prompt[active].prompt : ""}</CILabel>
+            </div> : (feedback.length ? (show ? <div id="feedback">
                 <CILabel className={clsx(cls.question, feedback[active].options.length === 2 && cls.questionAlt)}>{feedback[active].question}</CILabel>
-                {feedback[active].question_type === 1 ? <CIInput className={cls.input} onChange={handleInput} placeholder="Answer" value={answer} /> : (feedback[active].question_type === 4 ? <div className={cls.ratingContainer}>
+                {feedback[active].question_type === 1 ? <CIInput autoFocus className={cls.input} onChange={handleInput} placeholder="Answer" value={answer} /> : (feedback[active].question_type === 4 ? <div className={cls.ratingContainer}>
                     <Rating active={score >= 1} className={cls.rating} id="1" onClick={handleScore(1)} />
                     <Rating active={score >= 2} className={cls.rating} id="2" onClick={handleScore(2)} />
                     <Rating active={score >= 3} className={cls.rating} id="3" onClick={handleScore(3)} />
@@ -279,8 +332,8 @@ const Feedback = ({ module, onClose }) => {
                 </Fragment>)}
             </div> : <div className={cls.feedback} />) : <div className={cls.noFeedback}>
                 <CILabel>No Feedback required.</CILabel>
-            </div>}
-            <CIButton className={cls.button} onClick={handleClick}>{(!feedback.length || active === feedback.length - 1) ? "Close" : "Next"}</CIButton>
+            </div>)}
+            <CIButton className={cls.button} onClick={handleClick}>{((alt ? !prompt.length : !feedback.length) || active === (alt ? prompt.length : feedback.length) - 1) ? "Close" : "Next"}</CIButton>
         </div>
     </div>
 }

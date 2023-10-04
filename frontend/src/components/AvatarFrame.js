@@ -1,8 +1,8 @@
 import { useEffect } from "react";
 import { makeStyles } from "@material-ui/core";
+import { anime } from "../libs/utils";
 import FrameImg from "../assets/images/Frame.png";
 import FrameAltImg from "../assets/images/Frame-alt.png";
-import anime from "animejs";
 import clsx from "clsx";
 
 const useStyles = makeStyles({
@@ -70,14 +70,6 @@ const useStyles = makeStyles({
         position: "relative",
         transform: "scale(0)"
     },
-    shadow: {
-        position: "absolute",
-        rotate: "52deg",
-        zIndex: -1,
-        width: "24vw",
-        top: "2vh",
-        left: "-14vw"
-    },
     worm: {
         position: "absolute",
         height: "4.37vh",
@@ -96,7 +88,7 @@ const useStyles = makeStyles({
         top: "-0.6vh",
         left: "11vw",
         rotate: "20deg"
-    },
+    }
 });
 
 const AvatarFrame = (props) => {
@@ -129,65 +121,6 @@ const AvatarFrame = (props) => {
             <path d="M7.41228 16.0013C6.03744 15.64 4.0415 17.995 5.38017 19.3622C6.72486 20.7354 8.79918 16.3507 7.41228 16.0013Z" fill="#543615" />
             <path d="M15.8453 17.7479C17.196 18.2358 17.4975 21.3015 15.6162 21.6629C13.7288 22.0363 14.5247 17.2601 15.8453 17.7479Z" fill="#543615" />
         </svg>
-        {props.active && <svg className={cls.shadow} viewBox="0 0 670 601">
-            <g filter="url(#filter0_f_382_265)">
-                <g clipPath="url(#clip0_382_265)">
-                    <g filter="url(#filter1_dd_382_265)">
-                        <circle cx="357" cy="244" r="157" fill="#F8F8F8" />
-                    </g>
-                    <g opacity="0.8" filter="url(#filter2_f_382_265)">
-                        <ellipse cx="155.166" cy="153.239" rx="155.166" ry="153.239" transform="matrix(-0.288205 -0.957569 0.936518 -0.35062 254.352 352.88)" fill="#FFE073" />
-                    </g>
-                    <g opacity="0.8" filter="url(#filter3_f_382_265)">
-                        <ellipse cx="131.665" cy="127.538" rx="131.665" ry="127.538" transform="matrix(-0.482888 -0.875682 0.798496 -0.602 237.129 377.583)" fill="#FFC700" />
-                    </g>
-                    <g opacity="0.8" filter="url(#filter4_f_382_265)">
-                        <path d="M509.384 21.507C579.172 78.5824 526.023 365.966 499.035 347.08C482.571 335.559 463.107 238.103 411.425 196.338C378.387 169.64 319.237 189.122 281.563 191.877C184.956 198.942 439.015 -36.0445 509.384 21.507Z" fill="#FF5C00" />
-                    </g>
-                </g>
-            </g>
-            <defs>
-                <filter id="filter0_f_382_265" x="0" y="-113" width="714" height="714" filterUnits="userSpaceOnUse" colorInterpolationFilters="sRGB">
-                    <feFlood floodOpacity="0" result="BackgroundImageFix" />
-                    <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
-                    <feGaussianBlur stdDeviation="100" result="effect1_foregroundBlur_382_265" />
-                </filter>
-                <filter id="filter1_dd_382_265" x="188" y="77" width="338" height="338" filterUnits="userSpaceOnUse" colorInterpolationFilters="sRGB">
-                    <feFlood floodOpacity="0" result="BackgroundImageFix" />
-                    <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha" />
-                    <feOffset dy="2" />
-                    <feGaussianBlur stdDeviation="6" />
-                    <feComposite in2="hardAlpha" operator="out" />
-                    <feColorMatrix type="matrix" values="0 0 0 0 0.6875 0 0 0 0 0.744318 0 0 0 0 1 0 0 0 0.06 0" />
-                    <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_382_265" />
-                    <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha" />
-                    <feOffset dy="1" />
-                    <feGaussianBlur stdDeviation="1" />
-                    <feComposite in2="hardAlpha" operator="out" />
-                    <feColorMatrix type="matrix" values="0 0 0 0 0.549757 0 0 0 0 0.610463 0 0 0 0 0.929167 0 0 0 0.05 0" />
-                    <feBlend mode="normal" in2="effect1_dropShadow_382_265" result="effect2_dropShadow_382_265" />
-                    <feBlend mode="normal" in="SourceGraphic" in2="effect2_dropShadow_382_265" result="shape" />
-                </filter>
-                <filter id="filter2_f_382_265" x="178.785" y="-31.4721" width="348.715" height="364.082" filterUnits="userSpaceOnUse" colorInterpolationFilters="sRGB">
-                    <feFlood floodOpacity="0" result="BackgroundImageFix" />
-                    <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
-                    <feGaussianBlur stdDeviation="12" result="effect1_foregroundBlur_382_265" />
-                </filter>
-                <filter id="filter3_f_382_265" x="131.316" y="22.9717" width="288.145" height="325.072" filterUnits="userSpaceOnUse" colorInterpolationFilters="sRGB">
-                    <feFlood floodOpacity="0" result="BackgroundImageFix" />
-                    <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
-                    <feGaussianBlur stdDeviation="12" result="effect1_foregroundBlur_382_265" />
-                </filter>
-                <filter id="filter4_f_382_265" x="235.924" y="-11.5777" width="331.994" height="383.547" filterUnits="userSpaceOnUse" colorInterpolationFilters="sRGB">
-                    <feFlood floodOpacity="0" result="BackgroundImageFix" />
-                    <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
-                    <feGaussianBlur stdDeviation="12" result="effect1_foregroundBlur_382_265" />
-                </filter>
-                <clipPath id="clip0_382_265">
-                    <rect x="200" y="87" width="314" height="314" rx="100" fill="white" />
-                </clipPath>
-            </defs>
-        </svg>}
         <div className={clsx(cls.container, "pointer")}>
             <img className={clsx(cls.avatar, cls[`avatar_${props.avatar}`], "pointer")} src={require(`../assets/avatars/xs/Avatar_${props.avatar}.png`)} />
         </div>

@@ -1,3 +1,4 @@
+import uuid
 from datetime import datetime
 from django.contrib.auth import get_user_model
 from django.utils.http import urlsafe_base64_decode
@@ -5,6 +6,8 @@ from django.utils.encoding import force_text
 from django.shortcuts import render
 from django.db import IntegrityError
 from django.core.exceptions import ObjectDoesNotExist
+from django.conf import settings
+from django.core.mail import EmailMessage
 from rest_framework.viewsets import ModelViewSet, ViewSet, ReadOnlyModelViewSet
 from rest_framework.response import Response
 from rest_framework import status, generics
@@ -14,20 +17,30 @@ from rest_framework.authtoken.serializers import AuthTokenSerializer
 from rest_framework.authtoken.models import Token
 from rest_framework import generics, status
 from rest_framework.response import Response
-from home.utils import encrypt_payload
+from rest_framework.exceptions import ValidationError
+from home.utils import encrypt_payload, generate_signed_url
+from home.tasks import generate_and_send_theme_pdf
 from users.models import (  Profile, 
                             EmailVerification, 
                             PasswordResetSession, 
                             PrivacyPolicy, 
                             TermAndCondition, 
-                            FishGameTrial,
                             Question,
                             ActivityFeedback,
                             AnswerOption,
                             ParticipantResponse,
                             RankedQualities,
                             IndividualRankingQualitiesScore,
+                            IncentiveRangeSelection,
+                            FishGameDistribution,
+                            TreeShakingDistributionTrials,
+                            DynamicPrompt,
+                            DynamicPromptResponse,
+                            PurchaseHistory,
+                            ThemeImage,
                         )
+
+
 from home.api.v1.serializers import (
     SignupSerializer,
     UserDetailsSerializer,
@@ -40,8 +53,9 @@ from home.api.v1.serializers import (
     FishGameTrialSerializer,
     QuestionSerializer,
     QuestionAnswerSerializer,
-    RankedQualitiesSerializer,
     TreeShakingGameTrialSerializer,
+    ThemeSerializer,
+    BuyThemeSerializer,
 )
 
 
@@ -208,6 +222,12 @@ class ProfileAPIView(APIView):
         return Response({'profile': encrypted_payload}, status=status.HTTP_200_OK)
 
     def post(self, request, *args, **kwargs):
+        try:
+            profile = Profile.objects.get(participant=request.user)
+            return Response({'error': 'Profile already exists.'}, status=status.HTTP_400_BAD_REQUEST)
+        except Profile.DoesNotExist:
+            pass
+
         serializer = UserProfileSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
@@ -323,25 +343,6 @@ class TermAndConditionViewSet(ReadOnlyModelViewSet):
             return Response(serializer.data)
         
         return Response(status=status.HTTP_400_BAD_REQUEST)
-    
-
-class FishGameTrialAPIView(generics.ListCreateAPIView):
-    queryset = FishGameTrial.objects.all()
-    serializer_class = FishGameTrialSerializer
-    permission_classes = [IsAuthenticated]
-
-    def perform_create(self, serializer):
-        serializer.save(participant=self.request.user)
-
-    def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
-        
-        if serializer.is_valid():
-            return Response(status=status.HTTP_200_OK)
-        else:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 class ActivityFeedbackViewSet(APIView):
@@ -351,7 +352,7 @@ class ActivityFeedbackViewSet(APIView):
         try:
             return ActivityFeedback.objects.get(activity_type=activity_type)
         except ActivityFeedback.DoesNotExist:
-            raise ObjectDoesNotExist('Activity feedback not found.')
+            raise ValidationError('Activity feedback not found.', code=status.HTTP_400_BAD_REQUEST)
         
     def get_question(self, question_id):
         try:
@@ -360,16 +361,19 @@ class ActivityFeedbackViewSet(APIView):
             raise ObjectDoesNotExist('Question not found.')
 
     def get(self, request, activity_type=None):
-        activity_feedback = self.get_activity_feedback(activity_type)
+        try:
+            activity_feedback = self.get_activity_feedback(activity_type)
+        except ValidationError as e:
+            return Response({}, status=status.HTTP_400_BAD_REQUEST)
         
-        if activity_type == 'tell-us-about-you':
+        if activity_type == 'voice-your-values':
             questions = activity_feedback.questions.filter(question_type='rating').order_by('questionorder__order')
         else:
             questions = activity_feedback.questions.order_by('questionorder__order')
         
         filtered_questions = []
         for question in questions:
-            if activity_type == 'tell-us-about-you':
+            if activity_type == 'voice-your-values':
                 if question.question_type == 'rating':
                     filtered_questions.append(question)
             else:
@@ -385,25 +389,34 @@ class ActivityFeedbackViewSet(APIView):
         return Response(serializer.data)
 
     def post(self, request, activity_type=None):
-        activity_feedback = self.get_activity_feedback(activity_type)
+        try:
+            activity_feedback = self.get_activity_feedback(activity_type)
+        except ValidationError as e:
+            return Response({}, status=status.HTTP_400_BAD_REQUEST)
+        
         serializer = QuestionAnswerSerializer(data=request.data, context={'participant': request.user})
         
         if serializer.is_valid():
             question_id = serializer.validated_data['id']
             answer = serializer.validated_data['answer']
+            session_id = serializer.validated_data['session_id']
 
             question = self.get_question(question_id)
             
-            if activity_type == 'tell-us-about-you':
+            if activity_type == 'voice-your-values':
                 if question.question_type == 'rating':
-                    score = int(answer[0])
-                    participant_score = IndividualRankingQualitiesScore(
-                        participant=request.user,
-                        question=question,
-                        score=score,
-                    )
-                    participant_score.save()
-                    return Response({'detail': 'Response submitted successfully.'}, status=status.HTTP_200_OK)
+                    score = int(answer[0]) if answer else None
+                    if score is not None:  
+                        participant_score = IndividualRankingQualitiesScore(
+                            participant=request.user,
+                            question=question,
+                            score=score,
+                            session_id=session_id,
+                        )
+                        participant_score.save()
+                        return Response({'detail': 'Response submitted successfully.'}, status=status.HTTP_200_OK)
+                    else:
+                        return Response({'error': 'Invalid score provided.'}, status=status.HTTP_400_BAD_REQUEST)
                 else:
                     return Response({'error': 'Invalid question type for this activity type.'}, status=status.HTTP_400_BAD_REQUEST)
             else:
@@ -414,6 +427,7 @@ class ActivityFeedbackViewSet(APIView):
                         activity_feedback=activity_feedback,
                         question=question,
                         text_answer=text_answer,
+                        session_id=session_id,
                     )
                     participant_response.save()
                 else:
@@ -421,6 +435,7 @@ class ActivityFeedbackViewSet(APIView):
                         participant=request.user,
                         activity_feedback=activity_feedback,
                         question=question,
+                        session_id=session_id
                     )
                     participant_response.save()
 
@@ -445,16 +460,48 @@ class RankedQualitiesAPIView(APIView):
                 quality = ranked_quality['id']
                 category = ranked_quality['category']
                 rank = ranked_quality['rank']
+                session_id = ranked_quality['session_id']
 
                 if quality not in dict(RankedQualities.quality_choices):
                     return Response(f"Invalid quality choice: {quality}", status=status.HTTP_400_BAD_REQUEST)
 
-                RankedQualities.objects.create(participant=user, quality=quality, category=category, rank=rank)
+                RankedQualities.objects.create(participant=user, quality=quality, category=category, rank=rank, session_id=session_id)
         except Exception as e:
             return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
 
         return Response("Ranked qualities saved successfully.", status=status.HTTP_200_OK)
     
+
+class FishGameTrialAPIView(APIView):
+    serializer_class = FishGameTrialSerializer
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        participant = request.user
+        stakes_type = IncentiveRangeSelection.objects.latest('id').stake_level_selected
+        fish_distribution = FishGameDistribution.objects.get(stake_level=stakes_type)
+        stakes_min = fish_distribution.min
+        stakes_max = fish_distribution.max
+        participant_shell = participant.shells
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            serializer.save(participant=participant, stakes_type=stakes_type,stakes_min=stakes_min, stakes_max= stakes_max, participant_shell=participant_shell )
+            user = request.user
+            data = serializer.validated_data
+            if data['match'] == True:
+                user.shells += data['shell']
+                user.save()
+            
+            user_detail_serializer = UserDetailsSerializer(user)
+            payload=encrypt_payload(user_detail_serializer.data)
+            response_data = {
+                'user': payload
+            }
+            return Response(response_data, status=status.HTTP_200_OK) 
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
 
 class TreeShakingGameTrialView(APIView):
     serializer_class = TreeShakingGameTrialSerializer
@@ -462,16 +509,207 @@ class TreeShakingGameTrialView(APIView):
 
     def post(self, request):
         participant = request.user
+        stakes_type = IncentiveRangeSelection.objects.latest('id').stake_level_selected
+        tree_shaking_distribution = tree_shaking_distributions = TreeShakingDistributionTrials.objects.filter(tree_game_level__stake_level=stakes_type)
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
-            serializer.save(participant=participant)
-            return Response(status=status.HTTP_200_OK) 
+            serializer.save(participant=participant, stakes_type=stakes_type)
+            user = request.user
+            data = serializer.validated_data
+            if data['response'] == True:
+                number = data['shell'] - data['shared_shell']
+                user.shells += number
+                user.save()
+            user_detail_serializer = UserDetailsSerializer(user)
+            payload=encrypt_payload(user_detail_serializer.data)
+            response_data = {
+                'user': payload
+            }
+            return Response(response_data, status=status.HTTP_200_OK) 
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
+class DataGenerateView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, activity_name):
+        response_data = {'session_id': str(uuid.uuid4())}
+
+        if activity_name == 'theme':
+            themes = ThemeImage.objects.all()
+            serializer = ThemeSerializer(themes, many=True)
+            response_data['themes'] = serializer.data
+
+        else:
+            try:
+                latest_stake_selection = IncentiveRangeSelection.objects.latest('id')
+                stake_level = latest_stake_selection.stake_level_selected
+            except IncentiveRangeSelection.DoesNotExist:
+                return Response({'error': 'Incentive range doesn\'t exist'}, status=status.HTTP_400_BAD_REQUEST)
+
+            if activity_name == 'fish-mind-reading':
+                try:
+                    fish_distribution = FishGameDistribution.objects.get(stake_level=stake_level)
+                    response_data['min'] = fish_distribution.min
+                    response_data['max'] = fish_distribution.max
+                except FishGameDistribution.DoesNotExist:
+                    response_data['min'] = 0
+                    response_data['max'] = 0
+
+            elif activity_name == 'tree-shaking':
+                tree_shaking_distributions = TreeShakingDistributionTrials.objects.filter(tree_game_level__stake_level=stake_level)
+                trials = [{'self': entry.self_distribution, 'partner': entry.partner_distribution} for entry in tree_shaking_distributions]
+
+                # Ensure exactly 24 trials or pad with zeros
+                trials += [{'self': 0, 'partner': 0}] * (24 - len(trials))
+                trials = trials[:24]
+                response_data['trials'] = trials
+
+            elif activity_name == 'voice-your-values':
+                pass
+
+            else:
+                return Response({'error': 'Invalid activity name'}, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response(response_data)
+    
+
+class DynamicPromptAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+    def get(self, request, activity_name):
+        try:
+            activity = ActivityFeedback.objects.get(activity_type=activity_name)
+            prompts = DynamicPrompt.objects.filter(activity=activity, is_active=True)
+            data = [{'id': prompt.id, 'prompt_text': prompt.prompt_text} for prompt in prompts]
+            return Response(data)
+        except ActivityFeedback.DoesNotExist:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+    def post(self, request, activity_name):
+        try:
+            activity = ActivityFeedback.objects.get(activity_type=activity_name)
+            data = request.data
+            prompt_id = data.get('id')
+            session_id = data.get('session_id')
+            
+            if not prompt_id or not session_id:
+                return Response({'error': 'Both id and session_id are required.'}, status=status.HTTP_400_BAD_REQUEST)
+            
+            try:
+                prompt = DynamicPrompt.objects.get(id=prompt_id, activity=activity)
+            except DynamicPrompt.DoesNotExist:
+                return Response({'error': 'Prompt not found for the given activity and id.'}, status=status.HTTP_404_NOT_FOUND)
+
+            DynamicPromptResponse.objects.create(dynamic_prompt=prompt, session_id=session_id)   
+
+            return Response(status=status.HTTP_200_OK)
+        except ActivityFeedback.DoesNotExist:
+            return Response(status=status.HTTP_400_BAD_REQUEST) 
+        
+
+class BuyThemeView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        serializer = BuyThemeSerializer(data=request.data)
+        if serializer.is_valid():
+            session_id = serializer.validated_data['session_id']
+            theme_image_id = serializer.validated_data['theme_id']
+            theme_image = ThemeImage.objects.get(title=theme_image_id)
+
+            try:
+                theme_image = ThemeImage.objects.get(title=theme_image_id)
+            except ThemeImage.DoesNotExist:
+                return Response({'error': 'Theme not found'}, status=status.HTTP_400_BAD_REQUEST)    
+
+            user = request.user
+            if PurchaseHistory.objects.filter(participant=user, theme_purchased=theme_image).exists():
+                return Response({'detail': 'You have already purchased this theme.'}, status=status.HTTP_400_BAD_REQUEST)
+
+            if user.shells < theme_image.price:
+                return Response({'detail': 'You do not have enough shells to purchase this theme.'}, status=status.HTTP_400_BAD_REQUEST)
+
+            purchase_record = PurchaseHistory(
+                session_id=uuid.uuid4(),
+                participant=user,
+                theme_purchased=theme_image,
+                purchase_cost=theme_image.price,
+                participant_shell_at_purchase=user.shells,
+            )
+            purchase_record.save()
+
+            user.shells -= theme_image.price
+            user.save()
+
+            user.purchased_themes.add(theme_image)
+            user.save()
+
+            signed_url = generate_signed_url(user.avatar_id, theme_image_id, image_type='color')
+
+            user_detail_serializer = UserDetailsSerializer(user)
+            payload=encrypt_payload(user_detail_serializer.data)
+
+            if signed_url:
+                return Response({'url': signed_url, 'user': payload}, status=status.HTTP_200_OK)
+            else:
+                Response({"error":"Object not found"}, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+
+class ThemeDetailsAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def user_has_purchased_theme(self, user, theme):
+        return user.purchased_themes.filter(title=theme.title).exists()
+
+    def get(self, request):
+        theme_id = request.query_params.get('theme_id')
+
+        try:
+            theme_image = ThemeImage.objects.get(title=theme_id)
+        except ThemeImage.DoesNotExist:
+            return Response({'error': 'Theme not found'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        user = request.user
+        if not self.user_has_purchased_theme(user, theme_image):
+            return Response({'error': 'You have not purchased this theme'}, status=status.HTTP_400_BAD_REQUEST)
+
+        signed_url = generate_signed_url(request.user.avatar_id, theme_id, image_type='color')
+
+        if signed_url:
+            return Response({'url': signed_url}, status=status.HTTP_200_OK)
+        else:
+            return Response({'error': 'Failed to generate signed URL'}, status=status.HTTP_400_BAD_REQUEST)
 
 
+class SendThemeAsPdfView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get_theme(self, theme_id):
+        return ThemeImage.objects.filter(title=theme_id).first()
+    
+    def user_has_purchased_theme(self, user, theme):
+        return user.purchased_themes.filter(title=theme.title).exists()
+
+    def post(self, request, theme_id):
+        try:
+            theme = self.get_theme(theme_id)
+            if not theme:
+                return Response({'error': 'Theme not found'}, status=status.HTTP_404_NOT_FOUND)
+            
+            user = request.user
+            if not self.user_has_purchased_theme(user, theme):
+                return Response({'error': 'You have not purchased this theme'}, status=status.HTTP_400_BAD_REQUEST)
+
+            generate_and_send_theme_pdf.delay(user.id, theme_id)
+ 
+
+            return Response({'message': 'Email sent successfully'}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
 
 
 

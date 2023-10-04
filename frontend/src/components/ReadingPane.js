@@ -1,26 +1,31 @@
 import { useEffect, useState } from "react";
 import { makeStyles } from "@material-ui/core";
 import { useHistory } from "react-router-dom";
+import { anime } from "../libs/utils";
 import { privacy, terms } from "../services/v1";
 import { showLoginBoard } from "../libs/animations";
 import ReactHtmlParser from "react-html-parser";
 import BoardImg from "../assets/images/Board-lg.png";
 import CILabel from "../shared/CILabel";
 import CIButton from "../shared/CIButton";
-import anime from "animejs";
 import clsx from "clsx";
 
 const useStyles = makeStyles((theme) => ({
     guide: {
         position: "absolute",
-        top: "33.5vh",
+        filter: "drop-shadow(0.33vh 0.66vh 1.2vh black)",
+        top: "34.5vh",
         left: "-30vw",
-        height: "88vh",
-        width: "30vw",
+        height: "66.2vh",
+        width: "22vw",
         transform: "scaleX(-1)"
+    },
+    guide2: {
+        top: "35.75vh",
     },
     board: {
         position: "absolute",
+        filter: "drop-shadow(0.33vh 0.66vh 1.2vh black)",
         top: "1.5vh",
         left: "110vw",
         height: "94vh",
@@ -48,13 +53,15 @@ const useStyles = makeStyles((theme) => ({
         "&::-webkit-scrollbar-track": {
             background: "transparent"
         },
+        fontFamily: "Summer Show",
+        fontSize: "2.6vh",
         textAlign: "left",
-        margin: "2vh 5vw 1vh 7vw",
+        margin: "2vh 5vw -4vh 7vw",
         height: "62.3vh",
         overflowY: "scroll"
     },
     button: {
-        marginTop: "2vh",
+        marginTop: "7vh",
         marginLeft: "2vw"
     }
 }));
@@ -97,7 +104,7 @@ const ReadingPane = () => {
     }
 
     return <div>
-        <img className={cls.guide} id="guide" src={require(`../assets/avatars/Avatar_${pageType ? 4 : 5}.png`)} />
+        <img className={clsx(cls.guide, !pageType && cls.guide2)} id="guide" src={require(`../assets/avatars/Avatar_${pageType ? 4 : 5}.png`)} />
         <div className={cls.board} id="board3">
             <CILabel className={cls.title}>
                 {pageType ? "Terms & Conditions" : "Privacy Policy"}

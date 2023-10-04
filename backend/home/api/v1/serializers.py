@@ -13,6 +13,7 @@ from users.models import (  ConsentAccessCode,
                             AnswerOption,
                             RankedQualities,
                             TreeShakingGameTrial,
+                            ThemeImage,
                         )
 
 
@@ -83,28 +84,39 @@ class UserSerializer(serializers.ModelSerializer):
         return user
 
 
+
 class UserDetailsSerializer(serializers.ModelSerializer):
+    themes = serializers.SerializerMethodField()
     class Meta:
         model = User
-        fields = ['username','age', 'avatar_id', 'consent_status', 'detail_status', 'consent_email']
+        fields = ['username','age', 'avatar_id', 'consent_email',  'consent_status', 'detail_status', 'shells', 'themes' ]
+
+    def get_themes(self, obj):
+        purchased_themes_titles = list(obj.purchased_themes.values_list('title', flat=True))
+        return purchased_themes_titles
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Profile
-        fields = ['birth_month', 'birth_year', 'nationality', 'gender', 'zipcode' ]
+        fields = ['birth_month', 'birth_year', 'nationality', 'gender', 'zipcode']
 
-    
+    def to_internal_value(self, data):
+        data['birth_month'] = data.get('birth_month') or None
+        data['birth_year'] = data.get('birth_year') or None
+        return super().to_internal_value(data)
+
     def validate_birth_month(self, value):
-        if not 1 <= value <= 12:
-            raise serializers.ValidationError('Birth month should be between 1 and 12.')
+        if value is not None and not 1 <= int(value) <= 12:
+            raise serializers.ValidationError('Birth month should be between 1 and 12 or leave it empty.')
         return value
 
     def validate_birth_year(self, value):
-        current_year = date.today().year
-        if current_year - value >= 18:
-            raise serializers.ValidationError('Users must be below 18 years old')
+        if value is not None:
+            current_year = date.today().year
+            if current_year - int(value) >= 18:
+                raise serializers.ValidationError('Users must be below 18 years old or leave it empty.')
         return value
 
 
@@ -144,11 +156,6 @@ class TermAndConditionSerializer(serializers.ModelSerializer):
         fields = ('body', 'author', 'created_at', 'updated_at')
 
 
-class FishGameTrialSerializer(serializers.ModelSerializer):
-    participant = serializers.PrimaryKeyRelatedField(read_only=True)
-    class Meta:
-        model = FishGameTrial
-        fields = ['id','participant', 'trial_number', 'match', 'trial_response_time']
 
 
 class AnswerOptionSerializer(serializers.ModelSerializer):
@@ -200,7 +207,8 @@ class QuestionSerializer(serializers.ModelSerializer):
 
 class QuestionAnswerSerializer(serializers.Serializer):
     id = serializers.IntegerField()
-    answer = serializers.ListField(child=serializers.CharField())
+    answer = serializers.ListField(child=serializers.CharField(allow_blank=True), required=False )
+    session_id = serializers.UUIDField()
 
     def validate(self, data):
         question_id = data.get('id')
@@ -211,24 +219,19 @@ class QuestionAnswerSerializer(serializers.Serializer):
         except Question.DoesNotExist:
             raise serializers.ValidationError('Question not found.')
 
+        valid_answer_option_ids = question.answer_options.values_list('id', flat=True)
+
         if question.question_type == 'text_input':
-            if len(answer) != 1:
-                raise serializers.ValidationError('Invalid answer. Only one answer is allowed for text type question.')
-        elif question.question_type == 'dropdown':
-            if len(answer) != 1:
-                raise serializers.ValidationError('Invalid answer. Please select one option for dropdown type question.')
-            valid_answer_option_ids = question.answer_options.values_list('id', flat=True)
-            if not set(answer).issubset(set(str(opt_id) for opt_id in valid_answer_option_ids)):
-                raise serializers.ValidationError('Invalid answer. Answer options are not valid for dropdown question.')
-        elif question.question_type == 'multiple_choice':
-            valid_answer_option_ids = question.answer_options.values_list('id', flat=True)
-            if not set(answer).issubset(set(str(opt_id) for opt_id in valid_answer_option_ids)):
-                raise serializers.ValidationError('Invalid answer. Some answer options are not valid for multiple choice question.')
+            if len(answer) > 1:
+                raise serializers.ValidationError(f'Invalid answer. Blank or One Answer is allowed for text type question.')
+        
+        elif question.question_type == 'dropdown' or question.question_type == 'multiple_choice':
+            if  len(answer) != 0 and not set(answer).issubset(set(str(opt_id) for opt_id in valid_answer_option_ids)) :
+                raise serializers.ValidationError('Invalid answer. Answer options are not valid for question.')
+
         elif question.question_type == 'rating':
-            if len(answer) != 1:
-                raise serializers.ValidationError('Invalid answer. Only one answer is allowed for rating type question.')
-            if int(answer[0]) not in range(1, 11):
-                raise serializers.ValidationError(f'Invalid answer {answer[0]}. Only answers in the range 1-10 are acceptable.')
+            if len(answer) != 0 and int(answer[0]) not in range(0, 6):
+                raise serializers.ValidationError(f'Invalid answer {answer[0]}. Only answers in the range 1-5 are acceptable.')
         else:
             raise serializers.ValidationError('Invalid question type.')
 
@@ -238,13 +241,42 @@ class QuestionAnswerSerializer(serializers.Serializer):
 class RankedQualitiesSerializer(serializers.ModelSerializer):
     class Meta:
         model = RankedQualities
-        fields = ['id', 'category', 'rank']
+        fields = ['id', 'category', 'rank', 'session_id']
 
+class FishGameTrialSerializer(serializers.ModelSerializer):
+    participant = serializers.PrimaryKeyRelatedField(read_only=True)
+    class Meta:
+        model = FishGameTrial
+        fields = ['id','participant', 'trial_number', 'match', 'trial_response_time', 'shell', 'number', 'session_id']
+
+    def validate_trial_response_time(self, value):
+        return round(value / 1000, 2)
 
 class TreeShakingGameTrialSerializer(serializers.ModelSerializer):
+    
     class Meta:
         model = TreeShakingGameTrial
-        fields = ['trial_number', 'shell', 'shared_shell', 'response', 'trial_response_time']
+        fields = ['trial_number', 'shell', 'shared_shell', 'response', 'trial_response_time', 'session_id']
+
+    def validate_trial_response_time(self, value):
+        return round(value / 1000, 2)
+    
 
 
+class BuyThemeSerializer(serializers.Serializer):
+    theme_id = serializers.IntegerField()
+    session_id = serializers.CharField()
 
+
+class ThemeDetailsSerializer(serializers.Serializer):
+    theme_id = serializers.IntegerField()
+
+
+class ThemeSerializer(serializers.ModelSerializer):
+    id = serializers.SerializerMethodField()
+
+    def get_id(self, obj):
+        return obj.title 
+    class Meta:
+        model = ThemeImage
+        fields = ['id', 'name', 'price', 'description']

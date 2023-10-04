@@ -1,18 +1,63 @@
+import { useContext, useEffect } from "react";
 import { makeStyles } from "@material-ui/core";
+import { anime, usePrevious } from "../libs/utils";
+import { AppContext } from "../App";
 import { Howl } from "howler";
-import anime from "animejs";
 import clsx from "clsx";
+import $ from "jquery";
 
-const useStyles = makeStyles({
+const useStyles = makeStyles((theme) => ({
+    label: {
+        fill: theme.palette.primary.main,
+        fontFamily: "Summer Show",
+        dominantBaseline: "middle",
+        textAnchor: "middle",
+        translate: "50% 46%"
+    },
+    size1: {
+        fontSize: "300%"
+    },
+    size2: {
+        fontSize: "237%"
+    },
+    size3: {
+        fontSize: "175%"
+    },
+    size4: {
+        fontSize: "131%"
+    },
+    size5: {
+        fontSize: "112%"
+    },
     svg: {
+        filter: "drop-shadow(0.33vh 0.66vh 0.8vh black)",
         height: "10vh",
         outline: "none",
         zIndex: 2
     }
-});
+}));
 
 const CIShell = (props) => {
     const cls = useStyles();
+
+    const { user: { shells } } = useContext(AppContext);
+
+    const prevShells = usePrevious(shells);
+
+    const animeObj = { shells };
+
+    useEffect(() => {
+        anime({
+            targets: animeObj,
+            shells: [prevShells, shells],
+            round: 1,
+            easing: "linear",
+            duration: 400,
+            update: () => {
+                $(`#${props.id} text`).html(animeObj.shells);
+            }
+        });
+    }, [shells]);
 
     const handleClick = () => {
         new Howl({
@@ -27,7 +72,7 @@ const CIShell = (props) => {
     }
 
     return <svg className={clsx(cls.svg, props.className, "pointer")} id={props.id} onClick={handleClick} viewBox="0 0 100 111" data-tooltip-id="tooltip"
-        data-tooltip-content="Your Shells">
+        data-tooltip-content={shells + " Shells"}>
         <path className="pointer" opacity="0.3" d="M99.9987 58.4266C100.196 86.8848 77.9741 110.112 50.3618 110.305C22.7459 110.498 0.198183 87.5852 0.00134455 59.1252C-0.19904 30.667 22.0242 7.43836 49.6383 7.24684C77.2506 7.05178 99.7965 29.9666 99.9987 58.4266Z" fill="black" />
         <path className="pointer" d="M99.9987 51.1792C100.196 79.6374 77.9741 102.864 50.3618 103.058C22.7459 103.253 0.198183 80.3396 0.00134455 51.8796C-0.19904 23.4214 22.0242 0.192754 49.6383 0.0012362C77.2506 -0.193829 99.7965 22.721 99.9987 51.1792Z" fill="#552800" />
         <path className="pointer" d="M9.66767 26.1043C8.11779 30.8053 22.5863 22.6924 48.5973 23.5489C74.6119 24.4019 83.7125 22.8644 85.1436 19.6919C86.5782 16.5213 72.131 4.76061 57.8115 2.33649C43.4937 -0.0840905 16.6457 4.90957 9.66767 26.1043Z" fill="#A85C09" />
@@ -55,6 +100,7 @@ const CIShell = (props) => {
         <path className="pointer" opacity="0.5" fillRule="evenodd" clipRule="evenodd" d="M67.4998 74.2486C66.318 75.1792 33.9816 75.6873 32.8683 74.4256C32.4972 73.9974 32.3716 72.3246 32.3716 70.2922L32.4287 70.1894C32.4287 70.1894 32.9311 73.5007 33.9245 73.9803C34.9293 74.4655 59.0103 75.4818 64.0172 73.4208C66.7919 72.2732 67.6654 69.2817 67.888 66.8439C68.0365 70.4349 68.0365 73.8261 67.4998 74.2486Z" fill="url(#paint8_linear_1620_9489)" />
         <path className="pointer" opacity="0.5" fillRule="evenodd" clipRule="evenodd" d="M39.9312 70.9032C39.2746 70.5664 31.6986 66.6157 26.5946 58.229C26.332 57.7951 26.0694 57.3669 25.8296 56.9045C23.9742 53.2963 22.4498 49.711 22.1758 44.8468C22.1758 44.8468 23.2605 49.1229 26.0808 54.8035C26.2635 55.1746 26.4519 55.5514 26.6574 55.9339C29.4949 61.3347 33.7881 67.3522 39.9312 70.9032Z" fill="url(#paint9_linear_1620_9489)" />
         <path className="pointer" opacity="0.5" fillRule="evenodd" clipRule="evenodd" d="M77.6392 40.7133C77.3823 42.4545 77.0455 44.0988 76.6459 45.6574C76.6459 45.6631 76.6459 45.6631 76.6459 45.6688C76.1377 47.6555 75.5212 49.4939 74.8361 51.1952C74.3965 52.2742 73.934 53.2905 73.443 54.261C73.2946 54.5579 73.1462 54.849 72.992 55.1345C67.5741 65.2682 59.8382 69.276 59.5071 69.4416C65.4788 65.1597 69.8292 58.5999 72.7694 52.8337C72.9749 52.4341 73.169 52.0402 73.3574 51.6519V51.6462C73.9226 50.4816 74.4307 49.3569 74.8817 48.3007C75.5554 46.725 76.0978 45.3091 76.5203 44.1387C77.2796 42.0264 77.6392 40.7133 77.6392 40.7133Z" fill="url(#paint10_linear_1620_9489)" />
+        <text className={clsx(cls.label, cls["size" + animeObj.shells.toString().length], "pointer")} />
         <defs>
             <linearGradient id="paint0_linear_1620_9489" x1="50.1739" y1="75.1793" x2="50.1739" y2="57.8184" gradientUnits="userSpaceOnUse">
                 <stop stopColor="#D5A7C9" />

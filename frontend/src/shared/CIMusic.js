@@ -1,12 +1,13 @@
 import { useContext, useEffect } from "react";
 import { makeStyles } from "@material-ui/core";
+import { anime } from "../libs/utils";
 import { AppContext } from "../App";
 import { Howl } from "howler";
-import anime from "animejs";
 import clsx from "clsx";
 
 const useStyles = makeStyles({
     svg: {
+        filter: "drop-shadow(0.33vh 0.66vh 0.8vh black)",
         height: "10vh",
         outline: "none"
     }
@@ -41,8 +42,10 @@ const CIMusic = (props) => {
                 howler.module_1.fade(howler.module_1.volume(), 0, 1000);
             else if (window.location.pathname.includes("/tree-shaking"))
                 howler.module_2.fade(howler.module_2.volume(), 0, 1000);
-            else if (window.location.pathname.includes("/tell-us-about-you"))
+            else if (window.location.pathname.includes("/voice-your-values"))
                 howler.module_3.fade(howler.module_3.volume(), 0, 1000);
+            else if (window.location.pathname.includes("/shop"))
+                howler.shop.fade(howler.shop.volume(), 0, 1000);
             else
                 howler.welcome.fade(howler.welcome.volume(), 0, 1000);
         }
@@ -51,8 +54,10 @@ const CIMusic = (props) => {
                 howler.module_1.fade(0, 1, 1000);
             else if (window.location.pathname.includes("/tree-shaking"))
                 howler.module_2.fade(0, 1, 1000);
-            else if (window.location.pathname.includes("/tell-us-about-you"))
+            else if (window.location.pathname.includes("/voice-your-values"))
                 howler.module_3.fade(0, 1, 1000);
+            else if (window.location.pathname.includes("/shop"))
+                howler.shop.fade(0, 1, 1000);
             else
                 howler.welcome.fade(0, 1, 1000);
         setBGM(!BGM);
