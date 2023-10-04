@@ -9,3 +9,8 @@ services:
     image: postgres:12
   redis:
     image: redis:5
+  celery-worker:
+    depends_on:
+      - web
+      - redis
+    

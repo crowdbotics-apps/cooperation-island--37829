@@ -86,12 +86,12 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class UserDetailsSerializer(serializers.ModelSerializer):
-    theme = serializers.SerializerMethodField()
+    themes = serializers.SerializerMethodField()
     class Meta:
         model = User
-        fields = ['username','age', 'avatar_id', 'consent_email',  'consent_status', 'detail_status', 'shells', 'theme' ]
+        fields = ['username','age', 'avatar_id', 'consent_email',  'consent_status', 'detail_status', 'shells', 'themes' ]
 
-    def get_theme(self, obj):
+    def get_themes(self, obj):
         purchased_themes_titles = list(obj.purchased_themes.values_list('title', flat=True))
         return purchased_themes_titles
 

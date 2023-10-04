@@ -18,7 +18,8 @@ from rest_framework.authtoken.models import Token
 from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError
-from home.utils import encrypt_payload, generate_signed_url, convert_image_to_pdf
+from home.utils import encrypt_payload, generate_signed_url
+from home.tasks import generate_and_send_theme_pdf
 from users.models import (  Profile, 
                             EmailVerification, 
                             PasswordResetSession, 
@@ -607,7 +608,6 @@ class DynamicPromptAPIView(APIView):
             return Response(status=status.HTTP_400_BAD_REQUEST) 
         
 
-
 class BuyThemeView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -679,10 +679,9 @@ class ThemeDetailsAPIView(APIView):
         signed_url = generate_signed_url(request.user.avatar_id, theme_id, image_type='color')
 
         if signed_url:
-            return Response({'signed_url': signed_url}, status=status.HTTP_200_OK)
+            return Response({'url': signed_url}, status=status.HTTP_200_OK)
         else:
             return Response({'error': 'Failed to generate signed URL'}, status=status.HTTP_400_BAD_REQUEST)
-
 
 
 class SendThemeAsPdfView(APIView):
@@ -694,27 +693,6 @@ class SendThemeAsPdfView(APIView):
     def user_has_purchased_theme(self, user, theme):
         return user.purchased_themes.filter(title=theme.title).exists()
 
-    def convert_and_attach_pdf(self, user, theme, image_type):
-        image_url = generate_signed_url(user.avatar_id, theme.title, image_type=image_type)
-        pdf_data = convert_image_to_pdf(image_url)
-        return pdf_data
-
-    def send_pdf_email(self, request, user, theme, color_pdf_data, outline_pdf_data):
-        subject = 'Your Theme Images as PDFs'
-        message = 'Here are your theme images as PDF attachments.'
-
-        email = EmailMessage(
-            subject=subject,
-            body=message,
-            from_email=settings.DEFAULT_FROM_EMAIL,  
-            to=[user.email],  
-        )
-
-        email.attach(f'theme_{theme.get_title_display()}_colored.pdf', color_pdf_data, 'application/pdf')
-        email.attach(f'theme_{theme.get_title_display()}_outline.pdf', outline_pdf_data, 'application/pdf')
-
-        email.send()
-
     def post(self, request, theme_id):
         try:
             theme = self.get_theme(theme_id)
@@ -725,10 +703,8 @@ class SendThemeAsPdfView(APIView):
             if not self.user_has_purchased_theme(user, theme):
                 return Response({'error': 'You have not purchased this theme'}, status=status.HTTP_400_BAD_REQUEST)
 
-            # color_pdf_data = self.convert_and_attach_pdf(request.user, theme, 'color')
-            # outline_pdf_data = self.convert_and_attach_pdf(request.user, theme, 'outline')
-
-            # self.send_pdf_email(request, request.user, theme, color_pdf_data, outline_pdf_data)
+            generate_and_send_theme_pdf.delay(user.id, theme_id)
+ 
 
             return Response({'message': 'Email sent successfully'}, status=status.HTTP_200_OK)
         except Exception as e:

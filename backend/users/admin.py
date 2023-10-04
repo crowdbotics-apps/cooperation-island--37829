@@ -36,6 +36,7 @@ from .utils import (
                     export_treeshaking_trials_csv,
                     export_profile_csv,
                     export_scores_csv,
+                    export_purchase_history_csv,
                 )
 
 User = get_user_model()
@@ -226,7 +227,7 @@ class IndividualRankingQualitiesScoreAdmin(admin.ModelAdmin):
 
 @admin.register(TreeShakingGameTrial)
 class TreeShakingGameTrialAdmin(admin.ModelAdmin):
-    list_display = ['participant', 'trial_number', 'shell', 'shared_shell', 'response', 'trial_response_time', 'created_at' ]
+    list_display = ['participant','session_id','stakes_type','participant_shell', 'trial_number', 'shell', 'shared_shell', 'response', 'trial_response_time', 'created_at' ]
     actions = ['export_selected_trials_csv']
     list_filter = [
         ('created_at'),
@@ -331,5 +332,21 @@ class ThemeImageAdmin(admin.ModelAdmin):
 
 @admin.register(PurchaseHistory)
 class PurchaseHistoryAdmin(admin.ModelAdmin):
-    list_display=['participant','theme_purchased','purchase_cost','participant_shell_at_purchase','purchased_at']
+    list_display=['participant','original_participant_id','theme_purchased','purchase_cost','participant_shell_at_purchase','purchased_at']
     list_filter=['theme_purchased','purchased_at']
+    actions = ['export_selected_purchase_history_csv']
+
+    def export_selected_purchase_history_csv(self, request, queryset):
+        return export_purchase_history_csv(request, queryset=queryset, modeladmin=self)
+
+    export_selected_purchase_history_csv.short_description = 'Export selected purchase history as CSV'
+
+    def changelist_view(self, request, extra_context=None):
+        if extra_context is None:
+            extra_context = {}
+
+        if self.model == PurchaseHistory:
+            extra_context['export_csv_url'] = reverse('users:export-purchase-history-csv')
+
+        return super().changelist_view(request, extra_context=extra_context)
+

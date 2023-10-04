@@ -1,6 +1,7 @@
 import csv
 import datetime
 from django.http import HttpResponse
+from django.db.models import Q
 from .models import (
                         FishGameTrial, 
                         RankedQualities, 
@@ -8,12 +9,13 @@ from .models import (
                         Profile, 
                         IndividualRankingQualitiesScore, 
                         ActivityFeedback,
+                        PurchaseHistory
                     )
 
 
 
-def export_fishgame_trials_csv(request, queryset=None, modeladmin=None):
 
+def export_fishgame_trials_csv(request, queryset=None, modeladmin=None):
     if queryset is None:
         queryset = FishGameTrial.objects.all()
 
@@ -22,71 +24,75 @@ def export_fishgame_trials_csv(request, queryset=None, modeladmin=None):
 
     writer = csv.writer(response)
 
-    participants = queryset.values_list('participant__id', 'original_participant_id').distinct().order_by('participant__id')
     trials = FishGameTrial.objects.values_list('trial_number', flat=True).distinct().order_by('trial_number')
 
-    header = ['participantID']
+    header = ['participantID', 'sessionID', 'stakesType', 'stakesMin', 'stakesMax']
     for trial_number in trials:
-        header.append(f'trial{trial_number}_number')
-        header.append(f'trial{trial_number}_response')
-        header.append(f'trial{trial_number}_responsetime')
+        header.extend([
+            f'trial{trial_number}_timestamp',
+            f'trial{trial_number}_numberDisplayed',
+            f'trial{trial_number}_incentive',
+            f'trial{trial_number}_participantShells',
+            f'trial{trial_number}_response',
+            f'trial{trial_number}_responsetime'
+        ])
+
     writer.writerow(header)
 
-    participant_responses = {}
+    participants_sessions = queryset.values_list('participant__id', 'original_participant_id', 'session_id').distinct().order_by('participant__id', 'session_id')
 
-    for participant_id, original_participant_id in participants:
+    for participant_id, original_participant_id, session_id in participants_sessions:
         if participant_id:
-            participant_responses[participant_id] = {
+            participant_data = {
                 'participantID': participant_id,
+                'sessionID': session_id,
             }
         elif original_participant_id:
-            participant_responses[original_participant_id] = {
+            participant_data = {
                 'participantID': original_participant_id,
+                'sessionID': session_id,
+            }
+        else:
+            continue  
+
+        participant_trials = queryset.filter(Q(participant__id=participant_id) | Q(original_participant_id=original_participant_id), session_id=session_id).order_by('trial_number')
+
+        if participant_trials.exists():
+            participant_data['stakesType'] = participant_trials[0].stakes_type
+            participant_data['stakesMin'] = participant_trials[0].stakes_min
+            participant_data['stakesMax'] = participant_trials[0].stakes_max
+
+        trial_data = {}
+        for trial_number in range(1, 25):
+            trial_data[trial_number] = {
+                'timestamp': '',
+                'numberDisplayed': '',
+                'incentive': '',
+                'participantShells': '',
+                'response': '',
+                'responsetime': ''
             }
 
-    for trial in queryset:
-        participant_id = trial.participant.id if trial.participant else trial.original_participant_id
-        trial_number = trial.trial_number
+        for trial in participant_trials:
+            trial_number = trial.trial_number
+            trial_data[trial_number]['timestamp'] = trial.created_at
+            trial_data[trial_number]['numberDisplayed'] = trial.number
+            trial_data[trial_number]['incentive'] = trial.shell
+            trial_data[trial_number]['participantShells'] = trial.participant_shell
+            trial_data[trial_number]['response'] = 'match' if trial.match else 'nomatch'
+            trial_data[trial_number]['responsetime'] = trial.trial_response_time
 
-        if trial_number == 1:
-            participant_data = participant_responses.get(participant_id)
-            if participant_data:
-                data_row = [participant_data['participantID']]
-                for trial_num in trials:
-                    trial_data = participant_data.get(trial_num)
-                    if trial_data:
-                        data_row.append(trial_data['number'])
-                        data_row.append(trial_data['response'])
-                        data_row.append(trial_data['responsetime'])
-                    else:
-                        data_row.append('')
-                        data_row.append('')
-                        data_row.append('')
-                writer.writerow(data_row)
+        data_row = [participant_data['participantID'], participant_data['sessionID']]
+        if participant_data.get('stakesType'):
+            data_row.extend([participant_data['stakesType'], participant_data['stakesMin'], participant_data['stakesMax']])
+        else:
+            data_row.extend(['', '', ''])
 
-            participant_responses[participant_id] = {
-                'participantID': participant_id,
-            }
-
-        if trial_number not in participant_responses[participant_id]:
-            participant_responses[participant_id][trial_number] = {
-                'number': trial_number,
-                'response': 'match' if trial.match else 'nomatch',
-                'responsetime': trial.trial_response_time,
-            }
-
-    for participant_id, participant_data in participant_responses.items():
-        data_row = [participant_data['participantID']]
-        for trial_number in trials:
-            trial_data = participant_data.get(trial_number)
-            if trial_data:
-                data_row.append(trial_data['number'])
-                data_row.append(trial_data['response'])
-                data_row.append(trial_data['responsetime'])
-            else:
-                data_row.append('')
-                data_row.append('')
-                data_row.append('')
+        for trial_number in range(1, 25):
+            trial_info = trial_data[trial_number]
+            data_row.extend([trial_info['timestamp'], trial_info['numberDisplayed'], trial_info['incentive'],
+                             trial_info['participantShells'], trial_info['response'], trial_info['responsetime']])
+        
         writer.writerow(data_row)
 
     return response
@@ -104,92 +110,97 @@ def export_treeshaking_trials_csv(request, queryset=None, modeladmin=None):
 
     writer = csv.writer(response)
 
-    participants = queryset.values_list('participant__id', 'original_participant_id').distinct().order_by('participant__id')
+    header = ['participantID', 'sessionID', 'stakesType']
     trials = TreeShakingGameTrial.objects.values_list('trial_number', flat=True).distinct().order_by('trial_number')
-
-    header = ['participantID']
+    
     for trial_number in trials:
-        header.append(f'trial{trial_number}_type')
-        header.append(f'trial{trial_number}_denominator')
-        header.append(f'trial{trial_number}_answer')
-        header.append(f'trial{trial_number}_responsetime')
+        header.extend([
+            f'trial{trial_number}_timestamp',
+            f'trial{trial_number}_numberDisplayed',
+            f'trial{trial_number}_divisionType',
+            f'trial{trial_number}_denominator',
+            f'trial{trial_number}_selfDistribution',
+            f'trial{trial_number}_partnerDistribution',
+            f'trial{trial_number}_participantShells',
+            f'trial{trial_number}_answer',
+            f'trial{trial_number}_responsetime'
+        ])
+
     writer.writerow(header)
 
-    participant_responses = {}
+    participants_sessions = queryset.values_list('participant__id', 'original_participant_id', 'session_id', 'stakes_type').distinct().order_by('participant__id', 'session_id')
 
-    for participant_id, original_participant_id in participants:
+    for participant_id, original_participant_id, session_id, stakes_type in participants_sessions:
         if participant_id:
-            participant_responses[participant_id] = {
+            participant_data = {
                 'participantID': participant_id,
+                'sessionID': session_id,
+                'stakesType': stakes_type,
             }
         elif original_participant_id:
-            participant_responses[original_participant_id] = {
+            participant_data = {
                 'participantID': original_participant_id,
+                'sessionID': session_id,
+                'stakesType': stakes_type,
+            }
+        else:
+            continue 
+
+        trial_data = {}
+        for trial_number in range(1, 25):
+            trial_data[trial_number] = {
+                'timestamp': '',
+                'numberDisplayed': '',
+                'divisionType': '',
+                'denominator': '',
+                'selfDistribution': '',
+                'partnerDistribution': '',
+                'participantShells': '',
+                'answer': '',
+                'responsetime': ''
             }
 
-    for trial in queryset:
-        participant_id = trial.participant.id if trial.participant else trial.original_participant_id
-        trial_number = trial.trial_number
+        for trial in queryset.filter(participant__id=participant_id, session_id=session_id).order_by('trial_number'):
+            trial_number = trial.trial_number
+            trial_data[trial_number]['timestamp'] = trial.created_at
+            trial_data[trial_number]['numberDisplayed'] = trial.trial_number
+            trial_data[trial_number]['denominator'] = trial.shell
+            trial_data[trial_number]['selfDistribution'] = trial.shell - trial.shared_shell
+            trial_data[trial_number]['partnerDistribution'] = trial.shared_shell
+            trial_data[trial_number]['participantShells'] = trial.participant_shell
+            trial_data[trial_number]['answer'] = 'accept' if trial.response else 'reject'
+            trial_data[trial_number]['responsetime'] = trial.trial_response_time
 
-        if trial_number == 1:
-            participant_data = participant_responses.get(participant_id)
-            if participant_data:
-                data_row = [participant_data['participantID']]
-                for trial_num in trials:
-                    trial_data = participant_data.get(trial_num)
-                    if trial_data:
-                        data_row.append(trial_data['type'])
-                        data_row.append(trial_data['denominator'])
-                        data_row.append(trial_data['answer'])
-                        data_row.append(trial_data['responsetime'])
-                    else:
-                        data_row.append('')
-                        data_row.append('')
-                        data_row.append('')
-                        data_row.append('')
-                writer.writerow(data_row)
-
-            participant_responses[participant_id] = {
-                'participantID': participant_id,
-            }
-
-        trial_type = ''
-        if trial.shell > 0:
             ratio = trial.shared_shell / (trial.shell / 2)
             if ratio == 1:
-                trial_type = 'equal'
+                trial_data[trial_number]['divisionType'] = 'equal'
             elif ratio < 1:
-                trial_type = 'unequal_adv'
+                trial_data[trial_number]['divisionType'] = 'unequal_adv'
             elif ratio > 1:
-                trial_type = 'unequal_disadv'
+                trial_data[trial_number]['divisionType'] = 'unequal_disadv'
 
-        if trial_number not in participant_responses[participant_id]:
-            participant_responses[participant_id][trial_number] = {
-                'type': trial_type,
-                'denominator': trial.shell,
-                'answer': 'accept' if trial.response else 'reject',
-                'responsetime': trial.trial_response_time,
-            }
+        data_row = [participant_data['participantID'], participant_data['sessionID'], participant_data['stakesType']]
 
-    for participant_id, participant_data in participant_responses.items():
-        data_row = [participant_data['participantID']]
-        for trial_number in trials:
-            trial_data = participant_data.get(trial_number)
-            if trial_data:
-                data_row.append(trial_data['type'])
-                data_row.append(trial_data['denominator'])
-                data_row.append(trial_data['answer'])
-                data_row.append(trial_data['responsetime'])
-            else:
-                data_row.append('')
-                data_row.append('')
-                data_row.append('')
-                data_row.append('')
+        for trial_number in range(1, 25):
+            trial_info = trial_data[trial_number]
+            data_row.extend([
+                trial_info['timestamp'],
+                trial_info['numberDisplayed'],
+                trial_info['divisionType'],
+                trial_info['denominator'],
+                trial_info['selfDistribution'],
+                trial_info['partnerDistribution'],
+                trial_info['participantShells'],
+                trial_info['answer'],
+                trial_info['responsetime']
+            ])
+
         writer.writerow(data_row)
 
     return response
 
 export_treeshaking_trials_csv.short_description = 'Export selected trials as CSV'
+
 
 
 def export_rankedqualities_csv(request, queryset=None, modeladmin=None):
@@ -326,4 +337,64 @@ def export_profile_csv(request, queryset=None, modeladmin=None):
         zipcode = profile.zipcode
         writer.writerow([participant, age if age is not None else '', nationality, gender, zipcode])
 
+import csv
+
+def export_purchase_history_csv(request, queryset=None, modeladmin=None):
+    if queryset is None:
+        queryset = PurchaseHistory.objects.all()
+
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="purchase_history.csv"'
+
+    writer = csv.writer(response)
+
+    header = ['participantID']
+    for i in range(1, 10):
+        header.extend([
+            f'purchase{i}_timestamp',
+            f'purchase{i}_choice',
+            f'purchase{i}_cost',
+            f'purchase{i}_participantShells'
+        ])
+    writer.writerow(header)
+
+    participant_data = {}
+
+    for purchase in queryset.order_by('participant_id', 'purchased_at'):
+        participant_id = purchase.participant_id if purchase.participant else purchase.original_participant_id
+
+        if participant_id:
+            if participant_id not in participant_data:
+                participant_data[participant_id] = []
+
+            purchase_data = [
+                purchase.purchased_at,
+                purchase.theme_purchased.name,
+                purchase.purchase_cost,
+                purchase.participant_shell_at_purchase
+            ]
+            participant_data[participant_id].append(purchase_data)
+
+    for participant_id, purchases in participant_data.items():
+        data_row = [participant_id]
+
+        for i in range(1, 10):
+            if i <= len(purchases):
+                purchase_data = purchases[i - 1]
+                data_row.extend([
+                    purchase_data[0],  # purchase{i}_timestamp
+                    purchase_data[1],  # purchase{i}_choice
+                    purchase_data[2],  # purchase{i}_cost
+                    purchase_data[3],  # purchase{i}_participantShells
+                ])
+            else:
+                # Empty values for missing purchases
+                data_row.extend(['', '', '', ''])
+
+        writer.writerow(data_row)
+
     return response
+
+export_purchase_history_csv.short_description = 'Export Purchase History as CSV'
+
+
