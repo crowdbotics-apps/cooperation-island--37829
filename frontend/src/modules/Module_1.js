@@ -487,7 +487,6 @@ const Module_1 = () => {
                 duration: 500,
                 complete: () => {
                     setFeedback(true);
-                    setShells(anime.random(data.min, data.max));
                     hideBackdrop(false);
                     setStarted(true);
                 }
@@ -628,6 +627,7 @@ const Module_1 = () => {
         });
         setShow(true);
         setNumber(anime.random(1, 6));
+        setShells(anime.random(data.min, data.max));
     }
 
     const handleStart = () => {
