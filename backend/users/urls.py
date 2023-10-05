@@ -14,6 +14,7 @@ from .utils import (
                     export_profile_csv,
                     export_scores_csv,
                     export_purchase_history_csv,
+                    export_dynamic_prompt_responses_csv,
 )
 
 app_name = "users"
@@ -24,6 +25,7 @@ urlpatterns = [
     path('export-scores-csv/', export_scores_csv, name='export_scores_csv'),
     path('export-profiles-csv/', export_profile_csv, name='export_profiles_csv'),
     path('export-purchase-history-csv/', export_purchase_history_csv, name='export-purchase-history-csv'),
+    path('export-dynamic-prompt-responses-csv/', export_dynamic_prompt_responses_csv, name='export-dynamic-prompt-responses-csv'),
     # path('admin/users/fishgametrial/', FishGameTrialAdmin.as_view(model=FishGameTrial), name='fishgametrial-list'),
     # path("~redirect/", view=user_redirect_view, name="redirect"),
     # path("~update/", view=user_update_view, name="update"),
