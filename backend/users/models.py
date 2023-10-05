@@ -176,7 +176,7 @@ class PrivacyPolicy(models.Model):
         verbose_name_plural = 'Privacy Policy'
 
     def __str__(self):
-        truncated_text = self.body[:70] + '...' if len(self.prompt_text) > 70 else self.body
+        truncated_text = self.body[:70] + '...' if len(self.body) > 70 else self.body
         return f"Prompt: {truncated_text}"
 
 
@@ -188,7 +188,7 @@ class TermAndCondition(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        truncated_text = self.body[:70] + '...' if len(self.prompt_text) > 70 else self.body
+        truncated_text = self.body[:70] + '...' if len(self.body) > 70 else self.body
         return f"Prompt: {truncated_text}"
 
 
@@ -326,6 +326,7 @@ class RankedQualities(models.Model):
         return f"User: {participant_info}, Quality: {self.quality}, Rank: {self.rank}"
 
     class Meta:
+        verbose_name='Voice Your Values'
         verbose_name_plural = 'Voice Your Values'
 
     
@@ -458,8 +459,10 @@ class DynamicPrompt(models.Model):
         return f"Prompt: {truncated_text}"
 
     
-
 class DynamicPromptResponse(models.Model):
+    participant = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    original_participant_id = models.IntegerField(null=True, blank=True)
+    activity = models.ForeignKey(ActivityFeedback, on_delete=models.CASCADE, related_name='dynamic_prompt_responses')
     dynamic_prompt = models.ForeignKey(DynamicPrompt, on_delete=models.CASCADE)
     session_id = models.CharField(max_length=36)
     created_at = models.DateTimeField(auto_now_add=True)

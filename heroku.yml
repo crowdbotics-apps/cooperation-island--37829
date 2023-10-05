@@ -8,3 +8,10 @@ release:
   image: web
   command:
     - python3 manage.py migrate
+run:
+  worker:
+    command:
+      - celery -A cooperation_island_37829 worker -l INFO
+    image: web
+
+

@@ -37,6 +37,7 @@ from .utils import (
                     export_profile_csv,
                     export_scores_csv,
                     export_purchase_history_csv,
+                    export_dynamic_prompt_responses_csv,
                 )
 
 User = get_user_model()
@@ -48,7 +49,7 @@ class UserAdmin(auth_admin.UserAdmin):
     form = UserChangeForm
     add_form = UserCreationForm
     # fieldsets = (("User", {"fields": ("username",)}),) + auth_admin.UserAdmin.fieldsets
-    list_display = ['username', 'email', 'age', 'consent_status', 'date_joined']
+    list_display = ['username', 'email', 'age', 'avatar_id', 'consent_status', 'detail_status', 'shells', 'date_joined']
     search_fields = ('email','username')
     list_filter = [
         ('consent_status', admin.BooleanFieldListFilter),
@@ -75,7 +76,7 @@ class TermAndConditionAdmin(admin.ModelAdmin):
 
 @admin.register(FishGameTrial)
 class FishGameTrialAdmin(admin.ModelAdmin):
-    list_display = ['participant','stakes_type', 'trial_number', 'match', 'trial_response_time', 'shell', 'number', 'participant_shell','created_at']
+    list_display = ['participant','session_id','stakes_type', 'trial_number', 'match', 'trial_response_time', 'shell', 'number', 'participant_shell','created_at']
     list_filter = [
         ('created_at'),
     ]
@@ -147,7 +148,7 @@ class QuestionOrderInline(admin.TabularInline):
 @admin.register(ActivityFeedback)
 class ActivityFeedbackAdmin(admin.ModelAdmin):
     inlines = [QuestionOrderInline]
-    list_display = ['activity_type']
+    list_display = ['activity_type', 'created_at']
 
     def has_delete_permission(self, request, obj=None):
         return False
@@ -155,7 +156,7 @@ class ActivityFeedbackAdmin(admin.ModelAdmin):
 
 @admin.register(Question)
 class QuestionAdmin(admin.ModelAdmin):
-    list_display = ['question_text', 'question_type']
+    list_display = ['activity_feedback','question_text', 'question_type','created_at']
     list_filter = ['activity_feedback', 'question_type']
     search_fields = ['question_text']
     inlines = [AnswerOptionInline]
@@ -174,14 +175,14 @@ class QuestionOrderAdmin(admin.ModelAdmin):
 
 @admin.register(ParticipantResponse)
 class ParticipantResponseAdmin(admin.ModelAdmin):
-    list_display = ['participant', 'activity_feedback', 'question', 'text_answer']
+    list_display = ['participant','session_id', 'activity_feedback', 'question', 'text_answer','created_at']
     list_filter = [
         ('created_at'),
     ]
 
 @admin.register(RankedQualities)
 class RankedQualitiesAdmin(admin.ModelAdmin):
-    list_display = ['participant', 'quality', 'category', 'rank']
+    list_display = ['participant', 'session_id','quality', 'category', 'rank', 'created_at']
     actions = ['export_selected_rankedqualities_csv']
     list_filter = [
         ('created_at'),
@@ -190,7 +191,7 @@ class RankedQualitiesAdmin(admin.ModelAdmin):
     def export_selected_rankedqualities_csv(self, request, queryset):
         return export_rankedqualities_csv(request, queryset=queryset, modeladmin=self)
 
-    export_selected_rankedqualities_csv.short_description = 'Export selected ranked qualities as CSV'
+    export_selected_rankedqualities_csv.short_description = 'Export selected Voice Your Values as CSV'
 
     def changelist_view(self, request, extra_context=None):
         if extra_context is None:
@@ -204,7 +205,7 @@ class RankedQualitiesAdmin(admin.ModelAdmin):
 
 @admin.register(IndividualRankingQualitiesScore)
 class IndividualRankingQualitiesScoreAdmin(admin.ModelAdmin):
-    list_display = ['participant', 'question', 'score']
+    list_display = ['participant','session_id', 'question', 'score','created_at']
     actions = ['export_selected_scores_csv']
     list_filter = [
         ('created_at'),
@@ -213,7 +214,7 @@ class IndividualRankingQualitiesScoreAdmin(admin.ModelAdmin):
     def export_selected_scores_csv(self, request, queryset):
         return export_scores_csv(request, queryset=queryset, modeladmin=self)
 
-    export_selected_scores_csv.short_description = 'Export selected scores as CSV'
+    export_selected_scores_csv.short_description = 'Export selected Voice Your Values Ratings as CSV'
 
     def changelist_view(self, request, extra_context=None):
         if extra_context is None:
@@ -250,7 +251,7 @@ class TreeShakingGameTrialAdmin(admin.ModelAdmin):
 
 @admin.register(Profile)
 class ProfileAdmin(admin.ModelAdmin):
-    list_display = ['participant', 'birth_month', 'birth_year', 'nationality', 'gender', 'zipcode']
+    list_display = ['participant', 'birth_month', 'birth_year', 'nationality', 'gender', 'zipcode', 'created_at']
     actions = ['export_selected_profiles_csv']
     list_filter = [
         ('created_at'),
@@ -294,7 +295,7 @@ class FishGameDistributionAdmin(admin.ModelAdmin):
 
 @admin.register(IncentiveRangeSelection)
 class IncentiveRangeSelectionAdmin(admin.ModelAdmin):
-    list_display=['stake_level_selected', 'author', 'is_active']
+    list_display=['stake_level_selected', 'author', 'is_active','created_at']
     list_filter =['is_active', 'created_at']
 
     def has_delete_permission(self, request, obj=None):
@@ -303,7 +304,7 @@ class IncentiveRangeSelectionAdmin(admin.ModelAdmin):
 
 @admin.register(DynamicPrompt)
 class DynamicPromptAdmin(admin.ModelAdmin):
-    list_display = ['prompt_text', 'activity']
+    list_display = ['prompt_text', 'activity', 'is_active', 'created_at']
     list_filter = [
         ('activity'),
         ('is_active'),
@@ -312,8 +313,24 @@ class DynamicPromptAdmin(admin.ModelAdmin):
 
 @admin.register(DynamicPromptResponse)
 class DynamicPromptResponseAdmin(admin.ModelAdmin):
-    list_display = ['dynamic_prompt', 'created_at']
+    list_display = ['participant', 'session_id', 'activity', 'dynamic_prompt', 'created_at']
     search_fields= ['dynamic_prompt']
+    actions = ['export_dynamic_prompt_responses_csv']
+
+    def export_dynamic_prompt_responses_csv(self, request, queryset):
+        return export_dynamic_prompt_responses_csv(request, queryset=queryset, modeladmin=self)
+
+    export_dynamic_prompt_responses_csv.short_description = 'Export Dynamic Prompt Responses as CSV'
+
+    def changelist_view(self, request, extra_context=None):
+        if extra_context is None:
+            extra_context = {}
+
+        if self.model == DynamicPromptResponse:
+            extra_context['export_csv_url'] = reverse('users:export-dynamic-prompt-responses-csv')
+
+        return super().changelist_view(request, extra_context=extra_context)
+
 
 
 @admin.register(ThemeImage)
@@ -332,7 +349,7 @@ class ThemeImageAdmin(admin.ModelAdmin):
 
 @admin.register(PurchaseHistory)
 class PurchaseHistoryAdmin(admin.ModelAdmin):
-    list_display=['participant','original_participant_id','theme_purchased','purchase_cost','participant_shell_at_purchase','purchased_at']
+    list_display=['participant','session_id','theme_purchased','purchase_cost','participant_shell_at_purchase','purchased_at']
     list_filter=['theme_purchased','purchased_at']
     actions = ['export_selected_purchase_history_csv']
 

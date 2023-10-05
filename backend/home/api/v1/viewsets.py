@@ -601,7 +601,7 @@ class DynamicPromptAPIView(APIView):
             except DynamicPrompt.DoesNotExist:
                 return Response({'error': 'Prompt not found for the given activity and id.'}, status=status.HTTP_404_NOT_FOUND)
 
-            DynamicPromptResponse.objects.create(dynamic_prompt=prompt, session_id=session_id)   
+            DynamicPromptResponse.objects.create(dynamic_prompt=prompt, session_id=session_id, activity=activity, participant=request.user)   
 
             return Response(status=status.HTTP_200_OK)
         except ActivityFeedback.DoesNotExist:

@@ -8,10 +8,9 @@ from .models import (
                         TreeShakingGameTrial, 
                         Profile, 
                         IndividualRankingQualitiesScore, 
-                        ActivityFeedback,
-                        PurchaseHistory
+                        PurchaseHistory,
+                        DynamicPromptResponse,
                     )
-
 
 
 
@@ -97,7 +96,7 @@ def export_fishgame_trials_csv(request, queryset=None, modeladmin=None):
 
     return response
 
-export_fishgame_trials_csv.short_description = 'Export selected trials as CSV'
+export_fishgame_trials_csv.short_description = 'Export fish game trials as CSV'
 
 
 def export_treeshaking_trials_csv(request, queryset=None, modeladmin=None):
@@ -199,8 +198,7 @@ def export_treeshaking_trials_csv(request, queryset=None, modeladmin=None):
 
     return response
 
-export_treeshaking_trials_csv.short_description = 'Export selected trials as CSV'
-
+export_treeshaking_trials_csv.short_description = 'Export tree-shaking game trials as CSV'
 
 
 def export_rankedqualities_csv(request, queryset=None, modeladmin=None):
@@ -208,14 +206,14 @@ def export_rankedqualities_csv(request, queryset=None, modeladmin=None):
         queryset = RankedQualities.objects.all()
 
     response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = 'attachment; filename="rankedqualities.csv"'
+    response['Content-Disposition'] = 'attachment; filename="voice_your_values.csv"'
 
     writer = csv.writer(response)
 
     quality_choices = dict(RankedQualities.quality_choices)
     category_choices = dict(RankedQualities.category_choices)
 
-    header = ['participant']
+    header = ['participant', 'session_id', 'created_at']
     for category in category_choices.values():
         for quality in quality_choices.values():
             header.append(f'{category} - {quality}')
@@ -228,12 +226,16 @@ def export_rankedqualities_csv(request, queryset=None, modeladmin=None):
         quality = quality_choices[ranked_quality.quality]
         category = category_choices[ranked_quality.category]
         rank = ranked_quality.rank
+        session_id = ranked_quality.session_id
+        created_at = ranked_quality.created_at.strftime("%Y-%m-%d %H:%M:%S")
 
         if participant_id not in participant_rankings:
             if ranked_quality.participant:
                 participant_id = ranked_quality.participant.id
             participant_rankings[participant_id] = {
                 'participant': participant_id,
+                'session_id': session_id,
+                'created_at': created_at,
             }
 
         if category not in participant_rankings[participant_id]:
@@ -242,7 +244,7 @@ def export_rankedqualities_csv(request, queryset=None, modeladmin=None):
         participant_rankings[participant_id][category][quality] = rank
 
     for participant_id, participant_data in participant_rankings.items():
-        data_row = [participant_data['participant']]
+        data_row = [participant_data['participant'], participant_data['session_id'], participant_data['created_at']]
         for category in category_choices.values():
             for quality in quality_choices.values():
                 rank = participant_data.get(category, {}).get(quality, '')
@@ -251,7 +253,7 @@ def export_rankedqualities_csv(request, queryset=None, modeladmin=None):
 
     return response
 
-export_rankedqualities_csv.short_description = 'Export selected trials as CSV'
+export_rankedqualities_csv.short_description = 'Export Voice Your Values Ranking as CSV'
 
 
 def export_scores_csv(request, queryset=None, modeladmin=None):
@@ -259,7 +261,7 @@ def export_scores_csv(request, queryset=None, modeladmin=None):
         queryset = IndividualRankingQualitiesScore.objects.all()
 
     response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = 'attachment; filename="individual_ranking_qualities_scores.csv"'
+    response['Content-Disposition'] = 'attachment; filename="voice_your_values_ratings_scores.csv"'
 
     writer = csv.writer(response)
 
@@ -272,7 +274,7 @@ def export_scores_csv(request, queryset=None, modeladmin=None):
 
     tell_us_about_you_questions = list(unique_questions)
 
-    header = ['participant']
+    header = ['participant', 'session_id', 'created_at']
     header.extend(tell_us_about_you_questions)
     writer.writerow(header)
 
@@ -282,26 +284,29 @@ def export_scores_csv(request, queryset=None, modeladmin=None):
         participant_id = score.participant_id if score.participant else score.original_participant_id
         question_text = score.question.question_text if score.question else score.original_question_text
         score_value = score.score
+        session_id = score.session_id
+        created_at = score.created_at.strftime("%Y-%m-%d %H:%M:%S")
 
         if participant_id not in participant_data:
-            participant_data[participant_id] = {}
+            participant_data[participant_id] = {'session_id': session_id, 'created_at': created_at}
 
         if not question_text or question_text not in tell_us_about_you_questions:
-            question_text = score.original_question_text  # Get question_text from original_question_text
+            question_text = score.original_question_text
 
         if question_text:
+            if session_id != participant_data[participant_id]['session_id']:
+                participant_data[participant_id] = {'session_id': session_id, 'created_at': created_at}
             participant_data[participant_id][question_text] = score_value
 
     for participant_id, data in participant_data.items():
-        row = [participant_id]
+        row = [participant_id, data['session_id'], data['created_at']]
         for question in tell_us_about_you_questions:
             row.append(data.get(question, ''))
         writer.writerow(row)
 
     return response
 
-
-export_scores_csv.short_description = 'Export selected trials as CSV'
+export_scores_csv.short_description = 'Export Voice Your Values Ratings as CSV'
 
 
 def calculate_age(birth_month, birth_year):
@@ -324,20 +329,24 @@ def export_profile_csv(request, queryset=None, modeladmin=None):
 
     writer = csv.writer(response)
 
-    header = ['participant', 'age', 'nationality', 'gender', 'zipcode']
+    header = ['participant', 'age', 'nationality', 'gender', 'zipcode', 'created_at']
     writer.writerow(header)
 
     for profile in queryset:
-        participant = profile.participant.username
+        participant = profile.participant_id
         birth_month = profile.birth_month
         birth_year = profile.birth_year
         age = calculate_age(birth_month, birth_year)
         nationality = profile.nationality
         gender = profile.gender
         zipcode = profile.zipcode
-        writer.writerow([participant, age if age is not None else '', nationality, gender, zipcode])
+        created_at = profile.created_at
+        writer.writerow([participant, age if age is not None else '', nationality, gender, zipcode, created_at])
 
-import csv
+    return response
+
+export_profile_csv.short_description = 'Export User Profile data as CSV'
+
 
 def export_purchase_history_csv(request, queryset=None, modeladmin=None):
     if queryset is None:
@@ -398,3 +407,66 @@ def export_purchase_history_csv(request, queryset=None, modeladmin=None):
 export_purchase_history_csv.short_description = 'Export Purchase History as CSV'
 
 
+def export_dynamic_prompt_responses_csv(request, queryset=None, modeladmin=None):
+    if queryset is None:
+        queryset = DynamicPromptResponse.objects.all()
+
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="dynamic_prompt_responses.csv"'
+
+    writer = csv.writer(response)
+
+    header = ['participant_id', 'session_id', 'activity_name']
+    prompt_columns = {}
+    max_prompt_index = 0  
+
+    for dynamic_prompt_response in queryset:
+        participant_id = dynamic_prompt_response.participant_id if dynamic_prompt_response.participant else dynamic_prompt_response.original_participant_id
+        session_id = dynamic_prompt_response.session_id
+        dynamic_prompt_id = dynamic_prompt_response.dynamic_prompt_id
+
+        if dynamic_prompt_id not in prompt_columns:
+            prompt_columns[dynamic_prompt_id] = max_prompt_index + 1
+            max_prompt_index += 1
+
+    sorted_prompt_columns = sorted(prompt_columns.items(), key=lambda x: x[1])
+    prompt_columns = {prompt_id: index for index, (prompt_id, _) in enumerate(sorted_prompt_columns)}
+
+    for _, prompt_index in sorted_prompt_columns:
+        header.append(f'prompt-{prompt_index}')
+
+    writer.writerow(header)
+
+    participant_data = {}
+
+    for dynamic_prompt_response in queryset:
+        participant_id = dynamic_prompt_response.participant_id if dynamic_prompt_response.participant else dynamic_prompt_response.original_participant_id
+        session_id = dynamic_prompt_response.session_id
+        dynamic_prompt_id = dynamic_prompt_response.dynamic_prompt_id
+
+        if participant_id not in participant_data:
+            participant_data[participant_id] = {
+                'participant_id': participant_id,
+                'session_id': session_id,
+                'prompts': [''] * max_prompt_index  
+            }
+
+        prompt_index = prompt_columns.get(dynamic_prompt_id)
+        if prompt_index is not None:
+            if len(participant_data[participant_id]['prompts']) <= prompt_index:
+                participant_data[participant_id]['prompts'].extend([''] * (prompt_index - len(participant_data[participant_id]['prompts']) + 1))
+            participant_data[participant_id]['prompts'][prompt_index] = dynamic_prompt_response.dynamic_prompt.prompt_text
+
+    for participant_id, data in participant_data.items():
+        activity_name = '' 
+        dynamic_prompt_response = queryset.filter(participant_id=participant_id).first()
+        if dynamic_prompt_response:
+            activity_name = dynamic_prompt_response.activity.activity_type
+
+        row = [data['participant_id'], data['session_id'], activity_name]
+        row.extend(data['prompts'])
+        writer.writerow(row)
+
+    return response
+
+export_dynamic_prompt_responses_csv.short_description = 'Export Dynamic Prompt Responses as CSV'

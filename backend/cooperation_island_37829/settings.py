@@ -320,7 +320,7 @@ if GOOGLE_SERVICE_ACCOUNT_CONFIG:
 GS_BUCKET_NAME = env.str("GS_BUCKET_NAME", "")
 if GS_BUCKET_NAME:
     DEFAULT_FILE_STORAGE = "storages.backends.gcloud.GoogleCloudStorage"
-    STATICFILES_STORAGE = "storages.backends.gcloud.GoogleCloudStorage"
+    # STATICFILES_STORAGE = "storages.backends.gcloud.GoogleCloudStorage"
     GS_DEFAULT_ACL = "publicRead"
 
 
