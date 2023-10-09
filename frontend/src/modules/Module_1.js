@@ -627,12 +627,12 @@ const Module_1 = () => {
         });
         setShow(true);
         setNumber(anime.random(1, 6));
-        setShells(anime.random(data.min, data.max));
     }
 
     const handleStart = () => {
         setFeedback(false);
         setFlag(false);
+        setShells(anime.random(data.min, data.max));
 
         anime({
             targets: "#guide",
@@ -814,11 +814,13 @@ const Module_1 = () => {
                 duration: 2000
             })
                 .finished.then(() => {
+                    setShells(anime.random(data.min, data.max));
                     setFish(fishID + 1);
                     setTrial(trial + 1);
                     setResponse(true);
                     setShow(false);
                     setNumber(0);
+
                     anime({
                         targets: "#fish2",
                         scale: [0, 1],

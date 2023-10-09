@@ -128,7 +128,7 @@ export const formatUsername = (value, initial) => {
 }
 
 export const formatZipCode = (value, initial) => {
-    if (/[^0-9-]/.test(value))
+    if (/[^a-zA-Z0-9-]/.test(value))
         return initial;
     else
         return value.toUpperCase();

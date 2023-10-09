@@ -64,9 +64,9 @@ const PosterFrame = (props) => {
 
     const { user: { posters, shells } } = useContext(AppContext);
 
-    const isDisabled = props.shells > shells;
-
     const hideShells = posters.includes(props.id);
+
+    const isDisabled = !hideShells && props.shells > shells;
 
     const handleClick = () => {
         if (!isDisabled) {
