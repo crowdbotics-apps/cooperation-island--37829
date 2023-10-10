@@ -223,7 +223,15 @@ export const showShopPage = () => {
             height: "72vh",
             easing: "linear",
             duration: 1200
-        }, "-=4000");
+        }, "-=4000")
+        .add({
+            targets: "#board10",
+            scale: [0, 1],
+            duration: 1000,
+            begin: () => {
+                $("#backdrop").toggle();
+            }
+        }, "-=2000");
 }
 
 export const showHomePage = () => {
