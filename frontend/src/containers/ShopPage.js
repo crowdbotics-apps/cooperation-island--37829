@@ -158,7 +158,7 @@ const useStyles = makeStyles((theme) => ({
         position: "absolute",
         filter: "drop-shadow(0.33vh 0.66vh 1.2vh black)",
         top: "-12vh",
-        left: "94vw",
+        left: "85.3vw",
         height: "8.5vh",
         width: "4vw"
     },
@@ -166,7 +166,7 @@ const useStyles = makeStyles((theme) => ({
         position: "absolute",
         filter: "drop-shadow(0.33vh 0.66vh 1.2vh black)",
         top: "86vh",
-        left: "86vw",
+        left: "77.3vw",
         height: "8.88vh",
         width: "12vw",
         transform: "scale(0)"
@@ -391,10 +391,20 @@ const ShopPage = () => {
                 duration: 2000,
                 complete: () => {
                     $("#background").attr("src", posterURL);
+                    $("#background").css({
+                        marginLeft: "8.7vw",
+                        width: "82.6vw"
+                    });
                     hidePoster(true);
                     history.push("/poster");
                 }
             })
+            .add({
+                targets: "#container",
+                background: "#000",
+                easing: "linear",
+                duration: 2000,
+            }, "-=2000")
             .add({
                 targets: "#background",
                 opacity: 1,
