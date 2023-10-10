@@ -10,6 +10,8 @@ from .models import (
                         IndividualRankingQualitiesScore, 
                         PurchaseHistory,
                         DynamicPromptResponse,
+                        ParticipantResponse,
+                        Question,
                     )
 
 
@@ -470,3 +472,95 @@ def export_dynamic_prompt_responses_csv(request, queryset=None, modeladmin=None)
     return response
 
 export_dynamic_prompt_responses_csv.short_description = 'Export Dynamic Prompt Responses as CSV'
+
+
+def export_participant_responses_csv(request, queryset=None, modeladmin=None):
+    if queryset is None:
+        queryset = ParticipantResponse.objects.all()
+
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="participant_responses.csv"'
+
+    writer = csv.writer(response)
+
+    # Get distinct session_id and participant_id combinations
+    session_participant_combinations = queryset.distinct('session_id', 'participant__id', 'original_participant_id')
+
+    # Prepare the header row
+    header = ['participantID', 'sessionID']
+    question_headers = []
+    question_texts = []
+    question_types = []
+
+    for combination in session_participant_combinations:
+        if combination.participant:
+            participant_id = combination.participant.id
+        else:
+            participant_id = combination.original_participant_id
+        session_id = combination.session_id
+        participant_responses = queryset.filter(
+            Q(participant__id=participant_id) |
+            Q(original_participant_id=combination.original_participant_id),
+            session_id=combination.session_id
+        ).order_by('question__id')
+
+        for idx, response_data in enumerate(participant_responses, start=1):
+            question = response_data.question
+            question_type = question.question_type if question else 'Unknown'
+            question_text = question.question_text if question else response_data.original_question_text
+            header.append(f'question-type-{idx}')
+            question_types.append(question_type)
+            header.append(f'question-text-{idx}')
+            question_texts.append(question_text)
+            header.append(f'answer-{idx}')
+
+    writer.writerow(header)
+
+    for combination in session_participant_combinations:
+        if combination.participant:
+            participant_id = combination.participant.id
+        else:
+            participant_id = combination.original_participant_id
+        session_id = combination.session_id
+        participant_responses = queryset.filter(
+            Q(participant__id=participant_id) |
+            Q(original_participant_id=combination.original_participant_id),
+            session_id=combination.session_id
+        ).order_by('question__id')
+
+        data_row = [participant_id, session_id]
+        current_question_type = None
+        current_question_text = None
+        current_answers = []
+
+        for response_data in participant_responses:
+            question = response_data.question
+            question_type = question.question_type if question else 'Unknown'
+            question_text = question.question_text if question else response_data.original_question_text
+
+            if question_type == 'rating':
+                continue
+
+            if question_type != current_question_type or question_text != current_question_text:
+                if current_question_type:
+                    data_row.append(', '.join(current_answers))
+                current_question_type = question_type
+                current_question_text = question_text
+                current_answers = []
+
+            if question_type == 'text_input':
+                current_answers.append(response_data.text_answer)
+            elif question_type in ('multiple_choice', 'dropdown'):
+                answer_options = response_data.answer_options.all()
+                if answer_options:
+                    answer_texts = [option.option_text for option in answer_options]
+                    current_answers.append(', '.join(answer_texts))
+
+        if current_question_type:
+            data_row.append(', '.join(current_answers))
+
+        writer.writerow(data_row)
+
+    return response
+
+export_participant_responses_csv.short_description = 'Export participant responses as CSV'

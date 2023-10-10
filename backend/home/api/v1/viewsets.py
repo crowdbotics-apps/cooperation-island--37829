@@ -3,11 +3,9 @@ from datetime import datetime
 from django.contrib.auth import get_user_model
 from django.utils.http import urlsafe_base64_decode
 from django.utils.encoding import force_text
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.db import IntegrityError
-from django.core.exceptions import ObjectDoesNotExist
-from django.conf import settings
-from django.core.mail import EmailMessage
+from django.db.models import OuterRef, Subquery, Q
 from rest_framework.viewsets import ModelViewSet, ViewSet, ReadOnlyModelViewSet
 from rest_framework.response import Response
 from rest_framework import status, generics
@@ -25,7 +23,6 @@ from users.models import (  Profile,
                             PasswordResetSession, 
                             PrivacyPolicy, 
                             TermAndCondition, 
-                            Question,
                             ActivityFeedback,
                             AnswerOption,
                             ParticipantResponse,
@@ -38,6 +35,8 @@ from users.models import (  Profile,
                             DynamicPromptResponse,
                             PurchaseHistory,
                             ThemeImage,
+                            ConsentEmailConfiguration,
+                            QuestionOrder,
                         )
 
 
@@ -170,8 +169,6 @@ class ConsentAccessCodeViewSet(APIView):
         
         if request.user.consent_status:
             return Response({'error': 'User consent already verified'}, status=401)
-        # if request.user in access_code.used_by_users.all():
-        #     return Response({'error': 'Access code already used by this user'}, status=401)
         if access_code.is_expired:
             return Response({'error': 'Access code has expired'}, status=401)
         
@@ -259,19 +256,21 @@ class ProfileAPIView(APIView):
         return Response({'profile': encrypted_payload}, status=status.HTTP_200_OK)
 
 
+
 class UserVerificationView(generics.GenericAPIView):
     def get(self, request, uidb64, token):
         try:
             user_id = force_text(urlsafe_base64_decode(uidb64))
-            email_verification = EmailVerification.objects.get(user_id=user_id)
-        except (TypeError, ValueError, OverflowError, EmailVerification.DoesNotExist):
+            user = User.objects.get(id=user_id)
+            email_verification = get_object_or_404(EmailVerification, user=user)
+        except (TypeError, ValueError, OverflowError, User.DoesNotExist):
             return render(request, 'verification_error.html')
-        
-
-        if not email_verification.is_token_valid(token):
+        except EmailVerification.DoesNotExist:
             return render(request, 'verification_error.html')
 
-        user = email_verification.user
+        if not email_verification.is_token_valid(token=token):
+            return render(request, 'verification_error.html')
+
         user.consent_status = True
         user.save(update_fields=['consent_status'])
 
@@ -279,26 +278,31 @@ class UserVerificationView(generics.GenericAPIView):
         return render(request, 'verification_success.html')
 
 
+
 class EmailConsentView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
         user = request.user
+        email_template = ConsentEmailConfiguration.objects.filter(is_active=True).first()
+
+        if not email_template:
+            return Response({'error': 'No active email template found.'}, status=status.HTTP_400_BAD_REQUEST)
+        
         email_verification = EmailVerification.objects.filter(user=user).first()
-        if email_verification: 
-            token = email_verification.verification_token
-            if email_verification.is_token_valid(token=token): 
-                if request.data.get('resend_email', False):
-                    try:
-                        email_verification.send_verification_email()
-                    except Exception as e:
-                        print(e, flush=True)
-                        return Response({'error': 'Failed to send email'}, status=status.HTTP_400_BAD_REQUEST)
-                    user_detail_serializer = UserDetailsSerializer(user)
-                    payload=encrypt_payload(user_detail_serializer.data)
-                    return Response({'user': payload }, status=status.HTTP_200_OK)
-                return Response({'error': 'Consent email is already sent'}, status=status.HTTP_400_BAD_REQUEST)
-        email_verification = EmailVerification(user=user)
+        if email_verification and email_verification.is_token_valid(token=email_verification.verification_token):
+            if request.data.get('resend_email', False):
+                try:
+                    email_verification.send_verification_email()
+                except Exception as e:
+                    print(e, flush=True)
+                    return Response({'error': 'Failed to send email'}, status=status.HTTP_400_BAD_REQUEST)
+                user_detail_serializer = UserDetailsSerializer(user)
+                payload=encrypt_payload(user_detail_serializer.data)
+                return Response({'user': payload }, status=status.HTTP_200_OK)
+            return Response({'error': 'Consent email is already sent'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        email_verification = EmailVerification(user=user, email_template=email_template)
         email_verification.generate_token()
         email_verification.save()
         try:
@@ -354,38 +358,41 @@ class ActivityFeedbackViewSet(APIView):
         except ActivityFeedback.DoesNotExist:
             raise ValidationError('Activity feedback not found.', code=status.HTTP_400_BAD_REQUEST)
         
-    def get_question(self, question_id):
-        try:
-            return Question.objects.get(pk=question_id)
-        except Question.DoesNotExist:
-            raise ObjectDoesNotExist('Question not found.')
-
     def get(self, request, activity_type=None):
         try:
             activity_feedback = self.get_activity_feedback(activity_type)
         except ValidationError as e:
             return Response({}, status=status.HTTP_400_BAD_REQUEST)
-        
-        if activity_type == 'voice-your-values':
-            questions = activity_feedback.questions.filter(question_type='rating').order_by('questionorder__order')
-        else:
-            questions = activity_feedback.questions.order_by('questionorder__order')
-        
+
+        question_order_subquery = QuestionOrder.objects.filter(
+            activity_feedback=OuterRef('activity_feedback'),
+            question=OuterRef('pk')
+        ).values('order')[:1]
+
+       
+        questions = activity_feedback.questions.annotate(
+            question_order=Subquery(question_order_subquery)
+        ).filter(
+            Q(question_type='text_input') | (
+                Q(question_type__in=['dropdown', 'multiple_choice']) & (
+                    Q(question_order__isnull=False, activity_feedback__activity_type='voice-your-values') |
+                    Q(activity_feedback__activity_type=activity_type)
+                )
+            ),
+            question_order__isnull=False
+        ).order_by('question_order')
+
         filtered_questions = []
         for question in questions:
-            if activity_type == 'voice-your-values':
-                if question.question_type == 'rating':
+            if question.question_type == 'text_input':
+                filtered_questions.append(question)
+            elif question.question_type in ['dropdown', 'multiple_choice']:
+                answer_options_count = question.answer_options.count()
+                if answer_options_count == 2 or answer_options_count == 4:
                     filtered_questions.append(question)
-            else:
-                if question.question_type == 'text_input':
-                    filtered_questions.append(question)
-                elif question.question_type in ['dropdown', 'multiple_choice']:
-                    answer_options_count = question.answer_options.count()
-                    if answer_options_count == 2 or answer_options_count == 4:
-                        filtered_questions.append(question)
 
-        serializer = QuestionSerializer(filtered_questions, many=True) 
-        
+        serializer = QuestionSerializer(filtered_questions, many=True)
+
         return Response(serializer.data)
 
     def post(self, request, activity_type=None):

@@ -28,6 +28,9 @@ from .models import (ConsentAccessCode,
                      DynamicPromptResponse,
                      ThemeImage,
                      PurchaseHistory,
+                     ConsentEmailConfiguration,
+                     EmailVerification,
+                     ThemeEmailConfiguration,
                     )
 
 from .utils import (
@@ -38,6 +41,7 @@ from .utils import (
                     export_scores_csv,
                     export_purchase_history_csv,
                     export_dynamic_prompt_responses_csv,
+                    export_participant_responses_csv,
                 )
 
 User = get_user_model()
@@ -49,7 +53,7 @@ class UserAdmin(auth_admin.UserAdmin):
     form = UserChangeForm
     add_form = UserCreationForm
     # fieldsets = (("User", {"fields": ("username",)}),) + auth_admin.UserAdmin.fieldsets
-    list_display = ['username', 'email', 'age', 'avatar_id', 'consent_status', 'detail_status', 'shells', 'date_joined']
+    list_display = ['username','id', 'email', 'age', 'avatar_id', 'consent_status', 'detail_status', 'shells', 'date_joined']
     search_fields = ('email','username')
     list_filter = [
         ('consent_status', admin.BooleanFieldListFilter),
@@ -61,6 +65,9 @@ class UserAdmin(auth_admin.UserAdmin):
 class ConsentAccessCodeAdmin(admin.ModelAdmin):
     list_display=['access_code', 'created_at', 'is_expired']
     list_filter=['is_expired', 'created_at']
+
+admin.site.register(ConsentEmailConfiguration)
+# admin.site.register(EmailVerification)
 
 
 @admin.register(PrivacyPolicy)
@@ -173,12 +180,26 @@ class QuestionOrderAdmin(admin.ModelAdmin):
     list_filter = ['activity_feedback', 'created_at']
 
 
-@admin.register(ParticipantResponse)
 class ParticipantResponseAdmin(admin.ModelAdmin):
-    list_display = ['participant','session_id', 'activity_feedback', 'question', 'text_answer','created_at']
-    list_filter = [
-        ('created_at'),
-    ]
+    list_display = ['participant', 'session_id', 'activity_feedback', 'question', 'text_answer', 'created_at']
+    list_filter = ['created_at']
+    actions = ['export_selected_responses_csv']
+
+    def export_selected_responses_csv(self, request, queryset):
+        return export_participant_responses_csv(request, queryset=queryset, modeladmin=self)
+
+    export_selected_responses_csv.short_description = 'Export selected responses as CSV'
+
+    def changelist_view(self, request, extra_context=None):
+        if extra_context is None:
+            extra_context = {}
+
+        if self.model == ParticipantResponse:
+            extra_context['export_csv_url'] = reverse('users:export-participant-responses-csv')
+
+        return super().changelist_view(request, extra_context=extra_context)
+
+admin.site.register(ParticipantResponse, ParticipantResponseAdmin)
 
 @admin.register(RankedQualities)
 class RankedQualitiesAdmin(admin.ModelAdmin):
@@ -367,3 +388,5 @@ class PurchaseHistoryAdmin(admin.ModelAdmin):
 
         return super().changelist_view(request, extra_context=extra_context)
 
+
+admin.site.register(ThemeEmailConfiguration)

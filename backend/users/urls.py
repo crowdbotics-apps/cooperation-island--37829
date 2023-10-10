@@ -1,6 +1,4 @@
 from django.urls import path
-from .models import FishGameTrial
-from .admin import FishGameTrialAdmin
 
 from users.views import (
     user_redirect_view,
@@ -15,6 +13,7 @@ from .utils import (
                     export_scores_csv,
                     export_purchase_history_csv,
                     export_dynamic_prompt_responses_csv,
+                    export_participant_responses_csv,
 )
 
 app_name = "users"
@@ -26,7 +25,7 @@ urlpatterns = [
     path('export-profiles-csv/', export_profile_csv, name='export_profiles_csv'),
     path('export-purchase-history-csv/', export_purchase_history_csv, name='export-purchase-history-csv'),
     path('export-dynamic-prompt-responses-csv/', export_dynamic_prompt_responses_csv, name='export-dynamic-prompt-responses-csv'),
-    # path('admin/users/fishgametrial/', FishGameTrialAdmin.as_view(model=FishGameTrial), name='fishgametrial-list'),
+    path('export-participant-responses-csv/', export_participant_responses_csv, name='export-participant-responses-csv'),
     # path("~redirect/", view=user_redirect_view, name="redirect"),
     # path("~update/", view=user_update_view, name="update"),
     # path("<str:username>/", view=user_detail_view, name="detail"),

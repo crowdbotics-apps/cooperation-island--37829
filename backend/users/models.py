@@ -93,17 +93,34 @@ class Profile(models.Model):
         verbose_name_plural = 'User Profile Data'
 
 
+
+class ConsentEmailConfiguration(models.Model):
+    subject = models.CharField(max_length=255, verbose_name='Email Subject')
+    body = models.TextField(verbose_name='Email Body')
+    token_expiry_days = models.PositiveIntegerField(default=3) 
+    is_active=models.BooleanField(default=True)
+    author=models.ForeignKey(User, on_delete=models.CASCADE)
+    created_at=models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.subject
+
+    class Meta:
+        verbose_name = 'Consent Email Configuration'
+        verbose_name_plural = 'Consent Email Configuration'
+
+
 class EmailVerification(models.Model):
-    """send verification email to adult for consent"""
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     verification_token = models.CharField(max_length=255)
     created_at = models.DateTimeField(default=timezone.now)
     expiry_date = models.DateTimeField()
+    email_template = models.ForeignKey(ConsentEmailConfiguration, on_delete=models.SET_NULL, null=True)
 
     def generate_token(self):
         self.verification_token = get_random_string(length=32)
         self.created_at = timezone.now()
-        self.expiry_date = self.created_at + timezone.timedelta(days=7)
+        self.expiry_date = self.created_at + timezone.timedelta(days=self.email_template.token_expiry_days)
         self.save()
 
     def is_token_valid(self, token):
@@ -115,17 +132,10 @@ class EmailVerification(models.Model):
     def send_verification_email(self):
         current_site = get_current_site(request=None)
         domain = current_site.domain
-        # domain='localhost:8000', # set for local
-        mail_subject = 'Verify your email'
-        message = render_to_string('verification_email.html', {
-            'user': self.user,
-            'domain': domain,
-            'uidb64': urlsafe_base64_encode(force_bytes(self.user.pk)),
-            'token': self.verification_token,
-            'expiry_date': self.expiry_date
-        })
-        email = EmailMessage(mail_subject, message, to=[self.user.email])
-        email.content_subtype = 'html' 
+        mail_subject = f"{self.email_template.subject}"
+        email_body = f"{self.email_template.body} <a href='https://{domain}/api/v1/verify/{urlsafe_base64_encode(force_bytes(self.user.pk))}/{self.verification_token}/'>Verify Account</a>"
+        email = EmailMessage(mail_subject, email_body, to=[self.user.email])
+        email.content_subtype = 'html'
         email.send()
 
 
@@ -209,8 +219,8 @@ class ActivityFeedback(models.Model):
         return f"{self.activity_type}"
     
     class Meta:
-        verbose_name = 'Activity Type'
-        verbose_name_plural = 'Activity Type'
+        verbose_name = 'End-of-Module Question Editable'
+        verbose_name_plural = 'End-of-Module Question Editable'
 
    
 class Question(models.Model):
@@ -243,7 +253,7 @@ class Question(models.Model):
 class AnswerOption(models.Model):
     option_text = models.CharField(max_length=255)
     question = models.ForeignKey(
-                                    Question, 
+                                    'Question', 
                                     related_name='answer_options', 
                                     on_delete=models.CASCADE,
                                  )
@@ -290,9 +300,26 @@ class ParticipantResponse(models.Model):
         return f"Participant: {participant_info}, Question: {question_info}"
     
     class Meta:
-        verbose_name = 'End-of-Module Question Response'
+        verbose_name = 'End-of-Module Question Data'
+        verbose_name_plural = 'End-of-Module Question Data'
     
+class IndividualRankingQualitiesScore(models.Model):
+    participant = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    original_participant_id = models.IntegerField(null=True, blank=True)
+    question = models.ForeignKey(Question, on_delete=models.SET_NULL, null=True)
+    original_question_text = models.CharField(blank=True, max_length=255, default=None, null=True)
+    score = models.PositiveIntegerField()
+    session_id = models.CharField(max_length=36)
+    created_at = models.DateTimeField(auto_now_add=True)
 
+    def __str__(self):
+        participant_info = f"Participant: {self.participant.id}" if self.participant else "Participant: None"
+        question_info = f"Question : {self.question.question_text}" if self.question else "Question: None"
+        return f"{participant_info} - {question_info}"
+
+    class Meta:
+        verbose_name = 'Voice Your Values Rating Data'
+        verbose_name_plural='Voice Your Values Rating Data'
 
 class RankedQualities(models.Model):
     participant = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
@@ -326,8 +353,8 @@ class RankedQualities(models.Model):
         return f"User: {participant_info}, Quality: {self.quality}, Rank: {self.rank}"
 
     class Meta:
-        verbose_name='Voice Your Values'
-        verbose_name_plural = 'Voice Your Values'
+        verbose_name='Voice Your Values Category Data'
+        verbose_name_plural = 'Voice Your Values Category Data'
 
     
 class FishGameTrial(models.Model):
@@ -354,6 +381,10 @@ class FishGameTrial(models.Model):
         participant_info = f"Participant: {self.participant.id}" if self.participant else "Participant: None"
         return f"Participant: {participant_info} - Trial: {self.trial_number}"
     
+    class Meta:
+        verbose_name = 'Fish game data'
+        verbose_name_plural = 'Fish game data'
+    
 
 class TreeShakingGameTrial(models.Model):
     STAKE_CHOICES = [
@@ -377,24 +408,13 @@ class TreeShakingGameTrial(models.Model):
     def __str__(self):
         participant_info = f"Participant: {self.participant.id}" if self.participant else "Participant: None"
         return f"Participant: {participant_info} - Trial: {self.trial_number}"
-
-
-class IndividualRankingQualitiesScore(models.Model):
-    participant = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
-    original_participant_id = models.IntegerField(null=True, blank=True)
-    question = models.ForeignKey(Question, on_delete=models.SET_NULL, null=True)
-    original_question_text = models.CharField(blank=True, max_length=255, default=None, null=True)
-    score = models.PositiveIntegerField()
-    session_id = models.CharField(max_length=36)
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        participant_info = f"Participant: {self.participant.id}" if self.participant else "Participant: None"
-        question_info = f"Question : {self.question.question_text}" if self.question else "Question: None"
-        return f"{participant_info} - {question_info}"
-
+    
     class Meta:
-        verbose_name = 'Voice Your Values Rating'
+        verbose_name = 'Tree shaking game data'
+        verbose_name_plural = 'Tree shaking game data'
+
+
+
 
 
 class IncentiveRangeSelection(models.Model):  
@@ -500,7 +520,8 @@ class ThemeImage(models.Model):
         return self.name
 
     class Meta:
-        verbose_name_plural = 'Theme Images'
+        verbose_name = 'Experience Cost'
+        verbose_name_plural = 'Experience Costs'
 
 
 class PurchaseHistory(models.Model):
@@ -516,7 +537,20 @@ class PurchaseHistory(models.Model):
         return f"{self.participant.username} purchased {self.theme_purchased.title} on {self.purchased_at}"
 
     class Meta:
-        verbose_name = 'Theme Purchase History'
-        verbose_name_plural = 'Theme Purchase History'
+        verbose_name = 'Experience Purchase History'
+        verbose_name_plural = 'Experience Purchase History'
 
     
+class ThemeEmailConfiguration(models.Model):
+    subject = models.CharField(max_length=255, verbose_name='Email Subject')
+    body = models.TextField(verbose_name='Email Body')
+    is_active=models.BooleanField(default=True)
+    author=models.ForeignKey(User, on_delete=models.CASCADE)
+    created_at=models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.subject
+
+    class Meta:
+        verbose_name = 'Theme Email Configuration'
+        verbose_name_plural = 'Theme Email Configuration'
