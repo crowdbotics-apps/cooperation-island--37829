@@ -493,8 +493,12 @@ def export_participant_responses_csv(request, queryset=None, modeladmin=None):
     question_objects = Question.objects.filter(Q(pk__in=unique_questions) | Q(question_text__in=unique_questions))
 
     header = ['participantID', 'sessionID']
+    question_idx_mapping = {}  # A mapping to track the index of each unique question
     for idx, question in enumerate(question_objects, start=1):
+        question_text = question.question_text
+        question_type = question.question_type
         header.extend([f'question-text-{idx}', f'question-type-{idx}', f'answer-{idx}'])
+        question_idx_mapping[question_text] = idx
     writer.writerow(header)
 
     participant_data = {}
@@ -527,29 +531,31 @@ def export_participant_responses_csv(request, queryset=None, modeladmin=None):
         elif question_type in ('multiple_choice', 'dropdown'):
             answer_options = participant_response.answer_options.all()
             if answer_options:
-                answer_texts = [option.option_text for option in answer_options]
+                answer_texts = [option.option_text for option in answer_options if option.option_text]
                 answer = ', '.join(answer_texts)
             else:
                 answer = ''
 
+        if not answer:
+            continue
+
         if session_id != participant_data[participant_id]['session_id']:
             participant_data[participant_id] = {'session_id': session_id, 'created_at': created_at}
 
-        question_idx = list(unique_questions).index(participant_response.question_id) + 1
-        question_key = f'question-text-{question_idx}'
-        while question_key in participant_data[participant_id]:
-            question_idx += 1
-            question_key = f'question-text-{question_idx}'
-
-        participant_data[participant_id][question_key] = question_text
-        participant_data[participant_id][f'question-type-{question_idx}'] = question_type
-        participant_data[participant_id][f'answer-{question_idx}'] = answer
+        question_idx = question_idx_mapping.get(question_text)
+        if question_idx:
+            if f'question-text-{question_idx}' not in participant_data[participant_id]:
+                participant_data[participant_id][f'question-text-{question_idx}'] = question_text
+                participant_data[participant_id][f'question-type-{question_idx}'] = question_type
+                participant_data[participant_id][f'answer-{question_idx}'] = answer
+            else:
+                # If a question has multiple responses, separate them with '/'
+                participant_data[participant_id][f'answer-{question_idx}'] += f' / {answer}'
 
     for participant_id, data in participant_data.items():
         row = [participant_id, data['session_id']]
-        for idx, question in enumerate(question_objects, start=1):
-            question_key = f'question-text-{idx}'
-            row.append(data.get(question_key, ''))
+        for question_text, idx in question_idx_mapping.items():
+            row.append(data.get(f'question-text-{idx}', ''))
             row.append(data.get(f'question-type-{idx}', ''))
             row.append(data.get(f'answer-{idx}', ''))
         writer.writerow(row)

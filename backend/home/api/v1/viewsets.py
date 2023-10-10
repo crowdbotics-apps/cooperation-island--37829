@@ -269,7 +269,7 @@ class UserVerificationView(generics.GenericAPIView):
         # except EmailVerification.DoesNotExist:
         #     return render(request, 'verification_error.html')
 
-        if email_verification is None and user.consent_status:
+        if user.consent_status:
             return render(request, 'verification_repeat.html')
 
         if not email_verification.is_token_valid(token=token):
