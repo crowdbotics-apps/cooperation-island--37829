@@ -483,26 +483,37 @@ def export_participant_responses_csv(request, queryset=None, modeladmin=None):
 
     writer = csv.writer(response)
 
-    unique_questions = set()
+    unique_question_pks = set() 
+    unique_question_texts = set() 
+
     for participant_response in queryset:
         if participant_response.question:
-            unique_questions.add(participant_response.question_id)
+            unique_question_pks.add(participant_response.question_id)
         if participant_response.original_question_text:
-            unique_questions.add(participant_response.original_question_text)
+            unique_question_texts.add(participant_response.original_question_text)
 
-    question_objects = Question.objects.filter(Q(pk__in=unique_questions) | Q(question_text__in=unique_questions))
+    question_objects_by_pk = Question.objects.filter(pk__in=unique_question_pks)
+    question_objects_by_text = Question.objects.filter(question_text__in=unique_question_texts)
 
     header = ['participantID', 'sessionID']
     question_idx_mapping = {}  # A mapping to track the index of each unique question
-    for idx, question in enumerate(question_objects, start=1):
+
+    for idx, question in enumerate(question_objects_by_pk, start=1):
         question_text = question.question_text
         question_type = question.question_type
         header.extend([f'question-text-{idx}', f'question-type-{idx}', f'answer-{idx}'])
         question_idx_mapping[question_text] = idx
+
+    for question in question_objects_by_text:
+        if question.question_text not in unique_question_texts:
+            unique_question_texts.add(question.question_text)
+            idx = len(question_idx_mapping) + 1
+            header.extend([f'question-text-{idx}', f'question-type-{idx}', f'answer-{idx}'])
+            question_idx_mapping[question.question_text] = idx
+
     writer.writerow(header)
 
     participant_data = {}
-
     for participant_response in queryset:
         if participant_response.participant:
             participant_id = participant_response.participant.id
@@ -515,11 +526,11 @@ def export_participant_responses_csv(request, queryset=None, modeladmin=None):
         if participant_id not in participant_data:
             participant_data[participant_id] = {'session_id': session_id, 'created_at': created_at}
 
-        if not participant_response.question_id or participant_response.question_id not in unique_questions:
+        if not participant_response.question_id or participant_response.question_id not in unique_question_pks:
             question_text = participant_response.original_question_text
             question_type = ''
         else:
-            question = question_objects.get(pk=participant_response.question_id)
+            question = question_objects_by_pk.get(pk=participant_response.question_id)
             question_text = question.question_text
             question_type = question.question_type
 
