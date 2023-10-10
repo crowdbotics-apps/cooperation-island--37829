@@ -176,7 +176,7 @@ export const showAvatarPage = (callbackFn) => {
         }, "-=4000");
 }
 
-export const showShopPage = () => {
+export const showShopPage = (toggle) => {
     anime
         .timeline()
         .add({
@@ -229,7 +229,8 @@ export const showShopPage = () => {
             scale: [0, 1],
             duration: 1000,
             begin: () => {
-                $("#backdrop").toggle();
+                if (!toggle)
+                    $("#backdrop").toggle();
             }
         }, "-=2000");
 }

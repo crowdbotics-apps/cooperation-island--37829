@@ -337,7 +337,7 @@ const ShopPage = () => {
             easing: "easeInQuint",
             duration: 2000
         });
-        showShopPage();
+        showShopPage(true);
     }
 
     const handleOK = () => {
