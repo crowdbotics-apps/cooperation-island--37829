@@ -84,7 +84,40 @@ const useStyles = makeStyles((theme) => ({
         backgroundRepeat: "no-repeat",
         backgroundSize: "50vw 40vh"
     },
+    board2: {
+        "& button": {
+            backgroundSize: "10vw 7vh",
+            width: "10vw",
+            margin: "14vh 0vw",
+        },
+        "& label": {
+            "&:first-child": {
+                color: theme.palette.primary.main,
+                fontSize: "4.5vh",
+                margin: "14vh 0vw 8vh",
+            },
+            fontSize: "3.3vh",
+            color: "black",
+            marginTop: "5vh",
+            padding: "0vh 7vw"
+        },
+        position: "absolute",
+        filter: "drop-shadow(0.33vh 0.66vh 1.2vh black)",
+        textAlign: "center",
+        top: "6vh",
+        left: "17vw",
+        height: "88vh",
+        width: "66vw",
+        transform: "scale(0)",
+        background: `url(${BoardImg})`,
+        backgroundRepeat: "no-repeat",
+        backgroundSize: "66vw 88vh"
+    },
     backdrop: {
+        zIndex: 5
+    },
+    backdrop2: {
+        display: "none",
         zIndex: 5
     },
     hidden: {
@@ -125,7 +158,7 @@ const useStyles = makeStyles((theme) => ({
         position: "absolute",
         filter: "drop-shadow(0.33vh 0.66vh 1.2vh black)",
         top: "-12vh",
-        left: "94vw",
+        left: "85.3vw",
         height: "8.5vh",
         width: "4vw"
     },
@@ -133,7 +166,7 @@ const useStyles = makeStyles((theme) => ({
         position: "absolute",
         filter: "drop-shadow(0.33vh 0.66vh 1.2vh black)",
         top: "86vh",
-        left: "86vw",
+        left: "77.3vw",
         height: "8.88vh",
         width: "12vw",
         transform: "scale(0)"
@@ -193,7 +226,7 @@ const ShopPage = () => {
             complete: () => {
                 hideBackdrop(false);
             }
-        })
+        });
     }
 
     const handleClick = (poster) => () => {
@@ -304,7 +337,19 @@ const ShopPage = () => {
             easing: "easeInQuint",
             duration: 2000
         });
-        showShopPage();
+        showShopPage(true);
+    }
+
+    const handleOK = () => {
+        anime({
+            targets: "#board10",
+            scale: 0,
+            easing: "easeInQuint",
+            duration: 500,
+            complete: () => {
+                $("#backdrop").toggle();
+            }
+        });
     }
 
     const handleOpen = (poster) => () => {
@@ -346,10 +391,20 @@ const ShopPage = () => {
                 duration: 2000,
                 complete: () => {
                     $("#background").attr("src", posterURL);
+                    $("#background").css({
+                        marginLeft: "8.7vw",
+                        width: "82.6vw"
+                    });
                     hidePoster(true);
                     history.push("/poster");
                 }
             })
+            .add({
+                targets: "#container",
+                background: "#000",
+                easing: "linear",
+                duration: 2000,
+            }, "-=2000")
             .add({
                 targets: "#background",
                 opacity: 1,
@@ -439,10 +494,33 @@ const ShopPage = () => {
         <Backdrop className={cls.backdrop} open={showBackdrop}>
             <div className={cls.board} id="board9">
                 <CILabel>
-                    You'll spend <span>{poster?.shells}</span> shells to get this poster.
+                    Are you sure you want to spend <span>{poster?.shells}</span> shells on this Avatar Experience
                 </CILabel>
-                <CIButton alt onClick={handleOpen(poster)}>OK</CIButton>
-                <CIButton onClick={handleBack}>Go Back</CIButton>
+                <CIButton alt onClick={handleOpen(poster)}>Yes</CIButton>
+                <CIButton onClick={handleBack}>No</CIButton>
+            </div>
+        </Backdrop>
+        <Backdrop className={cls.backdrop2} open id="backdrop">
+            <div className={cls.board2} id="board10">
+                <CILabel>
+                    Welcome to the Shell Shop!
+                </CILabel>
+                <CILabel>
+                    Here is where you can exchange your shells for different Avatar Experience posters!
+                </CILabel>
+                <CILabel>
+                    Each poster costs a certain amount of shells.
+                </CILabel>
+                <CILabel>
+                    Once you spend those shells, you cannot get them back.
+                </CILabel>
+                <CILabel>
+                    When you spend those shells, you will get to see your Avatar Experience.
+                </CILabel>
+                <CILabel>
+                    You can also click the “Send” button and your parent will receive your Avatar Experience poster AND a coloring page of the poster that you can print and color at home.
+                </CILabel>
+                <CIButton onClick={handleOK}>OK</CIButton>
             </div>
         </Backdrop>
     </div>

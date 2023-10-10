@@ -176,7 +176,7 @@ export const showAvatarPage = (callbackFn) => {
         }, "-=4000");
 }
 
-export const showShopPage = () => {
+export const showShopPage = (toggle) => {
     anime
         .timeline()
         .add({
@@ -186,8 +186,18 @@ export const showShopPage = () => {
             duration: 2000,
             complete: () => {
                 $("#background").attr("src", require("../assets/images/Shop_BG.jpg"));
+                $("#background").css({
+                    marginLeft: "0vw",
+                    width: "100vw"
+                });
             }
         })
+        .add({
+            targets: "#container",
+            background: "#207067",
+            easing: "linear",
+            duration: 2000,
+        }, "-=2000")
         .add({
             targets: "#background",
             opacity: 1,
@@ -223,6 +233,15 @@ export const showShopPage = () => {
             height: "72vh",
             easing: "linear",
             duration: 1200
+        }, "-=4000")
+        .add({
+            targets: "#board10",
+            scale: [0, 1],
+            duration: 1000,
+            begin: () => {
+                if (!toggle)
+                    $("#backdrop").toggle();
+            }
         }, "-=4000");
 }
 
