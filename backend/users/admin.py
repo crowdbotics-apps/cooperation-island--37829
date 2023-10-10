@@ -182,7 +182,7 @@ class QuestionOrderAdmin(admin.ModelAdmin):
 
 class ParticipantResponseAdmin(admin.ModelAdmin):
     list_display = ['participant', 'session_id', 'activity_feedback', 'question', 'text_answer', 'created_at']
-    list_filter = ['created_at']
+    list_filter = ['created_at','activity_feedback']
     actions = ['export_selected_responses_csv']
 
     def export_selected_responses_csv(self, request, queryset):

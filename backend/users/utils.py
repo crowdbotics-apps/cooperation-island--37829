@@ -483,83 +483,76 @@ def export_participant_responses_csv(request, queryset=None, modeladmin=None):
 
     writer = csv.writer(response)
 
-    # Get distinct session_id and participant_id combinations
-    session_participant_combinations = queryset.distinct('session_id', 'participant__id', 'original_participant_id')
+    unique_questions = set()
+    for participant_response in queryset:
+        if participant_response.question:
+            unique_questions.add(participant_response.question_id)
+        if participant_response.original_question_text:
+            unique_questions.add(participant_response.original_question_text)
 
-    # Prepare the header row
+    question_objects = Question.objects.filter(Q(pk__in=unique_questions) | Q(question_text__in=unique_questions))
+
     header = ['participantID', 'sessionID']
-    question_headers = []
-    question_texts = []
-    question_types = []
-
-    for combination in session_participant_combinations:
-        if combination.participant:
-            participant_id = combination.participant.id
-        else:
-            participant_id = combination.original_participant_id
-        session_id = combination.session_id
-        participant_responses = queryset.filter(
-            Q(participant__id=participant_id) |
-            Q(original_participant_id=combination.original_participant_id),
-            session_id=combination.session_id
-        ).order_by('question__id')
-
-        for idx, response_data in enumerate(participant_responses, start=1):
-            question = response_data.question
-            question_type = question.question_type if question else 'Unknown'
-            question_text = question.question_text if question else response_data.original_question_text
-            header.append(f'question-type-{idx}')
-            question_types.append(question_type)
-            header.append(f'question-text-{idx}')
-            question_texts.append(question_text)
-            header.append(f'answer-{idx}')
-
+    for idx, question in enumerate(question_objects, start=1):
+        header.extend([f'question-text-{idx}', f'question-type-{idx}', f'answer-{idx}'])
     writer.writerow(header)
 
-    for combination in session_participant_combinations:
-        if combination.participant:
-            participant_id = combination.participant.id
+    participant_data = {}
+
+    for participant_response in queryset:
+        if participant_response.participant:
+            participant_id = participant_response.participant.id
         else:
-            participant_id = combination.original_participant_id
-        session_id = combination.session_id
-        participant_responses = queryset.filter(
-            Q(participant__id=participant_id) |
-            Q(original_participant_id=combination.original_participant_id),
-            session_id=combination.session_id
-        ).order_by('question__id')
+            participant_id = participant_response.original_participant_id
 
-        data_row = [participant_id, session_id]
-        current_question_type = None
-        current_question_text = None
-        current_answers = []
+        session_id = participant_response.session_id
+        created_at = participant_response.created_at.strftime("%Y-%m-%d %H:%M:%S")
 
-        for response_data in participant_responses:
-            question = response_data.question
-            question_type = question.question_type if question else 'Unknown'
-            question_text = question.question_text if question else response_data.original_question_text
+        if participant_id not in participant_data:
+            participant_data[participant_id] = {'session_id': session_id, 'created_at': created_at}
 
-            if question_type == 'rating':
-                continue
+        if not participant_response.question_id or participant_response.question_id not in unique_questions:
+            question_text = participant_response.original_question_text
+            question_type = ''
+        else:
+            question = question_objects.get(pk=participant_response.question_id)
+            question_text = question.question_text
+            question_type = question.question_type
 
-            if question_type != current_question_type or question_text != current_question_text:
-                if current_question_type:
-                    data_row.append(', '.join(current_answers))
-                current_question_type = question_type
-                current_question_text = question_text
-                current_answers = []
+        if question_type == 'rating':
+            continue
 
-            if question_type == 'text_input':
-                current_answers.append(response_data.text_answer)
-            elif question_type in ('multiple_choice', 'dropdown'):
-                answer_options = response_data.answer_options.all()
-                if answer_options:
-                    answer_texts = [option.option_text for option in answer_options]
-                    current_answers.append(', '.join(answer_texts))
+        if question_type == 'text_input':
+            answer = participant_response.text_answer
+        elif question_type in ('multiple_choice', 'dropdown'):
+            answer_options = participant_response.answer_options.all()
+            if answer_options:
+                answer_texts = [option.option_text for option in answer_options]
+                answer = ', '.join(answer_texts)
+            else:
+                answer = ''
 
-        if current_question_type:
-            data_row.append(', '.join(current_answers))
+        if session_id != participant_data[participant_id]['session_id']:
+            participant_data[participant_id] = {'session_id': session_id, 'created_at': created_at}
 
-        writer.writerow(data_row)
+        question_idx = list(unique_questions).index(participant_response.question_id) + 1
+        question_key = f'question-text-{question_idx}'
+        while question_key in participant_data[participant_id]:
+            question_idx += 1
+            question_key = f'question-text-{question_idx}'
+
+        participant_data[participant_id][question_key] = question_text
+        participant_data[participant_id][f'question-type-{question_idx}'] = question_type
+        participant_data[participant_id][f'answer-{question_idx}'] = answer
+
+    for participant_id, data in participant_data.items():
+        row = [participant_id, data['session_id']]
+        for idx, question in enumerate(question_objects, start=1):
+            question_key = f'question-text-{idx}'
+            row.append(data.get(question_key, ''))
+            row.append(data.get(f'question-type-{idx}', ''))
+            row.append(data.get(f'answer-{idx}', ''))
+        writer.writerow(row)
 
     return response
 

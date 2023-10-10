@@ -259,18 +259,22 @@ class ProfileAPIView(APIView):
 
 class UserVerificationView(generics.GenericAPIView):
     def get(self, request, uidb64, token):
+            
         try:
             user_id = force_text(urlsafe_base64_decode(uidb64))
             user = User.objects.get(id=user_id)
-            email_verification = get_object_or_404(EmailVerification, user=user)
+            email_verification = EmailVerification.objects.get(user=user)
         except (TypeError, ValueError, OverflowError, User.DoesNotExist):
             return render(request, 'verification_error.html')
-        except EmailVerification.DoesNotExist:
-            return render(request, 'verification_error.html')
+        # except EmailVerification.DoesNotExist:
+        #     return render(request, 'verification_error.html')
+
+        if email_verification is None and user.consent_status:
+            return render(request, 'verification_repeat.html')
 
         if not email_verification.is_token_valid(token=token):
             return render(request, 'verification_error.html')
-
+        
         user.consent_status = True
         user.save(update_fields=['consent_status'])
 
