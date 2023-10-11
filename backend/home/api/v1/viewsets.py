@@ -170,9 +170,9 @@ class ConsentAccessCodeViewSet(APIView):
         access_code = serializer.validated_data['access_code']
         
         if request.user.consent_status:
-            return Response({'error': 'User consent already verified'}, status=401)
+            return Response({'error': 'User consent already verified'}, status=status.HTTP_400_BAD_REQUEST)
         if access_code.is_expired:
-            return Response({'error': 'Access code has expired'}, status=401)
+            return Response({'error': 'Access code has expired'}, status=status.HTTP_400_BAD_REQUEST)
         
         access_code.used_by_users.add(request.user)
         access_code.save()
@@ -381,18 +381,6 @@ class ActivityFeedbackViewSet(APIView):
             question=OuterRef('pk')
         ).values('order')[:1]
 
-       
-        # questions = activity_feedback.questions.annotate(
-        #     question_order=Subquery(question_order_subquery)
-        # ).filter(
-        #     Q(question_type='text_input') | Q(question_type='rating') | (
-        #         Q(question_type__in=['dropdown', 'multiple_choice']) & (
-        #             Q(question_order__isnull=False, activity_feedback__activity_type='voice-your-values') |
-        #             Q(activity_feedback__activity_type=activity_type)
-        #         )
-        #     ),
-        #     question_order__isnull=False
-        # ).order_by('question_order')
 
         questions = activity_feedback.questions.annotate(
             question_order=Subquery(question_order_subquery)
