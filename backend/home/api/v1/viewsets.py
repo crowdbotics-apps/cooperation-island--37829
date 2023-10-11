@@ -6,6 +6,7 @@ from django.utils.encoding import force_text
 from django.shortcuts import render, get_object_or_404
 from django.db import IntegrityError
 from django.db.models import OuterRef, Subquery, Q
+from django.core.exceptions import ObjectDoesNotExist
 from rest_framework.viewsets import ModelViewSet, ViewSet, ReadOnlyModelViewSet
 from rest_framework.response import Response
 from rest_framework import status, generics
@@ -37,6 +38,7 @@ from users.models import (  Profile,
                             ThemeImage,
                             ConsentEmailConfiguration,
                             QuestionOrder,
+                            Question,
                         )
 
 
@@ -362,6 +364,12 @@ class ActivityFeedbackViewSet(APIView):
         except ActivityFeedback.DoesNotExist:
             raise ValidationError('Activity feedback not found.', code=status.HTTP_400_BAD_REQUEST)
         
+    def get_question(self, question_id):
+        try:
+            return Question.objects.get(pk=question_id)
+        except Question.DoesNotExist:
+            raise ObjectDoesNotExist('Question not found.')
+        
     def get(self, request, activity_type=None):
         try:
             activity_feedback = self.get_activity_feedback(activity_type)
@@ -374,21 +382,28 @@ class ActivityFeedbackViewSet(APIView):
         ).values('order')[:1]
 
        
+        # questions = activity_feedback.questions.annotate(
+        #     question_order=Subquery(question_order_subquery)
+        # ).filter(
+        #     Q(question_type='text_input') | Q(question_type='rating') | (
+        #         Q(question_type__in=['dropdown', 'multiple_choice']) & (
+        #             Q(question_order__isnull=False, activity_feedback__activity_type='voice-your-values') |
+        #             Q(activity_feedback__activity_type=activity_type)
+        #         )
+        #     ),
+        #     question_order__isnull=False
+        # ).order_by('question_order')
+
         questions = activity_feedback.questions.annotate(
             question_order=Subquery(question_order_subquery)
-        ).filter(
-            Q(question_type='text_input') | (
-                Q(question_type__in=['dropdown', 'multiple_choice']) & (
-                    Q(question_order__isnull=False, activity_feedback__activity_type='voice-your-values') |
-                    Q(activity_feedback__activity_type=activity_type)
-                )
-            ),
-            question_order__isnull=False
-        ).order_by('question_order')
+                            ).filter(
+                                        question_type__in=['text_input', 'dropdown', 'multiple_choice','rating'],
+                                        question_order__isnull=False
+                                    ).order_by('question_order')
 
         filtered_questions = []
         for question in questions:
-            if question.question_type == 'text_input':
+            if question.question_type in ['text_input', 'rating']:
                 filtered_questions.append(question)
             elif question.question_type in ['dropdown', 'multiple_choice']:
                 answer_options_count = question.answer_options.count()
@@ -413,48 +428,52 @@ class ActivityFeedbackViewSet(APIView):
             session_id = serializer.validated_data['session_id']
 
             question = self.get_question(question_id)
+
+            if question.activity_feedback == activity_feedback:
             
-            if activity_type == 'voice-your-values':
-                if question.question_type == 'rating':
-                    score = int(answer[0]) if answer else None
-                    if score is not None:  
-                        participant_score = IndividualRankingQualitiesScore(
+                if activity_type == 'voice-your-values':
+                    if question.question_type == 'rating':
+                        score = int(answer[0]) if answer else None
+                        if score is not None:  
+                            participant_score = IndividualRankingQualitiesScore(
+                                participant=request.user,
+                                question=question,
+                                score=score,
+                                session_id=session_id,
+                            )
+                            participant_score.save()
+                            return Response({'detail': 'Response submitted successfully.'}, status=status.HTTP_200_OK)
+                        else:
+                            return Response({'error': 'Invalid score provided.'}, status=status.HTTP_400_BAD_REQUEST)
+                    else:
+                        return Response({'error': 'Invalid question type for this activity type.'}, status=status.HTTP_400_BAD_REQUEST)
+                else:
+                    if question.question_type == 'text_input':
+                        text_answer = answer[0] if answer else None
+                        participant_response = ParticipantResponse(
                             participant=request.user,
+                            activity_feedback=activity_feedback,
                             question=question,
-                            score=score,
+                            text_answer=text_answer,
                             session_id=session_id,
                         )
-                        participant_score.save()
-                        return Response({'detail': 'Response submitted successfully.'}, status=status.HTTP_200_OK)
+                        participant_response.save()
                     else:
-                        return Response({'error': 'Invalid score provided.'}, status=status.HTTP_400_BAD_REQUEST)
-                else:
-                    return Response({'error': 'Invalid question type for this activity type.'}, status=status.HTTP_400_BAD_REQUEST)
+                        participant_response = ParticipantResponse(
+                            participant=request.user,
+                            activity_feedback=activity_feedback,
+                            question=question,
+                            session_id=session_id
+                        )
+                        participant_response.save()
+
+                        answer_options = AnswerOption.objects.filter(id__in=answer)
+                        participant_response.answer_options.set(answer_options)
+
+
+                    return Response({'detail': 'Response submitted successfully.'}, status=status.HTTP_200_OK)
             else:
-                if question.question_type == 'text_input':
-                    text_answer = answer[0] if answer else None
-                    participant_response = ParticipantResponse(
-                        participant=request.user,
-                        activity_feedback=activity_feedback,
-                        question=question,
-                        text_answer=text_answer,
-                        session_id=session_id,
-                    )
-                    participant_response.save()
-                else:
-                    participant_response = ParticipantResponse(
-                        participant=request.user,
-                        activity_feedback=activity_feedback,
-                        question=question,
-                        session_id=session_id
-                    )
-                    participant_response.save()
-
-                    answer_options = AnswerOption.objects.filter(id__in=answer)
-                    participant_response.answer_options.set(answer_options)
-
-
-                return Response({'detail': 'Response submitted successfully.'}, status=status.HTTP_200_OK)
+                return Response({'error':'Activity type of question does not match.'}, status=status.HTTP_400_BAD_REQUEST)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

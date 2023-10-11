@@ -188,6 +188,10 @@ class PrivacyPolicy(models.Model):
     def __str__(self):
         truncated_text = self.body[:70] + '...' if len(self.body) > 70 else self.body
         return f"Prompt: {truncated_text}"
+    
+    class Meta:
+        verbose_name = 'Assent Page Configuration'
+        verbose_name_plural = 'Assent Page Configuration'
 
 
 class TermAndCondition(models.Model):
@@ -200,6 +204,10 @@ class TermAndCondition(models.Model):
     def __str__(self):
         truncated_text = self.body[:70] + '...' if len(self.body) > 70 else self.body
         return f"Prompt: {truncated_text}"
+    class Meta:
+        verbose_name = 'Consent Page Configuration'
+        verbose_name_plural = 'Consent Page Configuration'
+
 
 
 class ActivityFeedback(models.Model):
