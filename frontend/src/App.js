@@ -138,8 +138,8 @@ const App = () => {
         <Route path="/login" component={LoginBoard} />
         <Route path="/signup" component={LoginBoard} />
         <Route path="/reset-password/:id" component={ResetPassword} />
-        <Route path="/terms-conditions" component={ReadingPane} />
-        <Route path="/privacy" component={ReadingPane} />
+        <Route path="/consent" component={ReadingPane} />
+        <Route path="/assent" component={ReadingPane} />
         <Redirect to="/" />
       </Switch>;
     }

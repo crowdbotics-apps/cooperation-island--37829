@@ -185,11 +185,13 @@ export const showShopPage = (toggle) => {
             easing: "linear",
             duration: 2000,
             complete: () => {
-                $("#background").attr("src", require("../assets/images/Shop_BG.jpg"));
-                $("#background").css({
-                    marginLeft: "0vw",
-                    width: "100vw"
-                });
+                $("#background")
+                    .attr("src", require("../assets/images/Shop_BG.jpg"))
+                    .css({
+                        filter: "blur(1vh)",
+                        marginLeft: "0vw",
+                        width: "100vw"
+                    });
             }
         })
         .add({

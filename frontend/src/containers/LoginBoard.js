@@ -116,6 +116,17 @@ const useStyles = makeStyles({
         "& input": {
             marginBottom: "1vh"
         },
+        "& label": {
+            "&:last-child": {
+                marginTop: "1vh"
+            },
+            "& span": {
+                textDecoration: "underline"
+            },
+            fontSize: "2vh",
+            marginTop: "2.5vh",
+            marginBottom: "-1.5vh"
+        },
         position: "absolute",
         zIndex: 2,
         marginTop: "4vh"
@@ -167,22 +178,6 @@ const useStyles = makeStyles({
     },
     email: {
         width: "9.1vw"
-    },
-    footerText: {
-        fontSize: "2vh",
-        marginTop: "1.7vh",
-        marginBottom: "-1.33vh"
-    },
-    panel: {
-        display: "flex",
-        marginTop: "0.5vh"
-    },
-    link: {
-        fontSize: "2vh"
-    },
-    pipe: {
-        margin: "-0.25vh 0.5vw",
-        fontSize: "2.5vh"
     }
 });
 
@@ -441,7 +436,7 @@ const LoginBoard = () => {
                             toast.error("Something went wrong.");
                     })
                     .catch(() => {
-                        toast.error("Something went wrong.");
+                        toast.error("The Username is already taken.");
                     });
             }
         }
@@ -586,14 +581,12 @@ const LoginBoard = () => {
                         <CIInput className={cls.age} onChange={handleChange("age", "signup")} onEnter={handleSign(false)} placeholder="Age" xs value={signup.age} />
                     </div>
                     <CIButton onClick={handleSign(false)}>Sign Up</CIButton>
-                    <CILabel className={cls.footerText}>
-                        By Signing Up, you are agreeing to our
+                    <CILabel>
+                        To participate, a parent will need to provide <span className="pointer" onClick={handleClick("/consent")}>consent</span>
                     </CILabel>
-                    <div className={cls.panel}>
-                        <CILink className={cls.link} onClick={handleClick("/terms-conditions")}>Terms & Conditions</CILink>
-                        <CILabel className={cls.pipe}>|</CILabel>
-                        <CILink className={cls.link} onClick={handleClick("/privacy")}>Privacy Policy</CILink>
-                    </div>
+                    <CILabel>
+                        The child will need to provide <span className="pointer" onClick={handleClick("/assent")}>assent</span>
+                    </CILabel>
                 </div>
                 <div className={cls.resetSection}>
                     <CILabel>Forgot Password?</CILabel>

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { makeStyles } from "@material-ui/core";
 import { useHistory } from "react-router-dom";
 import { anime } from "../libs/utils";
-import { privacy, terms } from "../services/v1";
+import { assent, consent } from "../services/v1";
 import { showLoginBoard } from "../libs/animations";
 import ReactHtmlParser from "react-html-parser";
 import BoardImg from "../assets/images/Board-lg.png";
@@ -73,10 +73,10 @@ const ReadingPane = () => {
 
     const [body, setBody] = useState("");
 
-    const pageType = window.location.pathname.includes("/privacy") ? 0 : 1;
+    const pageType = window.location.pathname.includes("/assent") ? 0 : 1;
 
     useEffect(() => {
-        Promise.all([pageType ? terms() : privacy()])
+        Promise.all([pageType ? consent() : assent()])
             .then(([{ data }]) => {
                 setBody(ReactHtmlParser(data.body));
             });
@@ -107,7 +107,7 @@ const ReadingPane = () => {
         <img className={clsx(cls.guide, !pageType && cls.guide2)} id="guide" src={require(`../assets/avatars/Avatar_${pageType ? 4 : 5}.png`)} />
         <div className={cls.board} id="board3">
             <CILabel className={cls.title}>
-                {pageType ? "Terms & Conditions" : "Privacy Policy"}
+                {pageType ? "User Consent" : "Child Assent"}
             </CILabel>
             <div className={clsx(cls.body, "typer")}>
                 {body}
