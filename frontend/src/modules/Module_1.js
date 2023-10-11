@@ -901,7 +901,7 @@ const Module_1 = () => {
             </CILabel>
             <div className={cls.body}>
                 <CILabel>
-                    In this activity, fishes like me will think of a number between 1-6, and you will try to guess that number.
+                    In this activity, fishes will think of a number between 1-6, and you will try to guess that number.
                 </CILabel>
                 <CILabel>
                     If you guess the number correctly, then you will get some amount of shells. If you do not guess the number correctly, then you will not get any shells.

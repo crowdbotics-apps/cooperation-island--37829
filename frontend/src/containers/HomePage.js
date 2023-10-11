@@ -81,7 +81,7 @@ const HomePage = () => {
                     if (!user.active) {
                         if (window.location.pathname.includes("/reset-password"))
                             showResetPassword();
-                        else if (window.location.pathname.includes("/terms-conditions") || window.location.pathname.includes("/privacy"))
+                        else if (window.location.pathname.includes("/consent") || window.location.pathname.includes("/assent"))
                             showReadingPane(true);
                         else if (window.location.pathname.includes("/")) {
                             history.push("/login");

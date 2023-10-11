@@ -58,12 +58,12 @@ export const email = (resend = false) => {
     });
 }
 
-export const terms = () => {
-    return API.get(base + "/terms-conditions/");
+export const consent = () => {
+    return API.get(base + "/consent/");
 }
 
-export const privacy = () => {
-    return API.get(base + "/privacy/");
+export const assent = () => {
+    return API.get(base + "/assent/");
 }
 
 export const feedback = (module) => {

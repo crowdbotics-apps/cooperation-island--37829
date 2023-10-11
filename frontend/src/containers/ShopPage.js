@@ -2,7 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import { Backdrop, makeStyles } from "@material-ui/core";
 import { useHistory } from "react-router-dom";
 import { mapPosters, mapUserData } from "../funnels/v1";
-import { anime, parseToken, postersData } from "../libs/utils";
+import { anime, parseToken, posterColors, postersData } from "../libs/utils";
 import { buyPoster, moduleData, openPoster, sendPoster } from "../services/v1";
 import { showHomePage, showShopPage } from "../libs/animations";
 import BoardImg from "../assets/images/Board-sm.png";
@@ -255,7 +255,9 @@ const ShopPage = () => {
                 easing: "linear",
                 duration: 2000,
                 complete: () => {
-                    $("#background").attr("src", require("../assets/images/Application_BG.jpg"));
+                    $("#background")
+                        .attr("src", require("../assets/images/Application_BG.jpg"))
+                        .css("filter", "");
                 }
             })
             .add({
@@ -390,11 +392,13 @@ const ShopPage = () => {
                 easing: "linear",
                 duration: 2000,
                 complete: () => {
-                    $("#background").attr("src", posterURL);
-                    $("#background").css({
-                        marginLeft: "8.7vw",
-                        width: "82.6vw"
-                    });
+                    $("#background")
+                        .attr("src", posterURL)
+                        .css({
+                            filter: `drop-shadow(0.33vh 0.66vh 50vh ${posterColors[poster.id - 1]})`,
+                            marginLeft: "8.7vw",
+                            width: "82.6vw"
+                        });
                     hidePoster(true);
                     history.push("/poster");
                 }
@@ -494,7 +498,7 @@ const ShopPage = () => {
         <Backdrop className={cls.backdrop} open={showBackdrop}>
             <div className={cls.board} id="board9">
                 <CILabel>
-                    Are you sure you want to spend <span>{poster?.shells}</span> shells on this Avatar Experience
+                    Are you sure you want to spend <span>{poster?.shells}</span> shells on this Avatar Experience?
                 </CILabel>
                 <CIButton alt onClick={handleOpen(poster)}>Yes</CIButton>
                 <CIButton onClick={handleBack}>No</CIButton>
