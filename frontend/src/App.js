@@ -1,10 +1,13 @@
 import { createContext, useEffect, useRef, useState } from "react";
 import { Redirect, Route, Switch, useHistory } from "react-router-dom";
-import { makeStyles } from "@material-ui/core";
+import { Backdrop, makeStyles } from "@material-ui/core";
 import { ToastContainer } from "react-toastify";
-import { parseToken, userState } from "./libs/utils";
+import { anime, parseToken, userState } from "./libs/utils";
 import { mapUserData } from "./funnels/v1";
 import { Tooltip } from "react-tooltip";
+import BoardImg from "./assets/images/Board-sm.png";
+import CIButton from "./shared/CIButton";
+import CILabel from "./shared/CILabel";
 import CILoader from "./shared/CILoader";
 import HomePage from "./containers/HomePage";
 import LoginBoard from "./containers/LoginBoard";
@@ -26,6 +29,32 @@ const AppContext = createContext();
 const LoginContext = createContext();
 
 const useStyles = makeStyles((theme) => ({
+  backdrop: {
+    zIndex: 10
+  },
+  board: {
+    "& button": {
+      backgroundSize: "10vw 7vh",
+      width: "10vw",
+      marginTop: "12vh",
+    },
+    "& label": {
+      fontSize: "4.5vh",
+      marginTop: "10vh",
+      padding: "0vh 7vw"
+    },
+    position: "absolute",
+    filter: "drop-shadow(0.33vh 0.66vh 1.2vh black)",
+    textAlign: "center",
+    top: "32vh",
+    left: "30vw",
+    height: "36vh",
+    width: "40vw",
+    transform: "scale(0)",
+    background: `url(${BoardImg})`,
+    backgroundRepeat: "no-repeat",
+    backgroundSize: "40vw 36vh"
+  },
   tooltip: {
     background: theme.palette.primary.tooltip,
     color: theme.palette.primary.main,
@@ -42,6 +71,8 @@ const App = () => {
 
   const avatarRef = useRef();
 
+  const modalRef = useRef();
+
   const localData = parseToken(localStorage["UserState"]);
 
   const [user, setUser] = useState(localData ? mapUserData(localData) : userState);
@@ -53,6 +84,8 @@ const App = () => {
   const [howler, setHowler] = useState({});
 
   const [loader, setLoader] = useState(false);
+
+  const [showBackdrop, hideBackdrop] = useState(false);
 
   const [tooltip, showTooltip] = useState(true);
 
@@ -72,6 +105,7 @@ const App = () => {
 
   useEffect(() => {
     window.setLoader = setLoader;
+    window.logOut = handleLogout;
 
     const handleBlock = history.block((_, action) => {
       if (action === "POP") {
@@ -90,16 +124,44 @@ const App = () => {
     }
   }, []);
 
-  const handleUser = (data) => {
-    setUser({
-      ...user,
-      ...data
+  const handleClick = () => {
+    anime({
+      targets: "#board11",
+      scale: 0,
+      easing: "easeInQuint",
+      duration: 500,
+      complete: () => {
+        hideBackdrop(false);
+        window.location.reload();
+      }
     });
+  }
+
+  const handleLogout = () => {
+    if (!modalRef.current)
+      anime({
+        targets: "#board11",
+        scale: [0, 1],
+        duration: 1000,
+        begin: () => {
+          hideBackdrop(true);
+          localStorage.clear();
+        }
+      });
+
+    modalRef.current = true;
   }
 
   const handleHowler = (data) => {
     setHowler({
       ...howler,
+      ...data
+    });
+  }
+
+  const handleUser = (data) => {
+    setUser({
+      ...user,
       ...data
     });
   }
@@ -152,6 +214,14 @@ const App = () => {
         {getRoutes()}
         <Redirect to="/" />
       </Switch>
+      <Backdrop className={cls.backdrop} open={showBackdrop}>
+        <div className={cls.board} id="board11">
+          <CILabel>
+            Something went wrong. Please try logging again.
+          </CILabel>
+          <CIButton onClick={handleClick}>Login</CIButton>
+        </div>
+      </Backdrop>
       {loader && <CILoader />}
       <ToastContainer
         position="bottom-right"

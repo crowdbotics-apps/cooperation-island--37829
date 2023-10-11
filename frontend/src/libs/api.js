@@ -23,6 +23,9 @@ API.interceptors.response.use(async (response) => {
 }, (error) => {
     window.setLoader(false);
 
+    if (error.response?.status === 401)
+        window.logOut();
+
     return Promise.reject(error);
 });
 
