@@ -1,5 +1,5 @@
 import csv
-import datetime
+from datetime import datetime, date
 from django.http import HttpResponse
 from django.db.models import Q
 from .models import (
@@ -332,7 +332,7 @@ export_scores_csv.short_description = 'Export Voice Your Values Ratings as CSV'
 
 
 def calculate_age(birth_month, birth_year):
-    current_date = datetime.date.today()
+    current_date = date.today()
     
     if birth_year is None:
         return None
