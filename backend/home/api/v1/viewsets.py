@@ -32,6 +32,7 @@ from users.models import (  Profile,
                             IncentiveRangeSelection,
                             FishGameDistribution,
                             TreeShakingDistributionTrials,
+                            TreeShakingDistribution,
                             DynamicPrompt,
                             DynamicPromptResponse,
                             PurchaseHistory,
@@ -268,8 +269,6 @@ class UserVerificationView(generics.GenericAPIView):
             email_verification = EmailVerification.objects.filter(user=user).first()
         except (TypeError, ValueError, OverflowError, User.DoesNotExist):
             return render(request, 'verification_error.html')
-        # except EmailVerification.DoesNotExist:
-        #     return render(request, 'verification_error.html')
 
         if email_verification is None and user.consent_status:
             return render(request, 'verification_repeat.html')
@@ -277,12 +276,14 @@ class UserVerificationView(generics.GenericAPIView):
         if not email_verification.is_token_valid(token=token):
             return render(request, 'verification_error.html')
         
+        if not email_verification:
+            return render(request, 'verification_error.html')
+        
         user.consent_status = True
         user.save(update_fields=['consent_status'])
 
         email_verification.delete()
         return render(request, 'verification_success.html')
-
 
 
 class EmailConsentView(APIView):
@@ -528,10 +529,11 @@ class TreeShakingGameTrialView(APIView):
     def post(self, request):
         participant = request.user
         stakes_type = IncentiveRangeSelection.objects.latest('id').stake_level_selected
-        tree_shaking_distribution = tree_shaking_distributions = TreeShakingDistributionTrials.objects.filter(tree_game_level__stake_level=stakes_type)
+        # tree_shaking_distributions = TreeShakingDistribution.objects.get(stake_level=stakes_type)
+        participant_shell = participant.shells
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
-            serializer.save(participant=participant, stakes_type=stakes_type)
+            serializer.save(participant=participant, stakes_type=stakes_type, participant_shell=participant_shell)
             user = request.user
             data = serializer.validated_data
             if data['response'] == True:

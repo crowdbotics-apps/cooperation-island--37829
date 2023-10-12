@@ -230,7 +230,7 @@ class ActivityFeedback(models.Model):
         verbose_name = 'End-of-Module Question Editable'
         verbose_name_plural = 'End-of-Module Question Editable'
 
-   
+
 class Question(models.Model):
     question_type_choices = [
         ('text_input', 'Text Input'),
@@ -256,8 +256,6 @@ class Question(models.Model):
         verbose_name = 'End-of-Module Question'
     
 
-
-
 class AnswerOption(models.Model):
     option_text = models.CharField(max_length=255)
     question = models.ForeignKey(
@@ -271,8 +269,6 @@ class AnswerOption(models.Model):
     def __str__(self):
         return f"{self.option_text}"
 
-
-    
 
 class QuestionOrder(models.Model):
     activity_feedback = models.ForeignKey(ActivityFeedback, on_delete=models.CASCADE)
@@ -297,8 +293,10 @@ class ParticipantResponse(models.Model):
     activity_feedback = models.ForeignKey(ActivityFeedback, on_delete=models.PROTECT)
     question = models.ForeignKey(Question, on_delete=models.SET_NULL, null=True)
     original_question_text = models.CharField(blank=True, max_length=255,  default=None, null=True)
+    original_question_type = models.CharField(blank=True, max_length=255,  default=None, null=True)
     text_answer = models.TextField(blank=True, null=True)
     answer_options = models.ManyToManyField(AnswerOption, blank=True)
+    original_answer_options=models.CharField(blank=True, max_length=255,  default=None, null=True)
     session_id = models.CharField(max_length=36)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -311,6 +309,7 @@ class ParticipantResponse(models.Model):
         verbose_name = 'End-of-Module Question Data'
         verbose_name_plural = 'End-of-Module Question Data'
     
+
 class IndividualRankingQualitiesScore(models.Model):
     participant = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     original_participant_id = models.IntegerField(null=True, blank=True)
@@ -422,9 +421,6 @@ class TreeShakingGameTrial(models.Model):
         verbose_name_plural = 'Tree shaking game data'
 
 
-
-
-
 class IncentiveRangeSelection(models.Model):  
     STAKE_CHOICES = [
         ('low', 'Low'),
@@ -495,8 +491,6 @@ class DynamicPromptResponse(models.Model):
     session_id = models.CharField(max_length=36)
     created_at = models.DateTimeField(auto_now_add=True)
 
-    def __str__(self):
-        return f"Prompt for session_id: {self.session_id}"
 
 
 class ThemeImage(models.Model):
@@ -540,9 +534,6 @@ class PurchaseHistory(models.Model):
     purchase_cost = models.PositiveIntegerField()
     participant_shell_at_purchase = models.PositiveIntegerField()
     purchased_at = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return f"{self.participant.username} purchased {self.theme_purchased.title} on {self.purchased_at}"
 
     class Meta:
         verbose_name = 'Experience Purchase History'

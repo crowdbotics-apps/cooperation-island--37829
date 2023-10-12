@@ -20,9 +20,12 @@ def export_fishgame_trials_csv(request, queryset=None, modeladmin=None):
     if queryset is None:
         queryset = FishGameTrial.objects.all()
 
-    response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = 'attachment; filename="fishgametrials.csv"'
+    current_datetime = datetime.now().strftime('%m%d%Y-%H%M')
 
+    file_name = f"fish_game_data_{current_datetime}.csv"
+
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = f'attachment; filename="{file_name}"'
     writer = csv.writer(response)
 
     trials = FishGameTrial.objects.values_list('trial_number', flat=True).distinct().order_by('trial_number')
@@ -106,14 +109,17 @@ def export_treeshaking_trials_csv(request, queryset=None, modeladmin=None):
     if queryset is None:
         queryset = TreeShakingGameTrial.objects.all()
 
-    response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = 'attachment; filename="treeshakinggametrials.csv"'
+    current_datetime = datetime.now().strftime('%m%d%Y-%H%M')
 
+    file_name = f"tree_shaking_data_{current_datetime}.csv"
+
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = f'attachment; filename="{file_name}"'
     writer = csv.writer(response)
 
     header = ['participantID', 'sessionID', 'stakesType']
     trials = TreeShakingGameTrial.objects.values_list('trial_number', flat=True).distinct().order_by('trial_number')
-    
+
     for trial_number in trials:
         header.extend([
             f'trial{trial_number}_timestamp',
@@ -132,20 +138,11 @@ def export_treeshaking_trials_csv(request, queryset=None, modeladmin=None):
     participants_sessions = queryset.values_list('participant__id', 'original_participant_id', 'session_id', 'stakes_type').distinct().order_by('participant__id', 'session_id')
 
     for participant_id, original_participant_id, session_id, stakes_type in participants_sessions:
-        if participant_id:
-            participant_data = {
-                'participantID': participant_id,
-                'sessionID': session_id,
-                'stakesType': stakes_type,
-            }
-        elif original_participant_id:
-            participant_data = {
-                'participantID': original_participant_id,
-                'sessionID': session_id,
-                'stakesType': stakes_type,
-            }
-        else:
-            continue 
+        participant_data = {
+            'participantID': participant_id if participant_id else original_participant_id,
+            'sessionID': session_id,
+            'stakesType': stakes_type,
+        }
 
         trial_data = {}
         for trial_number in range(1, 25):
@@ -161,7 +158,12 @@ def export_treeshaking_trials_csv(request, queryset=None, modeladmin=None):
                 'responsetime': ''
             }
 
-        for trial in queryset.filter(participant__id=participant_id, session_id=session_id).order_by('trial_number'):
+        participant_trials = queryset.filter(
+            Q(participant__id=participant_id, session_id=session_id) |
+            Q(original_participant_id=original_participant_id, session_id=session_id)
+        ).order_by('trial_number')
+
+        for trial in participant_trials:
             trial_number = trial.trial_number
             trial_data[trial_number]['timestamp'] = trial.created_at
             trial_data[trial_number]['numberDisplayed'] = trial.trial_number
@@ -207,18 +209,23 @@ def export_rankedqualities_csv(request, queryset=None, modeladmin=None):
     if queryset is None:
         queryset = RankedQualities.objects.all()
 
-    response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = 'attachment; filename="voice_your_values.csv"'
+    current_datetime = datetime.now().strftime('%m%d%Y-%H%M')
 
+    file_name = f"Voice_your_values_data_{current_datetime}.csv"
+
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = f'attachment; filename="{file_name}"'
     writer = csv.writer(response)
 
     quality_choices = dict(RankedQualities.quality_choices)
     category_choices = dict(RankedQualities.category_choices)
 
     header = ['participant', 'session_id', 'created_at']
-    for category in category_choices.values():
-        for quality in quality_choices.values():
-            header.append(f'{category} - {quality}')
+
+    for category_key, category_label in category_choices.items():
+        for quality_key, quality_label in quality_choices.items():
+            header.append(f'{category_label} - {quality_label}')
+
     writer.writerow(header)
 
     participant_rankings = {}
@@ -236,35 +243,48 @@ def export_rankedqualities_csv(request, queryset=None, modeladmin=None):
                 participant_id = ranked_quality.participant.id
             participant_rankings[participant_id] = {
                 'participant': participant_id,
-                'session_id': session_id,
-                'created_at': created_at,
+                'data_by_session': {}
             }
 
-        if category not in participant_rankings[participant_id]:
-            participant_rankings[participant_id][category] = {}
+        if session_id not in participant_rankings[participant_id]['data_by_session']:
+            participant_rankings[participant_id]['data_by_session'][session_id] = {
+                'session_id': session_id,
+                'created_at': created_at,
+                'rankings': {}
+            }
 
-        participant_rankings[participant_id][category][quality] = rank
+        participant_rankings[participant_id]['data_by_session'][session_id]['rankings'][category] = \
+            participant_rankings[participant_id]['data_by_session'][session_id]['rankings'].get(category, {})
+        participant_rankings[participant_id]['data_by_session'][session_id]['rankings'][category][quality] = rank
 
     for participant_id, participant_data in participant_rankings.items():
-        data_row = [participant_data['participant'], participant_data['session_id'], participant_data['created_at']]
-        for category in category_choices.values():
-            for quality in quality_choices.values():
-                rank = participant_data.get(category, {}).get(quality, '')
-                data_row.append(rank)
-        writer.writerow(data_row)
+        for session_id, session_data in participant_data['data_by_session'].items():
+            data_row = [participant_id, session_id, session_data['created_at']]
+            rankings = session_data['rankings']
+
+            for category_key, category_label in category_choices.items():
+                for quality_key, quality_label in quality_choices.items():
+                    rank = rankings.get(category_label, {}).get(quality_label, '')
+                    data_row.append(rank)
+
+            writer.writerow(data_row)
 
     return response
 
 export_rankedqualities_csv.short_description = 'Export Voice Your Values Ranking as CSV'
 
 
+
 def export_scores_csv(request, queryset=None, modeladmin=None):
     if queryset is None:
         queryset = IndividualRankingQualitiesScore.objects.all()
 
-    response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = 'attachment; filename="voice_your_values_ratings_scores.csv"'
+    current_datetime = datetime.now().strftime('%m%d%Y-%H%M')
 
+    file_name = f"Voice_your_Values_Ranking_{current_datetime}.csv"
+
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = f'attachment; filename="{file_name}"'
     writer = csv.writer(response)
 
     unique_questions = set()
@@ -326,9 +346,12 @@ def export_profile_csv(request, queryset=None, modeladmin=None):
     if queryset is None:
         queryset = Profile.objects.all()
 
-    response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = 'attachment; filename="profiles.csv"'
+    current_datetime = datetime.now().strftime('%m%d%Y-%H%M')
 
+    file_name = f"user_profiles_{current_datetime}.csv"
+
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = f'attachment; filename="{file_name}"'
     writer = csv.writer(response)
 
     header = ['participant', 'age', 'nationality', 'gender', 'zipcode', 'created_at']
@@ -354,9 +377,12 @@ def export_purchase_history_csv(request, queryset=None, modeladmin=None):
     if queryset is None:
         queryset = PurchaseHistory.objects.all()
 
-    response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = 'attachment; filename="purchase_history.csv"'
+    current_datetime = datetime.now().strftime('%m%d%Y-%H%M')
 
+    file_name = f"purchase_history_{current_datetime}.csv"
+
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = f'attachment; filename="{file_name}"'
     writer = csv.writer(response)
 
     header = ['participantID']
@@ -413,60 +439,55 @@ def export_dynamic_prompt_responses_csv(request, queryset=None, modeladmin=None)
     if queryset is None:
         queryset = DynamicPromptResponse.objects.all()
 
-    response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = 'attachment; filename="dynamic_prompt_responses.csv"'
+    current_datetime = datetime.now().strftime('%m%d%Y-%H%M')
 
+    file_name = f"dynamic_prompt_responses_{current_datetime}.csv"
+
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = f'attachment; filename="{file_name}"'
     writer = csv.writer(response)
 
-    header = ['participant_id', 'session_id', 'activity_name']
-    prompt_columns = {}
-    max_prompt_index = 0  
+    session_data = {}
 
     for dynamic_prompt_response in queryset:
-        participant_id = dynamic_prompt_response.participant_id if dynamic_prompt_response.participant else dynamic_prompt_response.original_participant_id
+        participant_id = dynamic_prompt_response.participant_id
+        if participant_id is None:
+            participant_id = dynamic_prompt_response.original_participant_id
+
         session_id = dynamic_prompt_response.session_id
-        dynamic_prompt_id = dynamic_prompt_response.dynamic_prompt_id
 
-        if dynamic_prompt_id not in prompt_columns:
-            prompt_columns[dynamic_prompt_id] = max_prompt_index + 1
-            max_prompt_index += 1
+        key = (session_id, participant_id)
 
-    sorted_prompt_columns = sorted(prompt_columns.items(), key=lambda x: x[1])
-    prompt_columns = {prompt_id: index for index, (prompt_id, _) in enumerate(sorted_prompt_columns)}
-
-    for _, prompt_index in sorted_prompt_columns:
-        header.append(f'prompt-{prompt_index}')
-
-    writer.writerow(header)
-
-    participant_data = {}
-
-    for dynamic_prompt_response in queryset:
-        participant_id = dynamic_prompt_response.participant_id if dynamic_prompt_response.participant else dynamic_prompt_response.original_participant_id
-        session_id = dynamic_prompt_response.session_id
-        dynamic_prompt_id = dynamic_prompt_response.dynamic_prompt_id
-
-        if participant_id not in participant_data:
-            participant_data[participant_id] = {
-                'participant_id': participant_id,
+        if key not in session_data:
+            session_data[key] = {
                 'session_id': session_id,
-                'prompts': [''] * max_prompt_index  
+                'participant_id': participant_id,
+                'created_at': dynamic_prompt_response.created_at,  
+                'activity_name': '',
+                'prompts': {},
             }
 
-        prompt_index = prompt_columns.get(dynamic_prompt_id)
-        if prompt_index is not None:
-            if len(participant_data[participant_id]['prompts']) <= prompt_index:
-                participant_data[participant_id]['prompts'].extend([''] * (prompt_index - len(participant_data[participant_id]['prompts']) + 1))
-            participant_data[participant_id]['prompts'][prompt_index] = dynamic_prompt_response.dynamic_prompt.prompt_text
+        prompt_text = dynamic_prompt_response.dynamic_prompt.prompt_text
+        prompt_index = len(session_data[key]['prompts']) + 1
 
-    for participant_id, data in participant_data.items():
-        activity_name = '' 
-        dynamic_prompt_response = queryset.filter(participant_id=participant_id).first()
-        if dynamic_prompt_response:
-            activity_name = dynamic_prompt_response.activity.activity_type
+        session_data[key]['prompts'][f'prompt-{prompt_index}'] = prompt_text
 
-        row = [data['participant_id'], data['session_id'], activity_name]
-        row.extend(data['prompts'])
+        if not session_data[key]['activity_name']:
+            session_data[key]['activity_name'] = dynamic_prompt_response.activity.activity_type
+
+    all_prompts = set()
+    for data in session_data.values():
+        all_prompts.update(data['prompts'].keys())
+
+    sorted_prompts = sorted(all_prompts, key=lambda x: int(x.split('-')[1]))
+
+    header = ['session_id', 'participant_id', 'created_at', 'activity_name'] + sorted_prompts
+    writer.writerow(header)
+
+    for key, data in session_data.items():
+        session_id, participant_id = key
+        row = [session_id, participant_id, data['created_at'], data['activity_name']]
+        row.extend(data['prompts'].get(prompt, '') for prompt in sorted_prompts)
         writer.writerow(row)
 
     return response
@@ -478,99 +499,73 @@ def export_participant_responses_csv(request, queryset=None, modeladmin=None):
     if queryset is None:
         queryset = ParticipantResponse.objects.all()
 
-    response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = 'attachment; filename="participant_responses.csv"'
+    current_datetime = datetime.now().strftime('%m%d%Y-%H%M')
 
+    file_name = f"participant_responses_{current_datetime}.csv"
+
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = f'attachment; filename="{file_name}"'
     writer = csv.writer(response)
 
-    unique_question_pks = set() 
-    unique_question_texts = set() 
+    session_data = {}
 
     for participant_response in queryset:
-        if participant_response.question:
-            unique_question_pks.add(participant_response.question_id)
-        if participant_response.original_question_text:
-            unique_question_texts.add(participant_response.original_question_text)
-
-    question_objects_by_pk = Question.objects.filter(pk__in=unique_question_pks)
-    question_objects_by_text = Question.objects.filter(question_text__in=unique_question_texts)
-
-    header = ['participantID', 'sessionID']
-    question_idx_mapping = {}  # A mapping to track the index of each unique question
-
-    for idx, question in enumerate(question_objects_by_pk, start=1):
-        question_text = question.question_text
-        question_type = question.question_type
-        header.extend([f'question-text-{idx}', f'question-type-{idx}', f'answer-{idx}'])
-        question_idx_mapping[question_text] = idx
-
-    for question in question_objects_by_text:
-        if question.question_text not in unique_question_texts:
-            unique_question_texts.add(question.question_text)
-            idx = len(question_idx_mapping) + 1
-            header.extend([f'question-text-{idx}', f'question-type-{idx}', f'answer-{idx}'])
-            question_idx_mapping[question.question_text] = idx
-
-    writer.writerow(header)
-
-    participant_data = {}
-    for participant_response in queryset:
-        if participant_response.participant:
-            participant_id = participant_response.participant.id
-        else:
+        participant_id = participant_response.participant_id
+        if participant_id is None:
             participant_id = participant_response.original_participant_id
 
         session_id = participant_response.session_id
-        created_at = participant_response.created_at.strftime("%Y-%m-%d %H:%M:%S")
 
-        if participant_id not in participant_data:
-            participant_data[participant_id] = {'session_id': session_id, 'created_at': created_at}
+        key = (session_id, participant_id)
 
-        if not participant_response.question_id or participant_response.question_id not in unique_question_pks:
-            question_text = participant_response.original_question_text
-            question_type = ''
-        else:
-            question = question_objects_by_pk.get(pk=participant_response.question_id)
-            question_text = question.question_text
-            question_type = question.question_type
+        if key not in session_data:
+            session_data[key] = {
+                'session_id': session_id, 
+                'participant_id': participant_id,
+                'created_at': participant_response.created_at, 
+                'activity_type': '', 
+                'questions': []
+            }
 
-        if question_type == 'rating':
-            continue
+        if not session_data[key]['activity_type']:
+            session_data[key]['activity_type'] = participant_response.activity_feedback.activity_type
 
-        if question_type == 'text_input':
-            answer = participant_response.text_answer
-        elif question_type in ('multiple_choice', 'dropdown'):
-            answer_options = participant_response.answer_options.all()
-            if answer_options:
-                answer_texts = [option.option_text for option in answer_options if option.option_text]
-                answer = ', '.join(answer_texts)
+        question_data = {
+            'question-text': participant_response.question.question_text if participant_response.question else participant_response.original_question_text,
+            'question-type': participant_response.question.question_type if participant_response.question else participant_response.original_question_type,
+            'answer': None
+        }
+
+        if question_data['question-type'] == 'text_input':
+            question_data['answer'] = participant_response.text_answer
+        elif question_data['question-type'] in ['dropdown', 'multiple_choice']:
+            if participant_response.question:
+                answer_options = participant_response.answer_options.all()
+                if answer_options:
+                    question_data['answer'] = ', '.join(option.option_text for option in answer_options)
             else:
-                answer = ''
+                question_data['answer'] = participant_response.original_answer_options
 
-        if not answer:
-            continue
+        session_data[key]['questions'].append(question_data)
 
-        if session_id != participant_data[participant_id]['session_id']:
-            participant_data[participant_id] = {'session_id': session_id, 'created_at': created_at}
+    max_questions = max(len(info['questions']) for info in session_data.values())
 
-        question_idx = question_idx_mapping.get(question_text)
-        if question_idx:
-            if f'question-text-{question_idx}' not in participant_data[participant_id]:
-                participant_data[participant_id][f'question-text-{question_idx}'] = question_text
-                participant_data[participant_id][f'question-type-{question_idx}'] = question_type
-                participant_data[participant_id][f'answer-{question_idx}'] = answer
-            else:
-                # If a question has multiple responses, separate them with '/'
-                participant_data[participant_id][f'answer-{question_idx}'] += f' / {answer}'
+    header = ['session_id', 'participant_id', 'created_at', 'activity_type'] 
+    for i in range(1, max_questions + 1):
+        header.extend([
+            f'question-text-{i}',
+            f'question-type-{i}',
+            f'answer-{i}'
+        ])
 
-    for participant_id, data in participant_data.items():
-        row = [participant_id, data['session_id']]
-        for question_text, idx in question_idx_mapping.items():
-            row.append(data.get(f'question-text-{idx}', ''))
-            row.append(data.get(f'question-type-{idx}', ''))
-            row.append(data.get(f'answer-{idx}', ''))
+    writer.writerow(header)
+
+    for session_key, session_info in session_data.items():
+        row = [session_info['session_id'], session_info['participant_id'], session_info['created_at'], session_info['activity_type']]  # Moved 'session_id' before 'participant_id'
+        for question_data in session_info['questions']:
+            row.extend([question_data['question-text'], question_data['question-type'], question_data['answer']])
         writer.writerow(row)
 
     return response
 
-export_participant_responses_csv.short_description = 'Export participant responses as CSV'
+export_participant_responses_csv.short_description = 'Export Participant Responses as CSV'

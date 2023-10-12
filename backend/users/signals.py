@@ -60,6 +60,9 @@ def question_pre_delete_handler(sender, instance, **kwargs):
 
     for response in related_responses:
         response.original_question_text = instance.question_text
+        response.original_question_type=instance.question_type
+        answer_option_texts = response.answer_options.all().values_list('option_text', flat=True)
+        response.original_answer_options = ', '.join(answer_option_texts)        
         response.save()
 
     for score in ranking_scores:
