@@ -274,7 +274,6 @@ def export_rankedqualities_csv(request, queryset=None, modeladmin=None):
 export_rankedqualities_csv.short_description = 'Export Voice Your Values Ranking as CSV'
 
 
-
 def export_scores_csv(request, queryset=None, modeladmin=None):
     if queryset is None:
         queryset = IndividualRankingQualitiesScore.objects.all()
@@ -310,21 +309,24 @@ def export_scores_csv(request, queryset=None, modeladmin=None):
         created_at = score.created_at.strftime("%Y-%m-%d %H:%M:%S")
 
         if participant_id not in participant_data:
-            participant_data[participant_id] = {'session_id': session_id, 'created_at': created_at}
+            participant_data[participant_id] = {}
+
+        if session_id not in participant_data[participant_id]:
+            participant_data[participant_id][session_id] = {'created_at': created_at}
 
         if not question_text or question_text not in tell_us_about_you_questions:
             question_text = score.original_question_text
 
         if question_text:
-            if session_id != participant_data[participant_id]['session_id']:
-                participant_data[participant_id] = {'session_id': session_id, 'created_at': created_at}
-            participant_data[participant_id][question_text] = score_value
+            if question_text not in participant_data[participant_id][session_id]:
+                participant_data[participant_id][session_id][question_text] = score_value
 
-    for participant_id, data in participant_data.items():
-        row = [participant_id, data['session_id'], data['created_at']]
-        for question in tell_us_about_you_questions:
-            row.append(data.get(question, ''))
-        writer.writerow(row)
+    for participant_id, session_data in participant_data.items():
+        for session_id, data in session_data.items():
+            row = [participant_id, session_id, data['created_at']]
+            for question in tell_us_about_you_questions:
+                row.append(data.get(question, ''))
+            writer.writerow(row)
 
     return response
 
