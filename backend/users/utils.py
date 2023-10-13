@@ -464,7 +464,7 @@ def export_dynamic_prompt_responses_csv(request, queryset=None, modeladmin=None)
             session_data[key] = {
                 'session_id': session_id,
                 'participant_id': participant_id,
-                'created_at': dynamic_prompt_response.created_at,  
+                'created_at': dynamic_prompt_response.created_at,
                 'activity_name': '',
                 'prompts': {},
             }
@@ -477,8 +477,10 @@ def export_dynamic_prompt_responses_csv(request, queryset=None, modeladmin=None)
         if not session_data[key]['activity_name']:
             session_data[key]['activity_name'] = dynamic_prompt_response.activity.activity_type
 
+    sorted_session_data = sorted(session_data.values(), key=lambda data: data['created_at'])
+
     all_prompts = set()
-    for data in session_data.values():
+    for data in sorted_session_data:
         all_prompts.update(data['prompts'].keys())
 
     sorted_prompts = sorted(all_prompts, key=lambda x: int(x.split('-')[1]))
@@ -486,9 +488,12 @@ def export_dynamic_prompt_responses_csv(request, queryset=None, modeladmin=None)
     header = ['session_id', 'participant_id', 'created_at', 'activity_name'] + sorted_prompts
     writer.writerow(header)
 
-    for key, data in session_data.items():
-        session_id, participant_id = key
-        row = [session_id, participant_id, data['created_at'], data['activity_name']]
+    for data in sorted_session_data:
+        session_id = data['session_id']
+        participant_id = data['participant_id']
+        created_at = data['created_at']
+        activity_name = data['activity_name']
+        row = [session_id, participant_id, created_at, activity_name]
         row.extend(data['prompts'].get(prompt, '') for prompt in sorted_prompts)
         writer.writerow(row)
 
@@ -522,10 +527,10 @@ def export_participant_responses_csv(request, queryset=None, modeladmin=None):
 
         if key not in session_data:
             session_data[key] = {
-                'session_id': session_id, 
+                'session_id': session_id,
                 'participant_id': participant_id,
-                'created_at': participant_response.created_at, 
-                'activity_type': '', 
+                'created_at': participant_response.created_at,
+                'activity_type': '',
                 'questions': []
             }
 
@@ -533,6 +538,7 @@ def export_participant_responses_csv(request, queryset=None, modeladmin=None):
             session_data[key]['activity_type'] = participant_response.activity_feedback.activity_type
 
         question_data = {
+            'created_at': participant_response.created_at,  # Include creation time for sorting
             'question-text': participant_response.question.question_text if participant_response.question else participant_response.original_question_text,
             'question-type': participant_response.question.question_type if participant_response.question else participant_response.original_question_type,
             'answer': None
@@ -552,7 +558,7 @@ def export_participant_responses_csv(request, queryset=None, modeladmin=None):
 
     max_questions = max(len(info['questions']) for info in session_data.values())
 
-    header = ['session_id', 'participant_id', 'created_at', 'activity_type'] 
+    header = ['session_id', 'participant_id', 'created_at', 'activity_type']
     for i in range(1, max_questions + 1):
         header.extend([
             f'question-text-{i}',
@@ -563,8 +569,10 @@ def export_participant_responses_csv(request, queryset=None, modeladmin=None):
     writer.writerow(header)
 
     for session_key, session_info in session_data.items():
-        row = [session_info['session_id'], session_info['participant_id'], session_info['created_at'], session_info['activity_type']]  # Moved 'session_id' before 'participant_id'
-        for question_data in session_info['questions']:
+        sorted_questions = sorted(session_info['questions'], key=lambda q: q['created_at'])
+
+        row = [session_info['session_id'], session_info['participant_id'], session_info['created_at'], session_info['activity_type']]
+        for question_data in sorted_questions:
             row.extend([question_data['question-text'], question_data['question-type'], question_data['answer']])
         writer.writerow(row)
 

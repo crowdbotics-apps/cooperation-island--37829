@@ -496,8 +496,9 @@ class DynamicPromptResponse(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        verbose_name = 'Dynamic Prompt Responses'
-        verbose_name_plural = 'Dynamic Prompt Responses'
+        verbose_name = 'Dynamic Prompt data'
+        verbose_name_plural = 'Dynamic Prompt data'
+
 
 class ThemeImage(models.Model):
     THEME_CHOICES = [
