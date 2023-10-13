@@ -188,6 +188,7 @@ export const showShopPage = (toggle) => {
                 $("#background")
                     .attr("src", require("../assets/images/Shop_BG.jpg"))
                     .css({
+                        boxShadow: "",
                         filter: "blur(1vh)",
                         marginLeft: "0vw",
                         width: "100vw"
