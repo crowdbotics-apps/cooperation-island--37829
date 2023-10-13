@@ -2,9 +2,45 @@
 <html>
 <head>
     <title>Consent Verification</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif; 
+            background-color: #f5f5f5; 
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .content {
+            text-align: center;
+        }
+
+        .button-wrapper {
+            margin-top: 20px;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #5fabfd;
+            color: #242747;
+            text-decoration: none;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
-    <h1>Click the link below to verify your account:</h1>
-    <a href="{% url 'user-verification' uidb64=uidb64 token=token %}">Confirm Verification</a>
+    <div class="content">
+        <h1>Click the button below to verify your account:</h1>
+        <div class="button-wrapper">
+            <a href="{% url 'user-verification' uidb64=uidb64 token=token %}" class="button">Confirm Verification</a>
+        </div>
+    </div>
 </body>
 </html>
+

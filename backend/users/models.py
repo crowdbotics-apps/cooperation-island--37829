@@ -134,8 +134,9 @@ class EmailVerification(models.Model):
         domain = current_site.domain
         mail_subject = f"{self.email_template.subject}"
         # email_body = f"{self.email_template.body} <a href='https://{domain}/api/v1/verify/{urlsafe_base64_encode(force_bytes(self.user.pk))}/{self.verification_token}/'>Verify Account</a>"
-        email_body = f"{self.email_template.body} <a href='https://{domain}/api/v1/verify-intermediate/{urlsafe_base64_encode(force_bytes(self.user.pk))}/{self.verification_token}/'>Verify Account</a>"
-
+        email_body = f"{self.email_template.body} \
+                        <a style='display: inline-block; padding: 10px 20px; background-color: #007BFF; color: #fff; text-decoration: none; border: none; border-radius: 5px; cursor: pointer;' \
+                        href='https://{domain}/api/v1/verify-intermediate/{urlsafe_base64_encode(force_bytes(self.user.pk))}/{self.verification_token}/'>Verify Account</a>"
 
         email = EmailMessage(mail_subject, email_body, to=[self.user.email])
         email.content_subtype = 'html'
@@ -494,7 +495,9 @@ class DynamicPromptResponse(models.Model):
     session_id = models.CharField(max_length=36)
     created_at = models.DateTimeField(auto_now_add=True)
 
-
+    class Meta:
+        verbose_name = 'Dynamic Prompt Responses'
+        verbose_name_plural = 'Dynamic Prompt Responses'
 
 class ThemeImage(models.Model):
     THEME_CHOICES = [
