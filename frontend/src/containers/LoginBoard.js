@@ -582,10 +582,10 @@ const LoginBoard = () => {
                     </div>
                     <CIButton onClick={handleSign(false)}>Sign Up</CIButton>
                     <CILabel>
-                        To participate, a parent will need to provide <span className="pointer" onClick={handleClick("/consent")}>consent</span>
+                        To participate, a parent will need to provide <span className="pointer" onClick={handleClick("/consent")}>consent</span>.
                     </CILabel>
                     <CILabel>
-                        The child will need to provide <span className="pointer" onClick={handleClick("/assent")}>assent</span>
+                        The child will need to provide <span className="pointer" onClick={handleClick("/assent")}>assent</span>.
                     </CILabel>
                 </div>
                 <div className={cls.resetSection}>
