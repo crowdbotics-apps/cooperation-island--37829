@@ -28,14 +28,12 @@ const useStyles = makeStyles((theme) => ({
         fill: theme.palette.primary.main,
         fontFamily: "Summer Show",
         dominantBaseline: "middle",
-        textAnchor: "middle",
-        translate: "16% 20%"
+        textAnchor: "middle"
     },
     name: {
         fill: theme.palette.primary.contrast,
         letterSpacing: "0.15vw",
-        fontSize: "125%",
-        translate: "47% 88%"
+        fontSize: "125%"
     },
     size1: {
         fontSize: "250%"
@@ -99,7 +97,7 @@ const PosterFrame = (props) => {
         <path className={clsx(!isDisabled && "pointer")} d="M54.8448 73.2729C40.492 81.8863 32.0433 69.4211 39.0052 61.05C51.4996 46.015 69.5121 64.4823 54.8448 73.2729Z" fill={hideShells ? "#215851" : "#8E430C"} />
         <path className={clsx(!isDisabled && "pointer")} d="M264.508 210.028C259.836 222.325 249.228 214.121 250.988 200.435C252.748 186.756 266.33 188.36 268.649 191.205" fill={hideShells ? "#18443E" : "#7C382D"} />
         <path className={clsx(!isDisabled && "pointer")} d="M37.2332 193.303C76.6942 213.957 222.545 213.919 267 197.058V215.221L254.013 233.768L228.04 248.52L157.612 254H83.1881L50.2206 242.619C38.7323 227.304 19.4061 183.972 37.2332 193.303Z" fill={hideShells ? "#18443E" : "#7C382D"} />
-        <text className={clsx(cls.label, cls.name, { "pointer": !isDisabled })}>{props.name}</text>
+        <text className={clsx(cls.label, cls.name, { "pointer": !isDisabled })} x="47%" y="88%">{props.name}</text>
         <path className={clsx(!isDisabled && "pointer")} d="M168.614 32.917C153.631 31.772 143.072 27.3365 165.535 28.8913C187.999 30.4401 214.85 32.7784 235.113 35.7796C255.375 38.7809 283.406 51.2437 285.765 92.5495C288.118 133.855 284.377 189.788 281.32 192.186C278.263 194.585 283.564 121.525 278.285 93.9115C272.689 64.6106 257.022 46.0971 230.488 41.0408C203.946 35.9725 177.439 33.586 168.614 32.917Z" fill={hideShells ? "#3F8477" : "#B76400"} />
         <g className={cls[`variant${props.variant}`]}>
             <path className={clsx(!isDisabled && "pointer")} d="M120.099 24.1475C125.888 26.4466 131.984 5.00286 145.548 3.69853C159.1 2.40165 162.644 15.7557 164.46 22.0936C166.275 28.4256 174.685 24.4537 175.904 31.1252C177.11 37.7982 170.194 41.7584 160.63 36.3448C150.924 30.8636 154.806 19.7854 147.105 18.6473C138.562 17.381 138.073 37.0748 120.185 36.8362C105.363 36.6312 112.427 21.1007 120.099 24.1475Z" fill="#B1B233" />
@@ -135,7 +133,7 @@ const PosterFrame = (props) => {
             <path className={clsx(!isDisabled && "pointer")} opacity="0.5" fillRule="evenodd" clipRule="evenodd" d="M67.4993 77.8135C66.3175 78.7441 33.9811 79.2522 32.8678 77.9905C32.4967 77.5623 32.3711 75.8895 32.3711 73.8571L32.4282 73.7543C32.4282 73.7543 32.9306 77.0656 33.924 77.5452C34.9288 78.0305 59.0099 79.0467 64.0168 76.9857C66.7914 75.8382 67.6649 72.8466 67.8875 70.4088C68.036 73.9998 68.036 77.391 67.4993 77.8135Z" fill="url(#paint8_linear_3069_6620)" />
             <path className={clsx(!isDisabled && "pointer")} opacity="0.5" fillRule="evenodd" clipRule="evenodd" d="M39.9312 74.4682C39.2746 74.1313 31.6986 70.1806 26.5946 61.7939C26.332 61.36 26.0694 60.9318 25.8296 60.4694C23.9742 56.8612 22.4498 53.2759 22.1758 48.4117C22.1758 48.4117 23.2605 52.6879 26.0808 58.3684C26.2635 58.7395 26.4519 59.1163 26.6574 59.4988C29.4949 64.8997 33.7881 70.9171 39.9312 74.4682Z" fill="url(#paint9_linear_3069_6620)" />
             <path className={clsx(!isDisabled && "pointer")} opacity="0.5" fillRule="evenodd" clipRule="evenodd" d="M77.6361 44.2782C77.3792 46.0195 77.0423 47.6637 76.6427 49.2223C76.6427 49.228 76.6427 49.228 76.6427 49.2337C76.1346 51.2205 75.518 53.0588 74.8329 54.7601C74.3933 55.8392 73.9309 56.8554 73.4399 57.8259C73.2914 58.1228 73.143 58.414 72.9888 58.6994C67.5709 68.8331 59.835 72.8409 59.5039 73.0065C65.4756 68.7247 69.826 62.1649 72.7662 56.3987C72.9717 55.999 73.1658 55.6051 73.3542 55.2169V55.2112C73.9194 54.0465 74.4275 52.9218 74.8786 51.8656C75.5522 50.2899 76.0946 48.874 76.5171 47.7037C77.2764 45.5913 77.6361 44.2782 77.6361 44.2782Z" fill="url(#paint10_linear_3069_6620)" />
-            <text className={clsx(cls.label, cls["size" + props.shells.toString().length], { "pointer": !isDisabled })}>{props.shells}</text>
+            <text className={clsx(cls.label, cls["size" + props.shells.toString().length], { "pointer": !isDisabled })} x="16%" y="20%" >{props.shells}</text>
         </g>
         <defs>
             <pattern id={`image${props.id}`} patternContentUnits="objectBoundingBox" width="1" height="1">
