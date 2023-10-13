@@ -395,7 +395,8 @@ const ShopPage = () => {
                     $("#background")
                         .attr("src", posterURL)
                         .css({
-                            filter: `drop-shadow(0.33vh 0.66vh 50vh ${posterColors[poster.id - 1]})`,
+                            boxShadow: `0 0 50vh 5vw ${posterColors[poster.id - 1]}`,
+                            filter: "",
                             marginLeft: "8.7vw",
                             width: "82.6vw"
                         });

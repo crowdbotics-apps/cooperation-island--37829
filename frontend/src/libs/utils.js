@@ -37,7 +37,7 @@ export const postersData = Array(9).fill()
         variant: [1, 3, 8].includes(i) ? 2 : [0, 5, 7].includes(i) ? 1 : 0
     }));
 
-export const posterColors = ["#689D4B", "#A9E5C1", "#259AE7", "#105954", "#106381", "#5B499D", "#D1F4D2", "#65E9FD", "#8FA695"];
+export const posterColors = ["#689D4B80", "#A9E5C180", "#259AE780", "#10595480", "#10638180", "#5B499D80", "#D1F4D280", "#65E9FD80", "#8FA69580"];
 
 export const rankedQualities = [
     {

@@ -11,8 +11,7 @@ const useStyles = makeStyles((theme) => ({
         fill: theme.palette.primary.main,
         fontFamily: "Summer Show",
         dominantBaseline: "middle",
-        textAnchor: "middle",
-        translate: "50% 46%"
+        textAnchor: "middle"
     },
     size1: {
         fontSize: "300%"
@@ -100,7 +99,7 @@ const CIShell = (props) => {
         <path className="pointer" opacity="0.5" fillRule="evenodd" clipRule="evenodd" d="M67.4998 74.2486C66.318 75.1792 33.9816 75.6873 32.8683 74.4256C32.4972 73.9974 32.3716 72.3246 32.3716 70.2922L32.4287 70.1894C32.4287 70.1894 32.9311 73.5007 33.9245 73.9803C34.9293 74.4655 59.0103 75.4818 64.0172 73.4208C66.7919 72.2732 67.6654 69.2817 67.888 66.8439C68.0365 70.4349 68.0365 73.8261 67.4998 74.2486Z" fill="url(#paint8_linear_1620_9489)" />
         <path className="pointer" opacity="0.5" fillRule="evenodd" clipRule="evenodd" d="M39.9312 70.9032C39.2746 70.5664 31.6986 66.6157 26.5946 58.229C26.332 57.7951 26.0694 57.3669 25.8296 56.9045C23.9742 53.2963 22.4498 49.711 22.1758 44.8468C22.1758 44.8468 23.2605 49.1229 26.0808 54.8035C26.2635 55.1746 26.4519 55.5514 26.6574 55.9339C29.4949 61.3347 33.7881 67.3522 39.9312 70.9032Z" fill="url(#paint9_linear_1620_9489)" />
         <path className="pointer" opacity="0.5" fillRule="evenodd" clipRule="evenodd" d="M77.6392 40.7133C77.3823 42.4545 77.0455 44.0988 76.6459 45.6574C76.6459 45.6631 76.6459 45.6631 76.6459 45.6688C76.1377 47.6555 75.5212 49.4939 74.8361 51.1952C74.3965 52.2742 73.934 53.2905 73.443 54.261C73.2946 54.5579 73.1462 54.849 72.992 55.1345C67.5741 65.2682 59.8382 69.276 59.5071 69.4416C65.4788 65.1597 69.8292 58.5999 72.7694 52.8337C72.9749 52.4341 73.169 52.0402 73.3574 51.6519V51.6462C73.9226 50.4816 74.4307 49.3569 74.8817 48.3007C75.5554 46.725 76.0978 45.3091 76.5203 44.1387C77.2796 42.0264 77.6392 40.7133 77.6392 40.7133Z" fill="url(#paint10_linear_1620_9489)" />
-        <text className={clsx(cls.label, cls["size" + animeObj.shells.toString().length], "pointer")} />
+        <text className={clsx(cls.label, cls["size" + animeObj.shells.toString().length], "pointer")} x="50%" y="46%" />
         <defs>
             <linearGradient id="paint0_linear_1620_9489" x1="50.1739" y1="75.1793" x2="50.1739" y2="57.8184" gradientUnits="userSpaceOnUse">
                 <stop stopColor="#D5A7C9" />
