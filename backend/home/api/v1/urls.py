@@ -21,7 +21,8 @@ from home.api.v1.viewsets import (
     DynamicPromptAPIView,
     BuyThemeView,
     ThemeDetailsAPIView,
-    SendThemeAsPdfView
+    SendThemeAsPdfView,
+    IntermediateVerificationView,
 )
 
 
@@ -34,6 +35,7 @@ urlpatterns = [
     path('refresh/',UserDetailView.as_view(), name='user-detail'),
     path('access-code/', ConsentAccessCodeViewSet.as_view(), name='consent-access-code'),
     path('users/update_avatar_id/', UpdateAvatarIDView.as_view(), name='update_avatar_id'),
+    path('verify-intermediate/<str:uidb64>/<str:token>/', IntermediateVerificationView.as_view(), name='verification-intermediate'),
     path('verify/<str:uidb64>/<str:token>/', UserVerificationView.as_view(), name='user-verification'),
     path('reset-password/', ResetPasswordViewSet.as_view({'post': 'create'}), name='reset-password'),
     path('reset-password/<str:session_id>/', ResetPasswordViewSet.as_view({'get': 'retrieve', 'post': 'update'}), name='reset-password-session'),

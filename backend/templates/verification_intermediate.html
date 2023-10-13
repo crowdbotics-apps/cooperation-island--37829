@@ -1,0 +1,10 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Consent Verification</title>
+</head>
+<body>
+    <h1>Click the link below to verify your account:</h1>
+    <a href="{% url 'user-verification' uidb64=uidb64 token=token %}">Confirm Verification</a>
+</body>
+</html>

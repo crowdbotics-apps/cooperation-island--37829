@@ -133,7 +133,10 @@ class EmailVerification(models.Model):
         current_site = get_current_site(request=None)
         domain = current_site.domain
         mail_subject = f"{self.email_template.subject}"
-        email_body = f"{self.email_template.body} <a href='https://{domain}/api/v1/verify/{urlsafe_base64_encode(force_bytes(self.user.pk))}/{self.verification_token}/'>Verify Account</a>"
+        # email_body = f"{self.email_template.body} <a href='https://{domain}/api/v1/verify/{urlsafe_base64_encode(force_bytes(self.user.pk))}/{self.verification_token}/'>Verify Account</a>"
+        email_body = f"{self.email_template.body} <a href='https://{domain}/api/v1/verify-intermediate/{urlsafe_base64_encode(force_bytes(self.user.pk))}/{self.verification_token}/'>Verify Account</a>"
+
+
         email = EmailMessage(mail_subject, email_body, to=[self.user.email])
         email.content_subtype = 'html'
         email.send()

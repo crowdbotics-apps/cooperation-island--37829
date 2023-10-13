@@ -285,6 +285,10 @@ class UserVerificationView(generics.GenericAPIView):
         email_verification.delete()
         return render(request, 'verification_success.html')
 
+class IntermediateVerificationView(generics.GenericAPIView):
+    def get(self, request, uidb64, token):
+        return render(request, 'verification_intermediate.html', {'uidb64': uidb64, 'token': token})
+
 
 class EmailConsentView(APIView):
     permission_classes = [IsAuthenticated]
