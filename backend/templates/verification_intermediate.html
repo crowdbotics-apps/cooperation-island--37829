@@ -25,10 +25,46 @@
         .button {
             display: inline-block;
             padding: 10px 20px;
-            background-color: #5fabfd;
-            color: #242747;
+            background-color: #007BFF; 
+            color: #fff;
             text-decoration: none;
             border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .checkbox-label {
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            padding-top: 100px;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+
+        .modal-content {
+            background-color: #fff;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #888;
+            border-radius: 5px;
+            text-align: center;
+        }
+
+        .modal-button {
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
             border-radius: 5px;
             cursor: pointer;
         }
@@ -36,11 +72,35 @@
 </head>
 <body>
     <div class="content">
-        <h1>Click the button below to verify your account</h1>
+        <h1>Click the button below to verify your account:</h1>
+        <div class="checkbox-label">
+            <label for="confirmation-checkbox">I confirm that I want to verify my account:</label>
+            <input type="checkbox" id="confirmation-checkbox">
+        </div>
         <div class="button-wrapper">
-            <a href="{% url 'user-verification' uidb64=uidb64 token=token %}" class="button">Confirm Verification</a>
+            <a href="#" id="verification-button" class="button" onclick="openModal()">Confirm Verification</a>
         </div>
     </div>
+
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <p>Please confirm that you want to verify your account by checking the checkbox.</p>
+            <button class="modal-button" onclick="closeModal()">OK</button>
+        </div>
+    </div>
+
+    <script>
+        function openModal() {
+            if (document.getElementById("confirmation-checkbox").checked) {
+                window.location = "{% url 'user-verification' uidb64=uidb64 token=token %}";
+            } else {
+                document.getElementById("myModal").style.display = "block";
+            }
+        }
+
+        function closeModal() {
+            document.getElementById("myModal").style.display = "none";
+        }
+    </script>
 </body>
 </html>
-
