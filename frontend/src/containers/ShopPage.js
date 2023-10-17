@@ -347,7 +347,7 @@ const ShopPage = () => {
 
         if (!user.posters.includes(poster.id)) {
             buyPoster({
-                session_id: data.sessionId,
+                session_id: data.session_id,
                 theme_id: poster.id
             })
                 .then(({ data }) => {
