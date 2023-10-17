@@ -28,15 +28,6 @@ export const userState = {
     posters: []
 };
 
-export const postersData = Array(9).fill()
-    .map((_, i) => ({
-        id: i + 1,
-        name: "",
-        description: "",
-        shells: "",
-        variant: [1, 3, 8].includes(i) ? 2 : [0, 5, 7].includes(i) ? 1 : 0
-    }));
-
 export const posterColors = ["#689D4B80", "#A9E5C180", "#259AE780", "#10595480", "#10638180", "#5B499D80", "#D1F4D280", "#65E9FD80", "#8FA69580"];
 
 export const rankedQualities = [

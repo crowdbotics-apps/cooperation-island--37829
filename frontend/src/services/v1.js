@@ -113,7 +113,7 @@ export const qualities = (data) => {
 export const moduleData = (module) => {
     return API.get(base + `/data/${module}/`, {
         env: {
-            noLoader: true
+            noLoader: module !== "theme"
         }
     });
 }

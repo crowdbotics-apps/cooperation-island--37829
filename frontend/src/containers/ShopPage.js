@@ -1,9 +1,9 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import { Backdrop, makeStyles } from "@material-ui/core";
 import { useHistory } from "react-router-dom";
-import { mapPosters, mapUserData } from "../funnels/v1";
-import { anime, parseToken, posterColors, postersData } from "../libs/utils";
-import { buyPoster, moduleData, openPoster, sendPoster } from "../services/v1";
+import { mapUserData } from "../funnels/v1";
+import { anime, parseToken, posterColors } from "../libs/utils";
+import { buyPoster, openPoster, sendPoster } from "../services/v1";
 import { showHomePage, showShopPage } from "../libs/animations";
 import BoardImg from "../assets/images/Board-sm.png";
 import PosterFrame from "../components/PosterFrame";
@@ -197,25 +197,13 @@ const ShopPage = () => {
 
     const history = useHistory();
 
-    const [posters, setPosters] = useState(postersData);
-
-    const [sessionId, setSession] = useState();
-
     const [showBackdrop, hideBackdrop] = useState(false);
 
     const [showPoster, hidePoster] = useState(false);
 
     const [poster, setPoster] = useState();
 
-    const { BGM, howler, user, setUser } = useContext(AppContext);
-
-    useEffect(() => {
-        moduleData("theme")
-            .then(({ data: { session_id, themes } }) => {
-                setSession(session_id);
-                setPosters(mapPosters(themes));
-            });
-    }, []);
+    const { BGM, data, howler, user, setUser } = useContext(AppContext);
 
     const handleBack = () => {
         anime({
@@ -359,7 +347,7 @@ const ShopPage = () => {
 
         if (!user.posters.includes(poster.id)) {
             buyPoster({
-                session_id: sessionId,
+                session_id: data.sessionId,
                 theme_id: poster.id
             })
                 .then(({ data }) => {
@@ -493,8 +481,8 @@ const ShopPage = () => {
         <CIMusic className={cls.music} id="music" />
         <CIShell className={cls.shell} id="shell" />
         <Shell className={clsx(cls.exit, "pointer")} id="exit" pointer onClick={handleLeave} />
-        {posters.length ? <div className={clsx(cls.container, showPoster && cls.hidden)} id="posters-container">
-            {posters.map((poster, i) => <PosterFrame className={cls.poster} key={i} {...poster} onClick={handleClick(poster)} />)}
+        {data?.posters.length ? <div className={clsx(cls.container, showPoster && cls.hidden)} id="posters-container">
+            {data.posters.map((poster, i) => <PosterFrame className={cls.poster} key={i} {...poster} onClick={handleClick(poster)} />)}
         </div> : ""}
         <Backdrop className={cls.backdrop} open={showBackdrop}>
             <div className={cls.board} id="board9">

@@ -1,9 +1,9 @@
 import { Fragment, useContext, useEffect, useState } from "react";
 import { makeStyles } from "@material-ui/core";
 import { useHistory } from "react-router-dom";
-import { mapUserData } from "../funnels/v1";
+import { mapPosters, mapUserData } from "../funnels/v1";
 import { anime, parseToken } from "../libs/utils";
-import { refresh as handleRefresh } from "../services/v1";
+import { moduleData, refresh as handleRefresh } from "../services/v1";
 import { showAvatarPage, showDetailsPage, showHomePage, showLandingPage, showLoginBoard, showReadingPane, showResetPassword, showShopPage } from "../libs/animations";
 import LoadAssets from "../components/LoadAssets";
 import { AppContext } from "../App";
@@ -36,7 +36,7 @@ const HomePage = () => {
 
     const history = useHistory();
 
-    const { avatarRef, user, setHowler, setUser } = useContext(AppContext);
+    const { avatarRef, user, setData, setHowler, setUser } = useContext(AppContext);
 
     const [loadedItems, setLoaded] = useState(0);
 
@@ -158,6 +158,16 @@ const HomePage = () => {
                                 easing: "easeInElastic",
                                 duration: 2000
                             });
+
+                            moduleData("theme")
+                            .then(({ data: { session_id, themes } }) => {
+                                setData({
+                                    posters: mapPosters(themes),
+                                    session_id
+                                });
+                                showShopPage();
+                            });
+                            
                             showShopPage();
                         }
                         else if (window.location.pathname.includes("/home")) {
