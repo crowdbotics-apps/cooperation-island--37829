@@ -1,7 +1,7 @@
 import { useContext, useEffect } from "react";
 import { makeStyles } from "@material-ui/core";
 import { useHistory } from "react-router-dom";
-import { mapFeedback, mapPrompt } from "../funnels/v1";
+import { mapFeedback, mapPosters, mapPrompt } from "../funnels/v1";
 import { anime, userState } from "../libs/utils";
 import { feedback, moduleData, prompt } from "../services/v1";
 import { showAvatarPage, showLoginBoard, showShopPage } from "../libs/animations";
@@ -190,18 +190,26 @@ const Dashboard = () => {
                     showAvatarPage(avatarRef.current.setUser);
                 }
                 else {
-                    howler.welcome.fade(howler.welcome.volume(), 0, 1000);
-                    setHowler({
-                        shop: new Howl({
-                            src: [require("../assets/sounds/Shop.mp3")],
-                            autoplay: true,
-                            volume: BGM ? 1 : 0,
-                            loop: true
-                        })
-                    });
+                    moduleData("theme")
+                        .then(({ data: { session_id, themes } }) => {
+                            setData({
+                                posters: mapPosters(themes),
+                                session_id
+                            });
 
-                    history.push("/shop");
-                    showShopPage();
+                            howler.welcome.fade(howler.welcome.volume(), 0, 1000);
+                            setHowler({
+                                shop: new Howl({
+                                    src: [require("../assets/sounds/Shop.mp3")],
+                                    autoplay: true,
+                                    volume: BGM ? 1 : 0,
+                                    loop: true
+                                })
+                            });
+
+                            history.push("/shop");
+                            showShopPage();
+                        });
                 }
             }
         });
