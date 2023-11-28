@@ -333,16 +333,6 @@ def export_scores_csv(request, queryset=None, modeladmin=None):
 export_scores_csv.short_description = 'Export Voice Your Values Ratings as CSV'
 
 
-def calculate_age(birth_month, birth_year):
-    current_date = date.today()
-    
-    if birth_year is None:
-        return None
-    
-    age = current_date.year - birth_year
-    if current_date.month < birth_month:
-        age -= 1
-    return age
 
 def export_profile_csv(request, queryset=None, modeladmin=None):
     if queryset is None:
@@ -356,19 +346,18 @@ def export_profile_csv(request, queryset=None, modeladmin=None):
     response['Content-Disposition'] = f'attachment; filename="{file_name}"'
     writer = csv.writer(response)
 
-    header = ['participant', 'age', 'nationality', 'gender', 'zipcode', 'created_at']
+    header = ['participant', 'birth_month', 'birth_year', 'nationality', 'gender', 'zipcode', 'created_at']
     writer.writerow(header)
 
     for profile in queryset:
         participant = profile.participant_id
         birth_month = profile.birth_month
         birth_year = profile.birth_year
-        age = calculate_age(birth_month, birth_year)
         nationality = profile.nationality
         gender = profile.gender
         zipcode = profile.zipcode
         created_at = profile.created_at
-        writer.writerow([participant, age if age is not None else '', nationality, gender, zipcode, created_at])
+        writer.writerow([participant, birth_month, birth_year , nationality, gender, zipcode, created_at])
 
     return response
 
