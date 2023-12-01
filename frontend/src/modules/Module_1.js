@@ -68,7 +68,7 @@ const useStyles = makeStyles((theme) => ({
         "& > button": {
             backgroundSize: "17vw 7vh",
             width: "17vw",
-            marginTop: "7vh",
+            marginTop: "1vh",
             marginLeft: "9vw"
         },
         "& > div": {
@@ -81,7 +81,7 @@ const useStyles = makeStyles((theme) => ({
             marginTop: "32vh"
         },
         "& label": {
-            fontSize: "6vh",
+            fontSize: "4.5vh",
             textAlign: "center",
             marginTop: "10vh",
             marginLeft: "5vw",
@@ -89,10 +89,18 @@ const useStyles = makeStyles((theme) => ({
         },
         "& label:nth-child(2)": {
             fontSize: "3.5vh",
-            marginTop: "16vh"
+            marginTop: "8vh"
         },
         "& label:nth-child(3)": {
-            fontSize: "3.5vh",
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            height: '10vh',
+            fontSize: "5vh",
+            marginTop: "2vh",
+        },
+        "& label:nth-child(4)": {
+            fontSize: "3vh",
             marginTop: "1.5vh"
         },
         position: "absolute",
@@ -330,6 +338,11 @@ const useStyles = makeStyles((theme) => ({
         top: "37vh",
         left: "40vw"
     },
+    shell3: {
+        height: "10vh",
+        width: '100%',
+        display: 'block'
+    },
     label: {
         position: "absolute",
         fontSize: "20vh",
@@ -363,6 +376,18 @@ const useStyles = makeStyles((theme) => ({
         },
         marginTop: "12vh",
         padding: "0vh 8vw"
+    },
+
+    shellWithNumber: {
+        position: 'relative',
+        display: 'inline-block',
+        marginRight: '2vh'
+    },
+    shellLabelText: {
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
     }
 }));
 
@@ -887,12 +912,19 @@ const Module_1 = () => {
                     I’m thinking of a number between 1-6.
                 </CILabel>
                 <CILabel>
-                    If you guess right, you'll get {shells > 1 ? shells + " shells" : "one shell"}.
+                    If you guess right, you'll get:
+                </CILabel>
+                <CILabel>
+                    <div className={cls.shellWithNumber}>
+                        <img className={cls.shell3} src={require("../assets/modules/Shell.png")} />
+                        <div className={cls.shellLabelText}>{shells}</div>
+                    </div>
+                    {shells > 1 ?" shells" : "shell"}
                 </CILabel>
                 <CILabel>
                     Guess now!
                 </CILabel>
-                <CIButton onClick={handleShow}>Show me the number</CIButton>
+                <CIButton alt onClick={handleShow}>Show me the number</CIButton>
             </Fragment>}
         </div>
         <div className={cls.board} id="board">
